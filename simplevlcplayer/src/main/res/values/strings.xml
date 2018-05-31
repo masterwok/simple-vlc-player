@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">SimpleVlcPlayer</string>
     <string name="title_activity_media_player">MediaPlayerActivity</string>
+    <string name="next_stop_akebonobashi">Next stop, Akebonobashi!</string>
 </resources>

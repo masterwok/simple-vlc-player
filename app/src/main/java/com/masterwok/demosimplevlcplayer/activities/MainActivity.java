@@ -8,6 +8,10 @@ import android.support.v7.widget.AppCompatButton;
 import com.masterwok.demosimplevlcplayer.R;
 import com.masterwok.simplevlcplayer.activities.MediaPlayerActivity;
 
+
+/**
+ * Initial/launcher activity of the demo application.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private AppCompatButton buttonPlay;
@@ -22,10 +26,16 @@ public class MainActivity extends AppCompatActivity {
         subscribeToViewComponents();
     }
 
+    /**
+     * Bind view components to private fields.
+     */
     private void bindViewComponents() {
         buttonPlay = findViewById(R.id.button_play);
     }
 
+    /**
+     * Subscribe to any bound view components.
+     */
     private void subscribeToViewComponents() {
         buttonPlay.setOnClickListener(view -> {
             // Disable play button (prevent bounce/re-enabled in onStart())
@@ -43,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
         buttonPlay.setEnabled(true);
     }
 
+    /**
+     * Start the simple-vlc-player media player activity. This method
+     * does not ensure activity is started on main thread.
+     */
     private void startMediaPlayerActivity() {
         Intent intent = new Intent(this, MediaPlayerActivity.class);
 

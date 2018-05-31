@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="media_player_toolbar_background">#CF000000</color>
+    <color name="media_player_toolbar_text_position">#5D5179</color>
+    <color name="media_player_toolbar_text_length">@android:color/white</color>
+    <color name="media_player_seekbar_color">#5D5179</color>
+    <color name="media_player_menu_cast_background">#5D5179</color>
+</resources>

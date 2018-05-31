@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/toolbar_vlc_player"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/media_player_toolbar_background"
+    android:minHeight="?attr/actionBarSize"
+    android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+    app:title=" ">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="20dp"
+        android:paddingTop="20dp">
+
+        <SeekBar
+            android:id="@+id/seekbar_position"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="10dp"
+            android:progressTint="@color/media_player_seekbar_color"
+            android:thumbTint="@color/media_player_seekbar_color"/>
+
+        <ImageButton
+            android:id="@+id/imagebutton_play_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/seekbar_position"
+            android:layout_centerHorizontal="true"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_pause_white_36dp"
+            tools:ignore="ContentDescription,MissingPrefix"/>
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/textview_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/seekbar_position"
+            android:layout_below="@id/seekbar_position"
+            android:layout_marginLeft="20dp"
+            android:textColor="@color/media_player_toolbar_text_position"
+            tools:ignore="RtlHardcoded"/>
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/textview_length"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@id/seekbar_position"
+            android:layout_below="@id/seekbar_position"
+            android:layout_marginRight="20dp"
+            android:textColor="@color/media_player_toolbar_text_length"
+            tools:ignore="RtlHardcoded"/>
+    </RelativeLayout>
+
+</android.support.v7.widget.Toolbar>

@@ -13,6 +13,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:text="@string/play_demo_media"/>
+        android:text="@string/play_demo_media"
+        android:enabled="false"/>
 
 </LinearLayout>

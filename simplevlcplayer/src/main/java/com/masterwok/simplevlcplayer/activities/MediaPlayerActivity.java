@@ -78,7 +78,7 @@ public class MediaPlayerActivity
     private SeekBarListener seekBarListener;
 
     private boolean toolbarsAreVisible = true;
-    private Timer toolbarHideTimer = new Timer();
+    private Timer toolbarHideTimer;
 
     private final MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
         @Override
@@ -280,12 +280,36 @@ public class MediaPlayerActivity
         }
 
         if (toolbarsAreVisible) {
-            toolbarsAreVisible = false;
-            ThreadUtil.onMain(() -> {
-                ViewUtil.slideViewAboveOrBelowParent(toolbarHeader, true);
-                ViewUtil.slideViewAboveOrBelowParent(toolbarFooter, false);
-            });
+            hideToolbars();
+            return;
+        }
 
+        showToolbars();
+    }
+
+    /**
+     * Hide header and footer toolbars by translating them off the screen vertically.
+     */
+    private void hideToolbars() {
+        // Already hidden, do nothing.
+        if (!toolbarsAreVisible) {
+            return;
+        }
+
+        toolbarsAreVisible = false;
+
+        ThreadUtil.onMain(() -> {
+            ViewUtil.slideViewAboveOrBelowParent(toolbarHeader, true);
+            ViewUtil.slideViewAboveOrBelowParent(toolbarFooter, false);
+        });
+    }
+
+    /**
+     * Show header and footer toolbars by translating them vertically.
+     */
+    private void showToolbars() {
+        // Already shown, do nothing.
+        if (toolbarsAreVisible) {
             return;
         }
 
@@ -322,10 +346,14 @@ public class MediaPlayerActivity
         super.onStart();
 
         startAndBindMediaPlayerService();
+
+        showToolbars();
         startToolbarHideTimer();
     }
 
     private void startToolbarHideTimer() {
+        toolbarHideTimer = new Timer();
+
         int timerDelay = getResources()
                 .getInteger(R.integer.media_player_toolbar_hide_timeout);
 

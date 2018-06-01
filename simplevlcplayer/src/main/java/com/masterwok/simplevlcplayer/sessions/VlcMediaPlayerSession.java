@@ -23,10 +23,12 @@ public class VlcMediaPlayerSession
     private final LibVLC libVlc;
     private final MediaPlayer mediaPlayer;
     private final PlaybackStateCompat.Builder playbackStateBuilder;
+    private final Context context;
 
     public VlcMediaPlayerSession(Context context, String tag) {
         super(context, tag);
 
+        this.context = context;
         this.libVlc = new LibVLC(context);
         this.mediaPlayer = new MediaPlayer(libVlc);
         this.playbackStateBuilder = new PlaybackStateCompat.Builder();
@@ -36,6 +38,7 @@ public class VlcMediaPlayerSession
 
     private void init() {
         VlcMediaPlayerEventListener vlcMediaPlayerEventListener = new VlcMediaPlayerEventListener(
+                context,
                 this,
                 libVlc,
                 mediaPlayer,

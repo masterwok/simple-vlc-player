@@ -106,8 +106,8 @@ public class MediaPlayerActivity
      */
     private void configure(PlaybackStateCompat state) {
         if (state == null
-                || state.getExtras() == null) {
-//                || seekBarListener.isTrackingTouch()) {
+                || state.getExtras() == null
+                || seekBarListener.isTrackingTouch()) {
             return;
         }
 
@@ -158,10 +158,7 @@ public class MediaPlayerActivity
 
             seekBarListener = new SeekBarListener(
                     mediaController,
-                    textViewPosition,
-                    () -> {
-                        // TODO: Set seekbar hide timer..
-                    }
+                    textViewPosition
             );
 
             seekBarPosition.setOnSeekBarChangeListener(seekBarListener);
@@ -277,6 +274,11 @@ public class MediaPlayerActivity
      * Toggle the visibility of the toolbars by slide animating them.
      */
     private void toggleToolbarVisibility() {
+        // User is sliding seek bar, do not modify visibility.
+        if (seekBarListener.isTrackingTouch()) {
+            return;
+        }
+
         if (toolbarsAreVisible) {
             toolbarsAreVisible = false;
             ThreadUtil.onMain(() -> {

@@ -6,9 +6,9 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.masterwok.simplevlcplayer.sessions.VlcMediaPlayerSession;
 import com.masterwok.simplevlcplayer.utils.ThreadUtil;
 import com.masterwok.simplevlcplayer.utils.TimeUtil;
-import com.masterwok.simplevlcplayer.sessions.VlcMediaPlayerSession;
 
 
 /**
@@ -19,7 +19,6 @@ public class SeekBarListener implements SeekBar.OnSeekBarChangeListener {
     private final MediaControllerCompat mediaController;
     private final TextView textViewPosition;
     private final MediaControllerCompat.TransportControls transportControls;
-    private final Runnable onSeekEnd;
 
     private boolean isTrackingTouch = false;
 
@@ -34,14 +33,12 @@ public class SeekBarListener implements SeekBar.OnSeekBarChangeListener {
 
     public SeekBarListener(
             MediaControllerCompat mediaController,
-            TextView textViewPosition,
-            Runnable onSeekEnd
+            TextView textViewPosition
     ) {
         this.mediaController = mediaController;
         this.textViewPosition = textViewPosition;
 
         this.transportControls = mediaController.getTransportControls();
-        this.onSeekEnd = onSeekEnd;
     }
 
     /**
@@ -82,11 +79,5 @@ public class SeekBarListener implements SeekBar.OnSeekBarChangeListener {
         transportControls.seekTo((int) (position * getMediaLength()));
 
         isTrackingTouch = false;
-
-        if (onSeekEnd == null) {
-            return;
-        }
-
-        onSeekEnd.run();
     }
 }

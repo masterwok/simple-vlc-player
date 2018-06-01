@@ -9,7 +9,7 @@ import android.util.Log;
 import com.masterwok.demosimplevlcplayer.R;
 import com.masterwok.demosimplevlcplayer.helpers.FileHelper;
 import com.masterwok.simplevlcplayer.activities.MediaPlayerActivity;
-import com.masterwok.simplevlcplayer.helpers.ThreadHelper;
+import com.masterwok.simplevlcplayer.utils.ThreadUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         bindViewComponents();
         subscribeToViewComponents();
 
-        ThreadHelper.onBackground(this::copyRawVideoResourceToCache);
+        ThreadUtil.onBackground(this::copyRawVideoResourceToCache);
     }
 
     /**
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
             FileHelper.copy(sampleInputStream, demoVideoFile);
 
             // Enable play button once copy is complete
-            ThreadHelper.onMain(() -> buttonPlay.setEnabled(true));
+            ThreadUtil.onMain(() -> buttonPlay.setEnabled(true));
         } catch (IOException e) {
             e.printStackTrace();
         }

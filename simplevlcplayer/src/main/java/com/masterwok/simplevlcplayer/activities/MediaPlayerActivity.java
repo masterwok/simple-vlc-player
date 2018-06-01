@@ -25,8 +25,8 @@ import android.widget.TextView;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.callbacks.SeekBarListener;
-import com.masterwok.simplevlcplayer.helpers.ThreadHelper;
-import com.masterwok.simplevlcplayer.helpers.TimeHelper;
+import com.masterwok.simplevlcplayer.utils.ThreadUtil;
+import com.masterwok.simplevlcplayer.utils.TimeUtil;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 import com.masterwok.simplevlcplayer.sessions.VlcMediaPlayerSession;
 
@@ -118,11 +118,11 @@ public class MediaPlayerActivity
      * @param length The length of the media.
      */
     private void setSeekBarState(long time, long length) {
-        String lengthText = TimeHelper.getTimeString(length);
-        String positionText = TimeHelper.getTimeString(time);
+        String lengthText = TimeUtil.getTimeString(length);
+        String positionText = TimeUtil.getTimeString(time);
         int progress = (int) (((float) time / length) * 100);
 
-        ThreadHelper.onMain(() -> {
+        ThreadUtil.onMain(() -> {
             seekBarPosition.setProgress(progress);
 
             textViewPosition.setText(positionText);

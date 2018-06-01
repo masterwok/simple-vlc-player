@@ -6,8 +6,8 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.masterwok.simplevlcplayer.helpers.ThreadHelper;
-import com.masterwok.simplevlcplayer.helpers.TimeHelper;
+import com.masterwok.simplevlcplayer.utils.ThreadUtil;
+import com.masterwok.simplevlcplayer.utils.TimeUtil;
 import com.masterwok.simplevlcplayer.sessions.VlcMediaPlayerSession;
 
 
@@ -65,9 +65,9 @@ public class SeekBarListener implements SeekBar.OnSeekBarChangeListener {
         }
 
         long position = (long) (((float) i / 100) * getMediaLength());
-        String timeText = TimeHelper.getTimeString(position);
+        String timeText = TimeUtil.getTimeString(position);
 
-        ThreadHelper.onMain(() -> textViewPosition.setText(timeText));
+        ThreadUtil.onMain(() -> textViewPosition.setText(timeText));
     }
 
     @Override

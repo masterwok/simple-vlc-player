@@ -1,4 +1,4 @@
-package com.masterwok.simplevlcplayer.helpers;
+package com.masterwok.simplevlcplayer.utils;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -7,11 +7,11 @@ import java.util.concurrent.Executors;
 
 
 /**
- * This helper class provides threading convenience methods.
+ * This class provides static convenience methods for threads.
  */
-public class ThreadHelper {
+public class ThreadUtil {
 
-    private ThreadHelper() {
+    private ThreadUtil() {
     }
 
     /**

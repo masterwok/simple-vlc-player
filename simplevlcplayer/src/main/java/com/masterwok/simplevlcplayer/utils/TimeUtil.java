@@ -1,16 +1,16 @@
-package com.masterwok.simplevlcplayer.helpers;
+package com.masterwok.simplevlcplayer.utils;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 
 /**
- * This helper class provides methods that deal with time.
+ * This class provides static convenience methods for time.
  */
 @SuppressWarnings("WeakerAccess")
-public class TimeHelper {
+public class TimeUtil {
 
-    private TimeHelper() {
+    private TimeUtil() {
     }
 
     /**

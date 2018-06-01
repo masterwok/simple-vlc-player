@@ -341,16 +341,6 @@ public class MediaPlayerActivity
         transportControls.play();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        startAndBindMediaPlayerService();
-
-        showToolbars();
-        startToolbarHideTimer();
-    }
-
     private void startToolbarHideTimer() {
         toolbarHideTimer = new Timer();
 
@@ -370,6 +360,7 @@ public class MediaPlayerActivity
         transportControls.stop();
 
         unbindService(mediaPlayerServiceConnection);
+
         mediaPlayerServiceIsBound = false;
 
         super.onStop();
@@ -378,8 +369,19 @@ public class MediaPlayerActivity
     @Override
     protected void onDestroy() {
         transportControls.stop();
+        unbindService(mediaPlayerServiceConnection);
 
         super.onDestroy();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        startAndBindMediaPlayerService();
+
+        showToolbars();
+        startToolbarHideTimer();
     }
 
     @Override

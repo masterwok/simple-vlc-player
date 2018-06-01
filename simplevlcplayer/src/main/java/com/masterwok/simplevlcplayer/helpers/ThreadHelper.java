@@ -29,15 +29,15 @@ public class ThreadHelper {
      * @param runnable The runnable instance.
      */
     public static void onMain(Runnable runnable) {
-        Thread mainThread = Looper.getMainLooper().getThread();
+        Looper mainLooper = Looper.getMainLooper();
 
         // Already on main thread, execute and return.
-        if (Thread.currentThread() == mainThread) {
+        if (Thread.currentThread() == mainLooper.getThread()) {
             runnable.run();
             return;
         }
 
         // Push work to main thread and execute.
-        new Handler(Looper.getMainLooper()).post(runnable);
+        new Handler(mainLooper).post(runnable);
     }
 }

@@ -1,5 +1,6 @@
 package com.masterwok.simplevlcplayer.activities;
 
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -16,8 +17,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -25,14 +28,17 @@ import android.widget.TextView;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.callbacks.SeekBarListener;
-import com.masterwok.simplevlcplayer.utils.ThreadUtil;
-import com.masterwok.simplevlcplayer.utils.TimeUtil;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 import com.masterwok.simplevlcplayer.sessions.VlcMediaPlayerSession;
+import com.masterwok.simplevlcplayer.utils.ThreadUtil;
+import com.masterwok.simplevlcplayer.utils.TimeUtil;
+import com.masterwok.simplevlcplayer.utils.ViewUtil;
 
 import org.videolan.libvlc.IVLCVout;
 
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MediaPlayerActivity
         extends AppCompatActivity
@@ -70,6 +76,9 @@ public class MediaPlayerActivity
     private SeekBar seekBarPosition;
 
     private SeekBarListener seekBarListener;
+
+    private boolean toolbarsAreVisible = true;
+    private Timer toolbarHideTimer = new Timer();
 
     private final MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
         @Override
@@ -242,8 +251,47 @@ public class MediaPlayerActivity
         imageButtonPlayPause = toolbarFooter.findViewById(R.id.imagebutton_play_pause);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void subscribeToViewComponents() {
         imageButtonPlayPause.setOnClickListener(view -> onPlayPauseImageButtonClick());
+        relativeLayoutRoot.setOnTouchListener(this::onRootViewTouch);
+    }
+
+    private boolean onRootViewTouch(
+            View view,
+            MotionEvent motionEvent
+    ) {
+        // Only start animation on down press.
+        if (motionEvent.getActionMasked() != MotionEvent.ACTION_DOWN) {
+            return false;
+        }
+
+        toolbarHideTimer.cancel();
+
+        toggleToolbarVisibility();
+
+        return false;
+    }
+
+    /**
+     * Toggle the visibility of the toolbars by slide animating them.
+     */
+    private void toggleToolbarVisibility() {
+        if (toolbarsAreVisible) {
+            toolbarsAreVisible = false;
+            ThreadUtil.onMain(() -> {
+                ViewUtil.slideViewAboveOrBelowParent(toolbarHeader, true);
+                ViewUtil.slideViewAboveOrBelowParent(toolbarFooter, false);
+            });
+
+            return;
+        }
+
+        ThreadUtil.onMain(() -> {
+            toolbarsAreVisible = true;
+            ViewUtil.resetVerticalTranslation(toolbarHeader);
+            ViewUtil.resetVerticalTranslation(toolbarFooter);
+        });
     }
 
     /**
@@ -272,6 +320,19 @@ public class MediaPlayerActivity
         super.onStart();
 
         startAndBindMediaPlayerService();
+        startToolbarHideTimer();
+    }
+
+    private void startToolbarHideTimer() {
+        int timerDelay = getResources()
+                .getInteger(R.integer.media_player_toolbar_hide_timeout);
+
+        toolbarHideTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                toggleToolbarVisibility();
+            }
+        }, timerDelay);
     }
 
     @Override

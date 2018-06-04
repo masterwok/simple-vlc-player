@@ -24,8 +24,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginBottom="10dp"
-            android:progressTint="@color/media_player_seekbar_color"
-            android:thumbTint="@color/media_player_seekbar_color"/>
+            android:progressTint="@color/media_player_seekbar"
+            android:thumbTint="@color/media_player_seekbar"/>
 
         <ImageButton
             android:id="@+id/imagebutton_play_pause"

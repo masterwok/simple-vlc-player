@@ -5,6 +5,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.SurfaceView;
 
+import com.masterwok.simplevlcplayer.callbacks.RendererItemListener;
 import com.masterwok.simplevlcplayer.callbacks.VlcMediaPlayerEventListener;
 
 import org.videolan.libvlc.IVLCVout;
@@ -20,12 +21,18 @@ public class VlcMediaPlayerSession
     public static final String LengthExtra = "extra.length";
     public static final String TimeExtra = "extra.time";
 
+    private RendererItemListener rendererItemListener = new RendererItemListener();
+
     private final LibVLC libVlc;
     private final MediaPlayer mediaPlayer;
     private final PlaybackStateCompat.Builder playbackStateBuilder;
+    private RendererItem selectedRendererItem;
     private final Context context;
 
-    public VlcMediaPlayerSession(Context context, String tag) {
+    public VlcMediaPlayerSession(
+            Context context,
+            String tag
+    ) {
         super(context, tag);
 
         this.context = context;
@@ -58,6 +65,8 @@ public class VlcMediaPlayerSession
         setPlaybackState(playbackStateBuilder.build());
 
         setCallback(vlcMediaPlayerEventListener);
+
+        rendererItemListener.start(libVlc);
     }
 
     /**
@@ -66,6 +75,8 @@ public class VlcMediaPlayerSession
      * @param renderItem The render item to play on.
      */
     public void setRenderer(RendererItem renderItem) {
+        this.selectedRendererItem = renderItem;
+
         detachSurfaceViews();
 
         mediaPlayer.setRenderer(renderItem);
@@ -83,6 +94,8 @@ public class VlcMediaPlayerSession
             SurfaceView subtitleSurfaceView,
             IVLCVout.OnNewVideoLayoutListener layoutListener
     ) {
+        this.selectedRendererItem = null;
+
         attachSurfaceViews(
                 mediaSurfaceView,
                 subtitleSurfaceView,
@@ -118,5 +131,25 @@ public class VlcMediaPlayerSession
         }
 
         vlcOut.detachViews();
+    }
+
+
+    /**
+     * Get the renderer item listener (observable).
+     *
+     * @return The renderer item listener instance.
+     */
+    public RendererItemListener getRenderItemObservable() {
+        return rendererItemListener;
+    }
+
+
+    /**
+     * Get the user selected renderer item.
+     *
+     * @return If selected, the renderer item. Else, null.
+     */
+    public RendererItem getSelectedRendererItem() {
+        return selectedRendererItem;
     }
 }

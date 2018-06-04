@@ -12,6 +12,15 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
+    <style name="AppTheme.DialogDark" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:windowBackground">@color/media_player_dialog_background</item>
+        <item name="android:backgroundTint">@color/media_player_dialog_background_tint</item>
+        <item name="android:textColor">@color/media_player_dialog_text</item>
+        <item name="android:colorAccent">@color/media_player_dialog_accent</item>
+        <item name="android:textColorPrimary">@color/media_player_dialog_text</item>
+        <item name="android:textColorSecondary">@color/media_player_dialog_text</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>

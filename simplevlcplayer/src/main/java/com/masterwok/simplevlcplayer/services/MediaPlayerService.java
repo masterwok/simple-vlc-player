@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.view.SurfaceView;
 
+import com.masterwok.simplevlcplayer.callbacks.RendererItemListener;
 import com.masterwok.simplevlcplayer.sessions.VlcMediaPlayerSession;
 
 import org.videolan.libvlc.IVLCVout;
@@ -24,6 +25,19 @@ public class MediaPlayerService extends Service {
     private VlcMediaPlayerSession vlcMediaPlayerSession;
 
     public class MediaPlayerServiceBinder extends Binder {
+
+        public RendererItem getSelectedRendererItem() {
+            return vlcMediaPlayerSession.getSelectedRendererItem();
+        }
+
+        /**
+         * Get an observable of renderer items.
+         *
+         * @return A list of renderer items.
+         */
+        public RendererItemListener getRenderItemObservable() {
+            return vlcMediaPlayerSession.getRenderItemObservable();
+        }
 
         /**
          * Set renderer to VLC render item. Invoke this method to cast media.

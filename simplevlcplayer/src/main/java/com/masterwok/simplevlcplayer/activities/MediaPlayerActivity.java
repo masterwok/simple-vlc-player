@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -28,6 +29,7 @@ import android.widget.TextView;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.callbacks.SeekBarListener;
+import com.masterwok.simplevlcplayer.fragments.RendererItemDialogFragment;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 import com.masterwok.simplevlcplayer.sessions.VlcMediaPlayerSession;
 import com.masterwok.simplevlcplayer.utils.ThreadUtil;
@@ -49,6 +51,7 @@ public class MediaPlayerActivity
     public static final String RequestCodeExtra = "extra.requestcode";
     public static final String PlaybackPositionExtra = "extra.playbackposition";
     public static final String VlcOptions = "extra.vlcoptions";
+    public static final String RendererItemDialogTag = "tag.dialogrendereritem";
 
     private MediaControllerCompat mediaController;
     private MediaControllerCompat.TransportControls transportControls;
@@ -163,7 +166,7 @@ public class MediaPlayerActivity
 
             seekBarPosition.setOnSeekBarChangeListener(seekBarListener);
 
-            playMediaLocally();
+            playMedia();
         }
 
         @Override
@@ -173,16 +176,19 @@ public class MediaPlayerActivity
         }
     };
 
-    private void playMediaLocally() {
+    private void playMedia() {
         if (!mediaPlayerServiceIsBound) {
             return;
         }
 
-        mediaPlayerServiceBinder.setRenderer(
-                surfaceViewMedia,
-                surfaceViewSubtitles,
-                this
-        );
+        // No renderer selected, play locally.
+        if (mediaPlayerServiceBinder.getSelectedRendererItem() == null) {
+            mediaPlayerServiceBinder.setRenderer(
+                    surfaceViewMedia,
+                    surfaceViewSubtitles,
+                    this
+            );
+        }
 
         prepareMedia(videoFilePath, subtitleFilePath);
 
@@ -213,8 +219,6 @@ public class MediaPlayerActivity
 
         readIntent();
 
-        startAndBindMediaPlayerService();
-
         bindViewComponents();
         subscribeToViewComponents();
 
@@ -230,7 +234,7 @@ public class MediaPlayerActivity
         videoFilePath = intent.getStringExtra(VideoPathExtra);
         subtitleFilePath = intent.getStringExtra(SubtitlePathExtra);
         requestCode = intent.getIntExtra(RequestCodeExtra, Integer.MIN_VALUE);
-        playbackPosition = intent.getLongExtra(PlaybackPositionExtra, 0);
+        playbackPosition = intent.getLongExtra(PlaybackPositionExtra, 0L);
     }
 
     private void bindViewComponents() {
@@ -252,6 +256,20 @@ public class MediaPlayerActivity
     private void subscribeToViewComponents() {
         imageButtonPlayPause.setOnClickListener(view -> onPlayPauseImageButtonClick());
         relativeLayoutRoot.setOnTouchListener(this::onRootViewTouch);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() != R.id.menu_item_cast) {
+            return false;
+        }
+
+        new RendererItemDialogFragment().show(
+                getSupportFragmentManager(),
+                RendererItemDialogTag
+        );
+
+        return true;
     }
 
     private boolean onRootViewTouch(
@@ -357,7 +375,11 @@ public class MediaPlayerActivity
 
     @Override
     protected void onStop() {
-        transportControls.stop();
+        // Playing locally, stop playback.
+        if (mediaPlayerServiceIsBound
+                && mediaPlayerServiceBinder.getSelectedRendererItem() == null) {
+            transportControls.pause();
+        }
 
         unbindService(mediaPlayerServiceConnection);
 
@@ -369,7 +391,6 @@ public class MediaPlayerActivity
     @Override
     protected void onDestroy() {
         transportControls.stop();
-        unbindService(mediaPlayerServiceConnection);
 
         super.onDestroy();
     }
@@ -428,7 +449,10 @@ public class MediaPlayerActivity
     }
 
     private void startAndBindMediaPlayerService() {
-        Intent intent = new Intent(this, MediaPlayerService.class);
+        Intent intent = new Intent(
+                getApplicationContext(),
+                MediaPlayerService.class
+        );
 
         startService(intent);
 

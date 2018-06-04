@@ -3,6 +3,13 @@
     <color name="media_player_toolbar_background">#CF000000</color>
     <color name="media_player_toolbar_text_position">#5D5179</color>
     <color name="media_player_toolbar_text_length">@android:color/white</color>
-    <color name="media_player_seekbar_color">#5D5179</color>
+    <color name="media_player_seekbar">#5D5179</color>
     <color name="media_player_menu_cast_background">#5D5179</color>
+
+    <color name="media_player_dialog_background">#313A3B</color>
+    <color name="media_player_dialog_background_tint">#313A3B</color>
+    <color name="media_player_dialog_text">@android:color/white</color>
+    <color name="media_player_dialog_accent">@android:color/white</color>
+
+    <color name="media_player_dialog_check">#94E495</color>
 </resources>

@@ -3,4 +3,6 @@
     <string name="title_activity_media_player">MediaPlayerActivity</string>
     <string name="next_stop_akebonobashi">Next stop, Akebonobashi!</string>
     <string name="cast_connect">Cast Devices</string>
+    <string name="dialog_title_renderer">Select Device</string>
+    <string name="dialog_button_renderer_negative">CANCEL</string>
 </resources>

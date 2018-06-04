@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
         intent.putExtra(
                 MediaPlayerActivity.PlaybackPositionExtra,
-                0
+                0L
         );
 
         // We don't pass any options in the demo..

@@ -2,13 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.masterwok.simplevlcplayer">
 
+
+    <!-- Permission required for VLC microdns_renderer -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application>
 
         <activity
             android:name=".activities.MediaPlayerActivity"
-            android:label="@string/title_activity_media_player"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/AppTheme.FullScreen" >
+            android:label="@string/title_activity_media_player"
+            android:theme="@style/AppTheme.FullScreen">
         </activity>
 
         <service android:name=".services.MediaPlayerService"/>

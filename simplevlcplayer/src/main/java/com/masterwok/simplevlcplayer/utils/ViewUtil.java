@@ -1,6 +1,7 @@
 package com.masterwok.simplevlcplayer.utils;
 
 import android.view.View;
+import android.view.Window;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
@@ -39,6 +40,19 @@ public class ViewUtil {
                 .translationY(0)
                 .setInterpolator(new DecelerateInterpolator())
                 .start();
+    }
 
+    /**
+     * Set the transparency dim amount on a window.
+     *
+     * @param window The window to set the dim for.
+     * @param amount The dim amount.
+     */
+    public static void setDimAmount(Window window, float amount) {
+        if (window == null) {
+            return;
+        }
+
+        window.setDimAmount(amount);
     }
 }

@@ -40,6 +40,10 @@ public class RendererItemDialogFragment
     private ListView listViewRendererItem;
     private SelectionListAdapter<RendererItem> rendererItemAdapter;
 
+    /**
+     * This observer is responsible for updating the display state
+     * when renderer items are added or removed.
+     */
     private final Observer rendererItemObserver = (observable, o) -> {
         if (o == null) {
             return;
@@ -65,6 +69,7 @@ public class RendererItemDialogFragment
             RendererItemListener rendererItemObservable = mediaPlayerServiceBinder
                     .getRenderItemObservable();
 
+            // Configure with initial renderer items.
             configure(
                     rendererItemObservable.getRenderItems(),
                     mediaPlayerServiceBinder.getSelectedRendererItem()
@@ -136,15 +141,33 @@ public class RendererItemDialogFragment
 
         listViewRendererItem.setAdapter(rendererItemAdapter);
 
+        // On list view item tap, set the renderer item and dismiss the dialog.
         listViewRendererItem.setOnItemClickListener((parent, itemView, position, id) -> {
-            RendererItem rendererItem = rendererItemAdapter
-                    .getItem(position)
-                    .getValue();
-
-            mediaPlayerServiceBinder.setRenderer(rendererItem);
-
+            setRendererItem(position);
             dismiss();
         });
+    }
+
+    /**
+     * Set the renderer item by the position of an item in the list view adapter index.
+     *
+     * @param position The position of the tapped item.
+     * @return The index of the tapped item.
+     */
+    private void setRendererItem(int position) {
+        // "None" selected, or item does not exist.
+        if (position == 0
+                || position > rendererItemAdapter.getCount()) {
+
+            // TODO: Switch back to local playback o_____O
+            // How to get surface views here?
+        }
+
+        mediaPlayerServiceBinder.setRenderer(
+                rendererItemAdapter
+                        .getItem(position)
+                        .getValue()
+        );
     }
 
     private void bindViewControls(View view) {
@@ -211,7 +234,6 @@ public class RendererItemDialogFragment
                 mediaPlayerServiceConnection,
                 Context.BIND_AUTO_CREATE
         );
-
     }
 
 }

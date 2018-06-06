@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.view.View;
@@ -33,11 +34,26 @@ import java.util.Observer;
 public class RendererItemDialogFragment
         extends AppCompatDialogFragment {
 
+    /**
+     * This interface should be implemented by activities who started
+     * the dialog fragment should they want a result when a renderer item
+     * is selected.
+     */
+    public interface RendererItemSelectionListener {
+
+        /**
+         * Invoked when a renderer item is selected.
+         *
+         * @param rendererItem The selected renderer item. This value can be null.
+         */
+        void onRendererUpdate(RendererItem rendererItem);
+    }
+
     private static final float DimAmount = 0.6f;
 
     private MediaPlayerService.MediaPlayerServiceBinder mediaPlayerServiceBinder;
 
-    private ListView listViewRendererItem;
+    private ListView listViewRendererItems;
     private SelectionListAdapter<RendererItem> rendererItemAdapter;
 
     /**
@@ -57,8 +73,11 @@ public class RendererItemDialogFragment
     };
 
 
+    /**
+     * This service connection is responsible for registering an observer against the
+     * media player service renderer item observable, and setting the initial display state.
+     */
     private final ServiceConnection mediaPlayerServiceConnection = new ServiceConnection() {
-
         @Override
         public void onServiceConnected(
                 ComponentName componentName,
@@ -69,15 +88,14 @@ public class RendererItemDialogFragment
             RendererItemListener rendererItemObservable = mediaPlayerServiceBinder
                     .getRenderItemObservable();
 
-            // Configure with initial renderer items.
+            // Configure display state with initial renderer items.
             configure(
                     rendererItemObservable.getRenderItems(),
                     mediaPlayerServiceBinder.getSelectedRendererItem()
             );
 
-            mediaPlayerServiceBinder
-                    .getRenderItemObservable()
-                    .addObserver(rendererItemObserver);
+            // Register renderer item observer.
+            rendererItemObservable.addObserver(rendererItemObserver);
         }
 
         @Override
@@ -86,6 +104,12 @@ public class RendererItemDialogFragment
         }
     };
 
+    /**
+     * Configure the display state of the dialog.
+     *
+     * @param rendererItems        The available renderer items.
+     * @param selectedRendererItem The selected renderer item.
+     */
     private void configure(
             List<RendererItem> rendererItems,
             RendererItem selectedRendererItem
@@ -94,6 +118,7 @@ public class RendererItemDialogFragment
 
         selectionItems.add(new SelectionItem<>(
                 rendererItems.size() == 0,
+                // TODO: Convert this to string resource.
                 "None",
                 null
         ));
@@ -126,12 +151,28 @@ public class RendererItemDialogFragment
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View view = inflateView();
 
-        bindViewControls(view);
+        bindViewComponents(view);
+        subscribeToViewComponents();
+
         initRendererItemAdapter();
 
         return createDialog(view);
     }
 
+    /**
+     * Subscribe to bound view component callbacks.
+     */
+    private void subscribeToViewComponents() {
+        // On list view item tap, set the renderer item and dismiss the dialog.
+        listViewRendererItems.setOnItemClickListener((parent, itemView, position, id) -> {
+            notifyRendererItemListener(position);
+            dismiss();
+        });
+    }
+
+    /**
+     * Initialize the renderer item list view adapter.
+     */
     private void initRendererItemAdapter() {
         rendererItemAdapter = new SelectionListAdapter<>(
                 getContext(),
@@ -139,39 +180,50 @@ public class RendererItemDialogFragment
                 R.color.media_player_dialog_check
         );
 
-        listViewRendererItem.setAdapter(rendererItemAdapter);
-
-        // On list view item tap, set the renderer item and dismiss the dialog.
-        listViewRendererItem.setOnItemClickListener((parent, itemView, position, id) -> {
-            setRendererItem(position);
-            dismiss();
-        });
+        listViewRendererItems.setAdapter(rendererItemAdapter);
     }
 
     /**
-     * Set the renderer item by the position of an item in the list view adapter index.
+     * Notify the renderer item selection listener of a selection.
      *
-     * @param position The position of the tapped item.
-     * @return The index of the tapped item.
+     * @param position The position of the selected item.
      */
-    private void setRendererItem(int position) {
-        // "None" selected, or item does not exist.
-        if (position == 0
-                || position > rendererItemAdapter.getCount()) {
+    private void notifyRendererItemListener(int position) {
+        FragmentActivity activity = getActivity();
 
-            // TODO: Switch back to local playback o_____O
-            // How to get surface views here?
+        // Activity is not a buddy, guy.
+        if (!(activity instanceof RendererItemSelectionListener)) {
+            return;
         }
 
-        mediaPlayerServiceBinder.setRenderer(
-                rendererItemAdapter
-                        .getItem(position)
-                        .getValue()
-        );
+        RendererItemSelectionListener listener = (RendererItemSelectionListener) getActivity();
+
+        // "None" selected, or renderer no longer exists.
+        if (position == 0) {
+            listener.onRendererUpdate(null);
+            return;
+        }
+
+        RendererItem selectedItem = null;
+
+        try {
+            selectedItem = rendererItemAdapter
+                    .getItem(position)
+                    .getValue();
+        } catch (Exception ignored) {
+            // Renderer item may not exist at this point.
+        }
+
+        listener.onRendererUpdate(selectedItem);
     }
 
-    private void bindViewControls(View view) {
-        listViewRendererItem = view.findViewById(R.id.listview_renderer_item);
+    /**
+     * Bind view components to private fields.
+     *
+     * @param view The dialog view.
+     */
+    private void bindViewComponents(View view) {
+        listViewRendererItems = view.findViewById(R.id.listview_renderer_item);
     }
 
     /**

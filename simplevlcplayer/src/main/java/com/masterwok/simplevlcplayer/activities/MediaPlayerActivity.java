@@ -37,6 +37,7 @@ import com.masterwok.simplevlcplayer.utils.TimeUtil;
 import com.masterwok.simplevlcplayer.utils.ViewUtil;
 
 import org.videolan.libvlc.IVLCVout;
+import org.videolan.libvlc.RendererItem;
 
 import java.io.File;
 import java.util.Timer;
@@ -44,7 +45,8 @@ import java.util.TimerTask;
 
 public class MediaPlayerActivity
         extends AppCompatActivity
-        implements IVLCVout.OnNewVideoLayoutListener {
+        implements IVLCVout.OnNewVideoLayoutListener,
+        RendererItemDialogFragment.RendererItemSelectionListener {
 
     public static final String VideoPathExtra = "extra.videopath";
     public static final String SubtitlePathExtra = "extra.subtitlepath";
@@ -166,7 +168,9 @@ public class MediaPlayerActivity
 
             seekBarPosition.setOnSeekBarChangeListener(seekBarListener);
 
-            playMedia();
+            setRenderer(mediaPlayerServiceBinder.getSelectedRendererItem());
+            prepareMedia(videoFilePath, subtitleFilePath);
+            transportControls.play();
         }
 
         @Override
@@ -175,42 +179,6 @@ public class MediaPlayerActivity
             mediaPlayerServiceBinder = null;
         }
     };
-
-    private void playMedia() {
-        if (!mediaPlayerServiceIsBound) {
-            return;
-        }
-
-        // No renderer selected, play locally.
-        if (mediaPlayerServiceBinder.getSelectedRendererItem() == null) {
-            mediaPlayerServiceBinder.setRenderer(
-                    surfaceViewMedia,
-                    surfaceViewSubtitles,
-                    this
-            );
-        }
-
-        prepareMedia(videoFilePath, subtitleFilePath);
-
-        transportControls.play();
-    }
-
-    private void prepareMedia(
-            String videoFilePath,
-            String subtitleFilePath
-    ) {
-        Bundle bundle = new Bundle();
-
-        bundle.putString(
-                MediaPlayerActivity.SubtitlePathExtra,
-                subtitleFilePath
-        );
-
-        transportControls.prepareFromUri(
-                Uri.fromFile(new File(videoFilePath)),
-                bundle
-        );
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -264,7 +232,9 @@ public class MediaPlayerActivity
             return false;
         }
 
-        new RendererItemDialogFragment().show(
+        RendererItemDialogFragment rendererItemDialog = new RendererItemDialogFragment();
+
+        rendererItemDialog.show(
                 getSupportFragmentManager(),
                 RendererItemDialogTag
         );
@@ -596,6 +566,51 @@ public class MediaPlayerActivity
         }
 
         return new Pair<>(screenWidth, screenHeight);
+    }
+
+    @Override
+    public void onRendererUpdate(RendererItem rendererItem) {
+        transportControls.stop();
+
+        setRenderer(rendererItem);
+        prepareMedia(videoFilePath, subtitleFilePath);
+        transportControls.play();
+    }
+
+    private void setRenderer(RendererItem rendererItem) {
+        // No renderer selected, set local renderer.
+        if (rendererItem == null) {
+            mediaPlayerServiceBinder.setRenderer(
+                    surfaceViewMedia,
+                    surfaceViewSubtitles,
+                    this
+            );
+
+            return;
+        }
+
+        mediaPlayerServiceBinder.setRenderer(rendererItem);
+    }
+
+    private void prepareMedia(
+            String videoFilePath,
+            String subtitleFilePath
+    ) {
+        if (transportControls == null) {
+            return;
+        }
+
+        Bundle bundle = new Bundle();
+
+        bundle.putString(
+                MediaPlayerActivity.SubtitlePathExtra,
+                subtitleFilePath
+        );
+
+        transportControls.prepareFromUri(
+                Uri.fromFile(new File(videoFilePath)),
+                bundle
+        );
     }
 
 }

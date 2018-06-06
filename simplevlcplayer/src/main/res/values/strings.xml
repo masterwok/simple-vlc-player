@@ -5,4 +5,5 @@
     <string name="cast_connect">Cast Devices</string>
     <string name="dialog_title_renderer">Select Device</string>
     <string name="dialog_button_renderer_negative">CANCEL</string>
+    <string name="dialog_none">None</string>
 </resources>

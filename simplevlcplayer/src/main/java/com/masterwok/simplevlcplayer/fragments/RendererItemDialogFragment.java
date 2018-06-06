@@ -18,6 +18,7 @@ import com.masterwok.simplevlcplayer.adapters.SelectionListAdapter;
 import com.masterwok.simplevlcplayer.callbacks.RendererItemListener;
 import com.masterwok.simplevlcplayer.models.SelectionItem;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
+import com.masterwok.simplevlcplayer.utils.ResourceUtil;
 import com.masterwok.simplevlcplayer.utils.ThreadUtil;
 import com.masterwok.simplevlcplayer.utils.ViewUtil;
 
@@ -117,9 +118,11 @@ public class RendererItemDialogFragment
         List<SelectionItem<RendererItem>> selectionItems = new ArrayList<>();
 
         selectionItems.add(new SelectionItem<>(
-                rendererItems.size() == 0,
-                // TODO: Convert this to string resource.
-                "None",
+                rendererItems.size() == 0 || selectedRendererItem == null,
+                ResourceUtil.getStringResource(
+                        getContext(),
+                        R.string.dialog_none
+                ),
                 null
         ));
 

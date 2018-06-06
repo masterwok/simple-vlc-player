@@ -25,4 +25,14 @@ public class ResourceUtil {
                 : context.getResources().getColor(id);
     }
 
+    /**
+     * Get a string resource.
+     *
+     * @param context The current context.
+     * @param id      The id of the color resource.
+     * @return A string resource.
+     */
+    public static String getStringResource(Context context, int id) {
+        return context.getString(id);
+    }
 }

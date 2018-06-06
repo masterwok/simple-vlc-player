@@ -159,8 +159,6 @@ public class MediaPlayerActivity
 
             mediaController.registerCallback(mediaControllerCallback);
 
-            MediaControllerCompat.setMediaController(MediaPlayerActivity.this, mediaController);
-
             seekBarListener = new SeekBarListener(
                     mediaController,
                     textViewPosition

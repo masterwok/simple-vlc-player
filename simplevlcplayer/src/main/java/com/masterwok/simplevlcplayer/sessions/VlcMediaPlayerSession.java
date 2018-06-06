@@ -80,6 +80,13 @@ public class VlcMediaPlayerSession
         detachSurfaceViews();
 
         mediaPlayer.setRenderer(renderItem);
+
+        restartPlayback();
+    }
+
+    private void restartPlayback() {
+        mediaPlayer.stop();
+        mediaPlayer.play();
     }
 
     /**
@@ -96,11 +103,16 @@ public class VlcMediaPlayerSession
     ) {
         this.selectedRendererItem = null;
 
+        // Clear any previous renderer
+        mediaPlayer.setRenderer(null);
+
         attachSurfaceViews(
                 mediaSurfaceView,
                 subtitleSurfaceView,
                 layoutListener
         );
+
+        restartPlayback();
     }
 
     /**

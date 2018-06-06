@@ -568,11 +568,7 @@ public class MediaPlayerActivity
 
     @Override
     public void onRendererUpdate(RendererItem rendererItem) {
-        transportControls.stop();
-
         setRenderer(rendererItem);
-        prepareMedia(videoFilePath, subtitleFilePath);
-        transportControls.play();
     }
 
     private void setRenderer(RendererItem rendererItem) {

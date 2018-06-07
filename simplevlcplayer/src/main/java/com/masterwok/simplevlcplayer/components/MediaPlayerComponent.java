@@ -66,7 +66,8 @@ public class MediaPlayerComponent
 
     public void init(
             ParamRunnable<Float> onSeekBarPositionUpdate,
-            Runnable onCastButtonTap
+            Runnable onCastButtonTap,
+            Runnable onPlayPauseButtonTap
     ) {
         toolbarHeader.setOnMenuItemClickListener(item -> {
             onCastButtonTap.run();
@@ -74,6 +75,7 @@ public class MediaPlayerComponent
         });
 
         seekBarPosition.setOnSeekBarChangeListener(new SeekBarListener(onSeekBarPositionUpdate::run));
+        imageButtonPlayPause.setOnClickListener(view -> onPlayPauseButtonTap.run());
     }
 
 

@@ -1,16 +1,19 @@
 package com.masterwok.simplevlcplayer.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.components.MediaPlayerComponent;
+import com.masterwok.simplevlcplayer.fragments.RendererItemDialogFragment;
+
+import org.videolan.libvlc.RendererItem;
 
 public class MediaPlayerActivity
-        extends AppCompatActivity {
-//        implements IVLCVout.OnNewVideoLayoutListener,
-//        RendererItemDialogFragment.RendererItemSelectionListener {
+        extends AppCompatActivity
+        implements RendererItemDialogFragment.RendererItemSelectionListener {
 
     public static final String VideoPathExtra = "extra.videopath";
     public static final String SubtitlePathExtra = "extra.subtitlepath";
@@ -18,6 +21,12 @@ public class MediaPlayerActivity
     public static final String PlaybackPositionExtra = "extra.playbackposition";
     public static final String VlcOptions = "extra.vlcoptions";
     public static final String RendererItemDialogTag = "tag.dialogrendereritem";
+
+    private String subtitleFilePath;
+    private String videoFilePath;
+    private long playbackPosition;
+    private int requestCode;
+
 
     private MediaPlayerComponent mediaPlayerComponent;
 
@@ -27,19 +36,39 @@ public class MediaPlayerActivity
         setContentView(R.layout.activity_media_player);
 
         bindViewComponents();
-
-        mediaPlayerComponent.configure(100, 10, true);
+        readIntent();
     }
 
     private void bindViewComponents() {
         mediaPlayerComponent = findViewById(R.id.component_media_player);
         mediaPlayerComponent.init(
-                position -> {
-                },
-                () -> {
-                    // On cast button tap
-                }
+                this::onSeekBarPositionChanged,
+                this::onCastButtonTapped,
+                this::onPlayPauseButtonTapped
         );
+    }
+
+    private void onPlayPauseButtonTapped() {
+    }
+
+    private void onCastButtonTapped() {
+    }
+
+    private void onSeekBarPositionChanged(Float position) {
+    }
+
+    private void readIntent() {
+        Intent intent = getIntent();
+
+        videoFilePath = intent.getStringExtra(VideoPathExtra);
+        subtitleFilePath = intent.getStringExtra(SubtitlePathExtra);
+        requestCode = intent.getIntExtra(RequestCodeExtra, Integer.MIN_VALUE);
+        playbackPosition = intent.getLongExtra(PlaybackPositionExtra, 0L);
+    }
+
+    @Override
+    public void onRendererUpdate(RendererItem rendererItem) {
+
     }
 
 
@@ -49,25 +78,7 @@ public class MediaPlayerActivity
 //    private MediaPlayerService.MediaPlayerServiceBinder mediaPlayerServiceBinder;
 //    private boolean mediaPlayerServiceIsBound = false;
 //
-//    private String subtitleFilePath;
-//    private String videoFilePath;
-//    private long playbackPosition;
-//    private int requestCode;
-//
-//    private int videoWidth;
-//    private int videoHeight;
-//
-//    private AppCompatImageButton imageButtonPlayPause;
-//    private RelativeLayout relativeLayoutRoot;
-//    private SurfaceView surfaceViewSubtitles;
-//    private SurfaceView surfaceViewMedia;
-//    private SurfaceHolder surfaceHolderMedia;
-//    private Toolbar toolbarHeader;
-//    private Toolbar toolbarFooter;
-//    private TextView textViewPosition;
-//    private TextView textViewLength;
-//    private SeekBar seekBarPosition;
-//
+
 //    private SeekBarListener seekBarListener;
 //
 //    private boolean toolbarsAreVisible = true;
@@ -182,14 +193,6 @@ public class MediaPlayerActivity
 //        setSupportActionBar(toolbarHeader);
 //    }
 //
-//    private void readIntent() {
-//        Intent intent = getIntent();
-//
-//        videoFilePath = intent.getStringExtra(VideoPathExtra);
-//        subtitleFilePath = intent.getStringExtra(SubtitlePathExtra);
-//        requestCode = intent.getIntExtra(RequestCodeExtra, Integer.MIN_VALUE);
-//        playbackPosition = intent.getLongExtra(PlaybackPositionExtra, 0L);
-//    }
 //
 //    private void bindViewComponents() {
 //        relativeLayoutRoot = findViewById(R.id.relative_layout_root);

@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 videoFile.getPath()
         );
 
+        // TODO: Actually pass these to the libVLC creation o___O
         // No subtitle file for demo..
 //        intent.putExtra(
 //                MediaPlayerActivity.SubtitlePathExtra,

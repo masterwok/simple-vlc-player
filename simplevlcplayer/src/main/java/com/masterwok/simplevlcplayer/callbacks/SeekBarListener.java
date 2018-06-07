@@ -38,6 +38,10 @@ public class SeekBarListener implements SeekBar.OnSeekBarChangeListener {
         isTrackingTouch = false;
     }
 
+    public boolean isTrackingTouch() {
+        return isTrackingTouch;
+    }
+
 //    /**
 //     * Get the length of the media from the playback state.
 //     *

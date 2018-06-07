@@ -42,38 +42,4 @@ public class SeekBarListener implements SeekBar.OnSeekBarChangeListener {
         return isTrackingTouch;
     }
 
-//    /**
-//     * Get the length of the media from the playback state.
-//     *
-//     * @return The length of the media in milliseconds.
-//     */
-//    private long getMediaLength() {
-//        PlaybackStateCompat playbackState = mediaController.getPlaybackState();
-//        Bundle extras = playbackState.getExtras();
-//
-//        return extras == null
-//                ? 0
-//                : extras.getLong(VlcMediaPlayerSession.LengthExtra);
-//    }
-//
-//    @Override
-//    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-//        if (!isTrackingTouch) {
-//            return;
-//        }
-//
-//        long position = (long) (((float) i / 100) * getMediaLength());
-//        String timeText = TimeUtil.getTimeString(position);
-//
-//        ThreadUtil.onMain(() -> textViewPosition.setText(timeText));
-//    }
-//
-//    @Override
-//    public void onStopTrackingTouch(SeekBar seekBar) {
-//        float position = (float) seekBar.getProgress() / 100;
-//
-//        transportControls.seekTo((int) (position * getMediaLength()));
-//
-//        isTrackingTouch = false;
-//    }
 }

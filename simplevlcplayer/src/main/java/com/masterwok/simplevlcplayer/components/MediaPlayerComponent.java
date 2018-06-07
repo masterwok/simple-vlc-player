@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.callbacks.SeekBarListener;
 import com.masterwok.simplevlcplayer.interfaces.ParamRunnable;
+import com.masterwok.simplevlcplayer.utils.ResourceUtil;
 import com.masterwok.simplevlcplayer.utils.ThreadUtil;
 import com.masterwok.simplevlcplayer.utils.TimeUtil;
 import com.masterwok.simplevlcplayer.utils.ViewUtil;
@@ -31,6 +32,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
+/**
+ * This component encapsulates the media player view components. It handles
+ * resizing internally, and notifies consumers of user events through functions
+ * provided through the init method.
+ */
 public class MediaPlayerComponent
         extends RelativeLayout
         implements IVLCVout.OnNewVideoLayoutListener {
@@ -73,11 +79,19 @@ public class MediaPlayerComponent
         inflate();
     }
 
+    /**
+     * Get the window containing the activity.
+     *
+     * @return The window.
+     */
     private Window getWindow() {
         return ((AppCompatActivity) getContext())
                 .getWindow();
     }
 
+    /**
+     * Inflate the view component.
+     */
     private void inflate() {
         inflate(
                 getContext(),
@@ -97,9 +111,12 @@ public class MediaPlayerComponent
             return true;
         });
 
-        this.seekBarListener = new SeekBarListener(onSeekBarPositionUpdate::run);
+        this.seekBarListener = new SeekBarListener(onSeekBarPositionUpdate);
         seekBarPosition.setOnSeekBarChangeListener(seekBarListener);
-        imageButtonPlayPause.setOnClickListener(view -> onPlayPauseButtonTap.run());
+        imageButtonPlayPause.setOnClickListener(view -> {
+            toolbarHideTimer.cancel();
+            onPlayPauseButtonTap.run();
+        });
 
         setOnTouchListener((view, motionEvent) -> {
             // Only start animation on down press.
@@ -115,10 +132,24 @@ public class MediaPlayerComponent
         });
     }
 
+    /**
+     * Get whether or not the user is currently sliding the progress bar.
+     *
+     * @return If sliding, true. Else, false.
+     */
+    public boolean isTrackingTouch() {
+        return seekBarListener.isTrackingTouch();
+    }
+
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+
+        setBackgroundColor(ResourceUtil.getColor(
+                getContext(),
+                R.color.media_player_background)
+        );
 
         bindViewComponents();
 
@@ -133,6 +164,9 @@ public class MediaPlayerComponent
         startToolbarHideTimer();
     }
 
+    /**
+     * Bind view components to private fields.
+     */
     private void bindViewComponents() {
         toolbarHeader = findViewById(R.id.toolbar_header);
         toolbarFooter = findViewById(R.id.toolbar_footer);
@@ -146,14 +180,31 @@ public class MediaPlayerComponent
         imageButtonPlayPause = toolbarFooter.findViewById(R.id.imagebutton_play_pause);
     }
 
+    /**
+     * Get the media surface view.
+     *
+     * @return The media surface view.
+     */
     public SurfaceView getMediaSurfaceView() {
         return surfaceViewMedia;
     }
 
-    public SurfaceView getSubtitileSurfaceView() {
+    /**
+     * Get the subtitle surface view.
+     *
+     * @return The subtitle surface view.
+     */
+    public SurfaceView getSubtitleSurfaceView() {
         return surfaceViewSubtitle;
     }
 
+    /**
+     * Configure the component display state.
+     *
+     * @param length    The length of the media being played.
+     * @param time      The current time (position) of playback.
+     * @param isPlaying Whether or not the media is being played.
+     */
     public void configure(
             long length,
             long time,
@@ -171,6 +222,12 @@ public class MediaPlayerComponent
         });
     }
 
+    /**
+     * Get the correct drawable resource id for the play/pause button.
+     *
+     * @param isPlaying Whether or not the media is currently playing.
+     * @return The drawable resource id.
+     */
     public int getPlayPauseDrawableResourceId(boolean isPlaying) {
         return isPlaying
                 ? R.drawable.ic_pause_white_36dp
@@ -204,7 +261,8 @@ public class MediaPlayerComponent
         setSize(videoWidth, videoHeight);
     }
 
-    /* Set the size of the media surface views.
+    /**
+     * Set the size of the media surface views.
      *
      * @param width  The new surface view width.
      * @param height The new surface view height.
@@ -364,6 +422,9 @@ public class MediaPlayerComponent
     }
 
 
+    /**
+     * Start the timer that hides the toolbars after a predefined amount of time.
+     */
     private void startToolbarHideTimer() {
         toolbarHideTimer = new Timer();
 

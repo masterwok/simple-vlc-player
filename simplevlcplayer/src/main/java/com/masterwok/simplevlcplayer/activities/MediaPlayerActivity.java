@@ -4,17 +4,23 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.components.MediaPlayerComponent;
 import com.masterwok.simplevlcplayer.fragments.RendererItemDialogFragment;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
+import com.masterwok.simplevlcplayer.sessions.VlcMediaPlayerSession;
 
 import org.videolan.libvlc.RendererItem;
+
+import java.io.File;
 
 public class MediaPlayerActivity
         extends AppCompatActivity
@@ -34,39 +40,58 @@ public class MediaPlayerActivity
 
     private MediaPlayerComponent mediaPlayerComponent;
 
+    private MediaPlayerService.MediaPlayerServiceBinder mediaPlayerServiceBinder;
+    private MediaControllerCompat.TransportControls transportControls;
+    private MediaControllerCompat mediaController;
+    private boolean mediaPlayerServiceIsBound;
+
     private final ServiceConnection mediaPlayerServiceConnection = new ServiceConnection() {
+
 
         @Override
         public void onServiceConnected(
                 ComponentName componentName,
                 IBinder iBinder
         ) {
-//            mediaPlayerServiceBinder = (MediaPlayerService.MediaPlayerServiceBinder) iBinder;
-//            mediaPlayerServiceIsBound = true;
-//
-//            mediaController = mediaPlayerServiceBinder.getMediaController();
-//            transportControls = mediaController.getTransportControls();
-//
-//            mediaController.registerCallback(mediaControllerCallback);
-//
-//            seekBarListener = new SeekBarListener(
-//                    mediaController,
-//                    textViewPosition
-//            );
-//
-//            seekBarPosition.setOnSeekBarChangeListener(seekBarListener);
-//
-//            setRenderer(mediaPlayerServiceBinder.getSelectedRendererItem());
-//            prepareMedia(videoFilePath, subtitleFilePath);
-//            transportControls.play();
+            mediaPlayerServiceBinder = (MediaPlayerService.MediaPlayerServiceBinder) iBinder;
+            mediaPlayerServiceIsBound = true;
+
+            mediaController = mediaPlayerServiceBinder.getMediaController();
+            transportControls = mediaController.getTransportControls();
+
+            mediaController.registerCallback(mediaControllerCallback);
+
+            setRenderer(mediaPlayerServiceBinder.getSelectedRendererItem());
+            prepareMedia(videoFilePath, subtitleFilePath);
+            transportControls.play();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-//            mediaPlayerServiceIsBound = false;
-//            mediaPlayerServiceBinder = null;
+            mediaPlayerServiceIsBound = false;
+            mediaPlayerServiceBinder = null;
         }
     };
+
+    private final MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
+        @Override
+        public void onPlaybackStateChanged(PlaybackStateCompat state) {
+            // End of media reached, finish the activity.
+            if (state.getState() == PlaybackStateCompat.STATE_STOPPED
+                    && state.getPosition() == 0) {
+                finish();
+            }
+
+            // Media is buffering, seek to the current playback position.
+            if (state.getState() == PlaybackStateCompat.STATE_BUFFERING) {
+                transportControls.seekTo(playbackPosition);
+            }
+
+            // Always update display state when playback state changes.
+            configure(state);
+        }
+    };
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,28 +104,44 @@ public class MediaPlayerActivity
         startAndBindMediaPlayerService();
     }
 
-    private void bindViewComponents() {
-        mediaPlayerComponent = findViewById(R.id.component_media_player);
-        mediaPlayerComponent.init(
-                this::onSeekBarPositionChanged,
-                this::onCastButtonTapped,
-                this::onPlayPauseButtonTapped
+    @Override
+    protected void onDestroy() {
+        if (!mediaPlayerServiceIsBound) {
+            return;
+        }
+
+        transportControls.stop();
+        unbindService(mediaPlayerServiceConnection);
+        mediaPlayerServiceIsBound = false;
+
+        super.onDestroy();
+    }
+
+    /**
+     * Activity is finishing, add playback position to result if activity started
+     * with result code.
+     */
+    @Override
+    public void finish() {
+        // Activity wasn't started with result, do nothing.
+        if (requestCode < 0) {
+            super.finish();
+            return;
+        }
+
+        Intent intent = new Intent();
+
+        // Add playback position to result.
+        intent.putExtra(
+                PlaybackPositionExtra,
+                mediaController
+                        .getPlaybackState()
+                        .getPosition()
         );
-    }
 
-    private void onPlayPauseButtonTapped() {
-    }
+        setResult(requestCode, intent);
 
-    private void onCastButtonTapped() {
-        RendererItemDialogFragment rendererItemDialog = new RendererItemDialogFragment();
-
-        rendererItemDialog.show(
-                getSupportFragmentManager(),
-                RendererItemDialogTag
-        );
-    }
-
-    private void onSeekBarPositionChanged(Float position) {
+        super.finish();
     }
 
     private void readIntent() {
@@ -112,11 +153,14 @@ public class MediaPlayerActivity
         playbackPosition = intent.getLongExtra(PlaybackPositionExtra, 0L);
     }
 
-    @Override
-    public void onRendererUpdate(RendererItem rendererItem) {
-
+    private void bindViewComponents() {
+        mediaPlayerComponent = findViewById(R.id.component_media_player);
+        mediaPlayerComponent.init(
+                this::seekToPosition,
+                this::showRendererItemDialogFragment,
+                this::togglePlayback
+        );
     }
-
 
     private void startAndBindMediaPlayerService() {
         Intent intent = new Intent(
@@ -133,216 +177,140 @@ public class MediaPlayerActivity
         );
     }
 
-    //    private MediaControllerCompat mediaController;
-//    private MediaControllerCompat.TransportControls transportControls;
-//
-//    private MediaPlayerService.MediaPlayerServiceBinder mediaPlayerServiceBinder;
-//    private boolean mediaPlayerServiceIsBound = false;
-//
+    /**
+     * Update the display state.
+     *
+     * @param state The current playback state.
+     */
+    private void configure(PlaybackStateCompat state) {
+        if (state == null
+                || state.getExtras() == null
+                || mediaPlayerComponent.isTrackingTouch()) {
+            return;
+        }
 
-//    private SeekBarListener seekBarListener;
-//
-//    private boolean toolbarsAreVisible = true;
-//    private Timer toolbarHideTimer;
-//
-//    private final MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
-//        @Override
-//        public void onPlaybackStateChanged(PlaybackStateCompat state) {
-//            // End of media reached, finish the activity.
-//            if (state.getState() == PlaybackStateCompat.STATE_STOPPED
-//                    && state.getPosition() == 0) {
-//                finish();
-//            }
-//
-//            // Media is buffering, seek to the current playback position.
-//            if (state.getState() == PlaybackStateCompat.STATE_BUFFERING) {
-//                transportControls.seekTo(playbackPosition);
-//            }
-//
-//            // Always update display state when playback state changes.
-//            configure(state);
-//        }
-//    };
-//
-//    /**
-//     * Update the display state.
-//     *
-//     * @param state The current playback state.
-//     */
-//    private void configure(PlaybackStateCompat state) {
-//        if (state == null
-//                || state.getExtras() == null
-//                || seekBarListener.isTrackingTouch()) {
-//            return;
-//        }
-//
-//        Bundle extras = state.getExtras();
-//
-//        long length = extras.getLong(VlcMediaPlayerSession.LengthExtra);
-//        long time = extras.getLong(VlcMediaPlayerSession.TimeExtra);
-//
-//        setSeekBarState(time, length);
-//    }
-//
-//
-//    /**
-//     * Set the seek bar display state.
-//     *
-//     * @param time   The current playback position.
-//     * @param length The length of the media.
-//     */
-//    private void setSeekBarState(long time, long length) {
-//        String lengthText = TimeUtil.getTimeString(length);
-//        String positionText = TimeUtil.getTimeString(time);
-//        int progress = (int) (((float) time / length) * 100);
-//
-//        ThreadUtil.onMain(() -> {
-//            seekBarPosition.setProgress(progress);
-//
-//            textViewPosition.setText(positionText);
-//            textViewLength.setText(lengthText);
-//        });
-//    }
-//
+        Bundle extras = state.getExtras();
 
-//    /**
-//     * Play or pause the playback of the media. This method is invoked when the pause/play
-//     * button is tapped.
-//     */
-//    private void onPlayPauseImageButtonClick() {
-//        int playbackState = mediaController
-//                .getPlaybackState()
-//                .getState();
-//
-//        // Currently playing, update image button and pause media.
-//        if (playbackState == PlaybackStateCompat.STATE_PLAYING) {
-//            imageButtonPlayPause.setImageResource(R.drawable.ic_play_arrow_white_36dp);
-//            transportControls.pause();
-//            return;
-//        }
-//
-//        // Currently paused, update image button and play media.
-//        imageButtonPlayPause.setImageResource(R.drawable.ic_pause_white_36dp);
-//        transportControls.play();
-//    }
-//
-//    @Override
-//    protected void onStop() {
-//        // Playing locally, stop playback.
-//        if (mediaPlayerServiceIsBound
-//                && mediaPlayerServiceBinder.getSelectedRendererItem() == null) {
-//            transportControls.pause();
-//        }
-//
-//        unbindService(mediaPlayerServiceConnection);
-//
-//        mediaPlayerServiceIsBound = false;
-//
-//        super.onStop();
-//    }
-//
-//    @Override
-//    protected void onDestroy() {
-//        transportControls.stop();
-//
-//        super.onDestroy();
-//    }
-//
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//
-//        startAndBindMediaPlayerService();
-//
-//        showToolbars();
-//        startToolbarHideTimer();
-//    }
-//
-//    @Override
-//    protected void onPause() {
-//        transportControls.pause();
-//
-//        super.onPause();
-//    }
-//
-//    /**
-//     * Activity is finishing, add playback position to result if activity started
-//     * with result code.
-//     */
-//    @Override
-//    public void finish() {
-//        // Activity wasn't started with result, do nothing.
-//        if (requestCode < 0) {
-//            super.finish();
-//            return;
-//        }
-//
-//        Intent intent = new Intent();
-//
-//        // Add playback position to result.
-//        intent.putExtra(
-//                PlaybackPositionExtra,
-//                mediaController
-//                        .getPlaybackState()
-//                        .getPosition()
-//        );
-//
-//        setResult(requestCode, intent);
-//
-//        super.finish();
-//    }
-//
-//    @Override
-//    public void onConfigurationChanged(Configuration newConfig) {
-//        super.onConfigurationChanged(newConfig);
-//
-//        // Set the size of the media surface views when the layout configuration changes
-//        setSize(videoWidth, videoHeight);
-//    }
-//
-//
-//
+        long length = extras.getLong(VlcMediaPlayerSession.LengthExtra);
+        long time = extras.getLong(VlcMediaPlayerSession.TimeExtra);
 
-//
-//    @Override
-//    public void onRendererUpdate(RendererItem rendererItem) {
-//        setRenderer(rendererItem);
-//    }
-//
-//    private void setRenderer(RendererItem rendererItem) {
-//        // No renderer selected, set local renderer.
-//        if (rendererItem == null) {
-//            mediaPlayerServiceBinder.setRenderer(
-//                    surfaceViewMedia,
-//                    surfaceViewSubtitles,
-//                    this
-//            );
-//
-//            return;
-//        }
-//
-//        mediaPlayerServiceBinder.setRenderer(rendererItem);
-//    }
-//
-//    private void prepareMedia(
-//            String videoFilePath,
-//            String subtitleFilePath
-//    ) {
-//        if (transportControls == null) {
-//            return;
-//        }
-//
-//        Bundle bundle = new Bundle();
-//
-//        bundle.putString(
-//                MediaPlayerActivity.SubtitlePathExtra,
-//                subtitleFilePath
-//        );
-//
-//        transportControls.prepareFromUri(
-//                Uri.fromFile(new File(videoFilePath)),
-//                bundle
-//        );
-//    }
+        mediaPlayerComponent.configure(
+                length,
+                time,
+                getPlaybackStateCompat() == PlaybackStateCompat.STATE_PLAYING
+        );
+    }
+
+    /**
+     * Toggle the playback of the media by pausing or playing the media.
+     */
+    private void togglePlayback() {
+        if (getPlaybackStateCompat() == PlaybackStateCompat.STATE_PLAYING) {
+            transportControls.pause();
+            return;
+        }
+
+        transportControls.play();
+    }
+
+    /**
+     * Show the renderer item dialog fragment.
+     */
+    private void showRendererItemDialogFragment() {
+        RendererItemDialogFragment rendererItemDialog = new RendererItemDialogFragment();
+
+        rendererItemDialog.show(
+                getSupportFragmentManager(),
+                RendererItemDialogTag
+        );
+    }
+
+    /**
+     * Seek to a position that is a percentage of the total length of the media.
+     *
+     * @param position The percentage value to seek to.
+     */
+    private void seekToPosition(Float position) {
+        transportControls.seekTo((long) (position * getMediaLength()));
+    }
+
+    /**
+     * Get the playback state (i.e. PlaybackStateCompat.STATE_PLAYING) of the media.
+     *
+     * @return The playback state.
+     */
+    private int getPlaybackStateCompat() {
+        return mediaController
+                .getPlaybackState()
+                .getState();
+    }
+
+    /**
+     * Get the length of the media from the playback state.
+     *
+     * @return The length of the media in milliseconds.
+     */
+    private long getMediaLength() {
+        PlaybackStateCompat playbackState = mediaController.getPlaybackState();
+        Bundle extras = playbackState.getExtras();
+
+        return extras == null
+                ? 0
+                : extras.getLong(VlcMediaPlayerSession.LengthExtra);
+    }
+
+    /**
+     * Prepare the media for the provided video and subtitle files.
+     *
+     * @param videoFilePath    The path to the video file.
+     * @param subtitleFilePath The path to the subtitle file.
+     */
+    private void prepareMedia(
+            String videoFilePath,
+            String subtitleFilePath
+    ) {
+        if (transportControls == null) {
+            return;
+        }
+
+        Bundle bundle = new Bundle();
+
+        bundle.putString(
+                MediaPlayerActivity.SubtitlePathExtra,
+                subtitleFilePath
+        );
+
+        transportControls.prepareFromUri(
+                Uri.fromFile(new File(videoFilePath)),
+                bundle
+        );
+    }
+
+    @Override
+    public void onRendererUpdate(RendererItem rendererItem) {
+        setRenderer(rendererItem);
+    }
+
+    /**
+     * Set the current renderer item. If the renderer is null, then
+     * local playback is used.
+     *
+     * @param rendererItem The renderer item.
+     */
+    private void setRenderer(RendererItem rendererItem) {
+        // No renderer selected, set local renderer.
+        if (rendererItem == null) {
+            mediaPlayerServiceBinder.setRenderer(
+                    mediaPlayerComponent.getMediaSurfaceView(),
+                    mediaPlayerComponent.getSubtitleSurfaceView(),
+                    mediaPlayerComponent
+            );
+
+            return;
+        }
+
+        mediaPlayerServiceBinder.setRenderer(rendererItem);
+    }
+
 
 }

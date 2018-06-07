@@ -4,16 +4,26 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:background="@drawable/shape_gradient_rasta">
+    android:background="@drawable/shape_gradient_rasta"
+    android:gravity="center"
+    android:orientation="vertical">
 
     <android.support.v7.widget.AppCompatButton
-        android:id="@+id/button_play"
+        android:id="@+id/button_play_mp4"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:text="@string/play_demo_media"
-        android:enabled="false"/>
+        android:text="@string/play_demo_media_mp4"/>
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/button_play_avi"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="@string/play_demo_media_avi"/>
 
 </LinearLayout>

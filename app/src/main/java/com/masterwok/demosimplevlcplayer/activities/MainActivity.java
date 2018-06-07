@@ -5,15 +5,16 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
+import android.view.View;
 
 import com.masterwok.demosimplevlcplayer.R;
+import com.masterwok.demosimplevlcplayer.callbacks.DebouncedOnClickListener;
 import com.masterwok.demosimplevlcplayer.helpers.FileHelper;
 import com.masterwok.simplevlcplayer.activities.MediaPlayerActivity;
 import com.masterwok.simplevlcplayer.utils.ThreadUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 
 /**
@@ -21,9 +22,14 @@ import java.io.InputStream;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private AppCompatButton buttonPlay;
+    private static final int MediaPlayerRequestCode = 32106;
+    private static final int ButtonDebounceTimeout = 1000;
 
-    private File demoVideoFile;
+    private AppCompatButton buttonPlayMp4;
+    private AppCompatButton buttonPlayAvi;
+
+    private File demoVideoFileMp4;
+    private File demoVideoFileAvi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        demoVideoFile = new File(getCacheDir() + "/sample.mp4");
+        demoVideoFileMp4 = new File(getCacheDir() + "/sample.mp4");
+        demoVideoFileAvi = new File(getCacheDir() + "/sample.avi");
 
         bindViewComponents();
         subscribeToViewComponents();
@@ -45,14 +52,16 @@ public class MainActivity extends AppCompatActivity {
      * cache before it can be played.
      */
     private void copyRawVideoResourceToCache() {
-        InputStream sampleInputStream = getResources()
-                .openRawResource(R.raw.sample);
 
         try {
-            FileHelper.copy(sampleInputStream, demoVideoFile);
-
-            // Enable play button once copy is complete
-            ThreadUtil.onMain(() -> buttonPlay.setEnabled(true));
+            FileHelper.copy(
+                    getResources().openRawResource(R.raw.sample_mp4),
+                    demoVideoFileMp4
+            );
+            FileHelper.copy(
+                    getResources().openRawResource(R.raw.sample_avi),
+                    demoVideoFileAvi
+            );
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -62,30 +71,28 @@ public class MainActivity extends AppCompatActivity {
      * Bind view components to private fields.
      */
     private void bindViewComponents() {
-        buttonPlay = findViewById(R.id.button_play);
+        buttonPlayMp4 = findViewById(R.id.button_play_mp4);
+        buttonPlayAvi = findViewById(R.id.button_play_avi);
     }
 
     /**
      * Subscribe to any bound view components.
      */
     private void subscribeToViewComponents() {
-        buttonPlay.setOnClickListener(view -> {
-            // Disable play button (prevent bounce/re-enabled in onStart())
-            view.setEnabled(false);
+        buttonPlayMp4.setOnClickListener(new DebouncedOnClickListener(ButtonDebounceTimeout) {
+            @Override
+            public void onDebouncedClick(View v) {
+                startMediaPlayerActivity(demoVideoFileMp4);
+            }
+        });
 
-            startMediaPlayerActivity(demoVideoFile);
+        buttonPlayAvi.setOnClickListener(new DebouncedOnClickListener(ButtonDebounceTimeout) {
+            @Override
+            public void onDebouncedClick(View v) {
+                startMediaPlayerActivity(demoVideoFileAvi);
+            }
         });
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        // Re-enable play button (prevent bounce)
-        buttonPlay.setEnabled(true);
-    }
-
-    private static final int MediaPlayerRequestCode = 32106;
 
     /**
      * Start the simple-vlc-player media player activity. This method

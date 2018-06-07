@@ -1,16 +1,13 @@
 package com.masterwok.simplevlcplayer.callbacks;
 
 import android.content.Context;
-import android.media.AudioAttributes;
-import android.media.AudioFocusRequest;
-import android.media.AudioManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.masterwok.simplevlcplayer.interfaces.ParamRunnable;
+import com.masterwok.simplevlcplayer.utils.AudioUtil;
 
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
@@ -27,6 +24,7 @@ public class VlcMediaPlayerEventListener
         extends MediaSessionCompat.Callback
         implements MediaPlayer.EventListener {
 
+    private final Context context;
     private final MediaSessionCompat mediaSessionCompat;
     private final LibVLC libVlc;
     private final MediaPlayer mediaPlayer;
@@ -36,7 +34,6 @@ public class VlcMediaPlayerEventListener
     private final String positionExtra;
     private final String lengthExtra;
     private final String timeExtra;
-    private final AudioManager audioManager;
 
     public VlcMediaPlayerEventListener(
             Context context,
@@ -50,6 +47,7 @@ public class VlcMediaPlayerEventListener
             String lengthExtra,
             String timeExtra
     ) {
+        this.context = context;
         this.mediaSessionCompat = mediaSessionCompat;
         this.libVlc = libVlc;
         this.mediaPlayer = mediaPlayer;
@@ -61,36 +59,6 @@ public class VlcMediaPlayerEventListener
         this.lengthExtra = lengthExtra;
         this.timeExtra = timeExtra;
 
-        this.audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-    }
-
-    /**
-     * Request audio focus so other applications pause playback.
-     */
-    private void requestAudioFocus() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
-                    .build();
-
-            AudioFocusRequest audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                    .setAudioAttributes(audioAttributes)
-                    .setAcceptsDelayedFocusGain(false)
-                    .build();
-
-            audioManager.requestAudioFocus(audioFocusRequest);
-
-            return;
-        }
-
-        //noinspection deprecation
-        audioManager.requestAudioFocus(
-                null,
-                AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN
-        );
     }
 
 
@@ -130,11 +98,10 @@ public class VlcMediaPlayerEventListener
 
     @Override
     public void onPlay() {
-        requestAudioFocus();
+        AudioUtil.requestAudioFocus(context);
 
         mediaPlayer.play();
     }
-
 
     @Override
     public void onPause() {

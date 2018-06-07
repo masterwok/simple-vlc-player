@@ -1,4 +1,4 @@
-package com.masterwok.demosimplevlcplayer.callbacks;
+package com.masterwok.simplevlcplayer.callbacks;
 
 import android.os.SystemClock;
 import android.view.View;

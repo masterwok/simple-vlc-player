@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.masterwok.demosimplevlcplayer.R;
-import com.masterwok.demosimplevlcplayer.callbacks.DebouncedOnClickListener;
+import com.masterwok.simplevlcplayer.callbacks.DebouncedOnClickListener;
 import com.masterwok.demosimplevlcplayer.helpers.FileHelper;
 import com.masterwok.simplevlcplayer.activities.MediaPlayerActivity;
 import com.masterwok.simplevlcplayer.utils.ThreadUtil;

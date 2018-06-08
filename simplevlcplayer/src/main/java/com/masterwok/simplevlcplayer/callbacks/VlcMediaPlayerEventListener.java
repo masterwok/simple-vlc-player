@@ -8,10 +8,13 @@ import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.masterwok.simplevlcplayer.interfaces.ParamRunnable;
 import com.masterwok.simplevlcplayer.utils.AudioUtil;
+import com.masterwok.simplevlcplayer.utils.FileUtil;
 
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.MediaPlayer;
+
+import java.io.FileDescriptor;
 
 import static com.masterwok.simplevlcplayer.sessions.VlcMediaPlayerSession.SubtitleExtra;
 
@@ -59,14 +62,21 @@ public class VlcMediaPlayerEventListener
         this.lengthExtra = lengthExtra;
         this.timeExtra = timeExtra;
 
+        mediaSessionCompat.setActive(false);
     }
 
 
     @Override
     public void onPrepareFromUri(Uri uri, Bundle extras) {
-        mediaPlayer.stop();
+        mediaSessionCompat.setActive(false);
 
-        mediaPlayer.setMedia(new Media(libVlc, uri));
+        FileDescriptor mediaFileDescriptor = FileUtil.getUriFileDescriptor(
+                context,
+                uri,
+                "r"
+        );
+
+        mediaPlayer.setMedia(new Media(libVlc, mediaFileDescriptor));
 
         String subtitlePath = extras == null || !extras.containsKey(SubtitleExtra)
                 ? null
@@ -111,11 +121,6 @@ public class VlcMediaPlayerEventListener
     @Override
     public void onStop() {
         mediaPlayer.stop();
-
-        // Allow the media session to release any resources.
-        onStop.run();
-
-        mediaSessionCompat.setActive(false);
     }
 
     @Override
@@ -168,7 +173,7 @@ public class VlcMediaPlayerEventListener
                 PlaybackStateCompat.STATE_BUFFERING,
                 mediaPlayer.getTime(),
                 1
-        ).build();
+        ).setExtras(buildPlaybackStateBundle()).build();
 
         setPlaybackState.run(newState);
     }
@@ -183,7 +188,7 @@ public class VlcMediaPlayerEventListener
                 PlaybackStateCompat.STATE_STOPPED,
                 0,
                 0
-        ).build();
+        ).setExtras(buildPlaybackStateBundle()).build();
 
         setPlaybackState.run(newState);
     }

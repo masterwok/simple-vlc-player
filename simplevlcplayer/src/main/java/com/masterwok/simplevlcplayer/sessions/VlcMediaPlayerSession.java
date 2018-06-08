@@ -80,14 +80,8 @@ public class VlcMediaPlayerSession
         detachSurfaceViews();
 
         mediaPlayer.setRenderer(renderItem);
-
-        restartPlayback();
     }
 
-    private void restartPlayback() {
-        mediaPlayer.stop();
-        mediaPlayer.play();
-    }
 
     /**
      * Play media locally using the provided surface views.
@@ -111,8 +105,6 @@ public class VlcMediaPlayerSession
                 subtitleSurfaceView,
                 layoutListener
         );
-
-        restartPlayback();
     }
 
     /**

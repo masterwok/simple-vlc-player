@@ -144,6 +144,27 @@ public class MediaPlayerActivity
         super.finish();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (!mediaPlayerServiceIsBound) {
+            return;
+        }
+
+        // TODO: Fix this, renderer shouldn't be going black on pause.
+        if (mediaPlayerServiceBinder.getSelectedRendererItem() == null) {
+            setLocalRenderer();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        transportControls.pause();
+    }
+
     private void readIntent() {
         Intent intent = getIntent();
 
@@ -291,6 +312,15 @@ public class MediaPlayerActivity
         setRenderer(rendererItem);
     }
 
+    private void setLocalRenderer() {
+        mediaPlayerServiceBinder.setRenderer(
+                mediaPlayerComponent.getMediaSurfaceView(),
+                mediaPlayerComponent.getSubtitleSurfaceView(),
+                mediaPlayerComponent
+        );
+    }
+
+
     /**
      * Set the current renderer item. If the renderer is null, then
      * local playback is used.
@@ -300,12 +330,7 @@ public class MediaPlayerActivity
     private void setRenderer(RendererItem rendererItem) {
         // No renderer selected, set local renderer.
         if (rendererItem == null) {
-            mediaPlayerServiceBinder.setRenderer(
-                    mediaPlayerComponent.getMediaSurfaceView(),
-                    mediaPlayerComponent.getSubtitleSurfaceView(),
-                    mediaPlayerComponent
-            );
-
+            setLocalRenderer();
             return;
         }
 

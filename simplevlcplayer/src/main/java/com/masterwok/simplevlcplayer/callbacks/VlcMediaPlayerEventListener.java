@@ -65,24 +65,21 @@ public class VlcMediaPlayerEventListener
     @Override
     public void onPrepareFromUri(Uri uri, Bundle extras) {
         mediaPlayer.stop();
+
         mediaPlayer.setMedia(new Media(libVlc, uri));
 
-        if (extras == null || !extras.containsKey(SubtitleExtra)) {
-            return;
+        String subtitlePath = extras == null || !extras.containsKey(SubtitleExtra)
+                ? null
+                : extras.getString(SubtitleExtra);
+
+        if (subtitlePath != null) {
+            //noinspection ConstantConditions
+            mediaPlayer.addSlave(
+                    Media.Slave.Type.Subtitle,
+                    subtitlePath,
+                    true
+            );
         }
-
-        String subtitlePath = extras.getString(SubtitleExtra);
-
-        if (subtitlePath == null) {
-            return;
-        }
-
-        //noinspection ConstantConditions
-        mediaPlayer.addSlave(
-                Media.Slave.Type.Subtitle,
-                subtitlePath,
-                true
-        );
 
         mediaSessionCompat.setActive(true);
     }

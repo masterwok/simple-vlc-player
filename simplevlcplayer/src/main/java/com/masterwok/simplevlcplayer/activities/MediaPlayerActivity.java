@@ -160,9 +160,9 @@ public class MediaPlayerActivity
 
     @Override
     protected void onPause() {
-        super.onPause();
-
         transportControls.pause();
+
+        super.onPause();
     }
 
     private void readIntent() {

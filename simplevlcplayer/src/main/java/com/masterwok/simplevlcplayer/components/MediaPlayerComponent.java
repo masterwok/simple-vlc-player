@@ -160,6 +160,9 @@ public class MediaPlayerComponent
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
+        configureMediaSurfaceViewHolder(surfaceViewMedia);
+        configureSubtitlesSurfaceView(surfaceViewSubtitle);
+
         showToolbars();
         startToolbarHideTimer();
     }

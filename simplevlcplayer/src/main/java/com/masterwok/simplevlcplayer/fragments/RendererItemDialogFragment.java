@@ -69,7 +69,9 @@ public class RendererItemDialogFragment
         //noinspection unchecked
         configure(
                 (List<RendererItem>) o,
-                mediaPlayerServiceBinder.getSelectedRendererItem()
+                mediaPlayerServiceBinder
+                        .getMediaPlayerSession()
+                        .getSelectedRendererItem()
         );
     };
 
@@ -87,12 +89,15 @@ public class RendererItemDialogFragment
             mediaPlayerServiceBinder = (MediaPlayerService.MediaPlayerServiceBinder) iBinder;
 
             RendererItemListener rendererItemObservable = mediaPlayerServiceBinder
+                    .getMediaPlayerSession()
                     .getRenderItemObservable();
 
             // Configure display state with initial renderer items.
             configure(
                     rendererItemObservable.getRenderItems(),
-                    mediaPlayerServiceBinder.getSelectedRendererItem()
+                    mediaPlayerServiceBinder
+                            .getMediaPlayerSession()
+                            .getSelectedRendererItem()
             );
 
             // Register renderer item observer.
@@ -269,6 +274,7 @@ public class RendererItemDialogFragment
                 .unbindService(mediaPlayerServiceConnection);
 
         mediaPlayerServiceBinder
+                .getMediaPlayerSession()
                 .getRenderItemObservable()
                 .deleteObserver(rendererItemObserver);
 

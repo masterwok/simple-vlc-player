@@ -130,7 +130,7 @@ public class VlcMediaPlayerSession
     /**
      * Detach the video and subtitle surface views.
      */
-    private void detachSurfaceViews() {
+    public void detachSurfaceViews() {
         IVLCVout vlcOut = mediaPlayer.getVLCVout();
 
         if (!vlcOut.areViewsAttached()) {
@@ -139,7 +139,6 @@ public class VlcMediaPlayerSession
 
         vlcOut.detachViews();
     }
-
 
     /**
      * Get the renderer item listener (observable).

@@ -42,6 +42,7 @@ public class MediaPlayerActivity
 
     private MediaPlayerService.MediaPlayerServiceBinder mediaPlayerServiceBinder;
     private MediaControllerCompat.TransportControls transportControls;
+    private VlcMediaPlayerSession mediaPlayerSession;
     private MediaControllerCompat mediaController;
     private boolean mediaPlayerServiceIsBound;
 
@@ -56,12 +57,13 @@ public class MediaPlayerActivity
             mediaPlayerServiceBinder = (MediaPlayerService.MediaPlayerServiceBinder) iBinder;
             mediaPlayerServiceIsBound = true;
 
+            mediaPlayerSession = mediaPlayerServiceBinder.getMediaPlayerSession();
             mediaController = mediaPlayerServiceBinder.getMediaController();
             transportControls = mediaController.getTransportControls();
 
             mediaController.registerCallback(mediaControllerCallback);
 
-            setRenderer(mediaPlayerServiceBinder.getSelectedRendererItem());
+            setRenderer(mediaPlayerSession.getSelectedRendererItem());
             prepareMedia(videoFilePath, subtitleFilePath);
             transportControls.play();
         }
@@ -70,6 +72,9 @@ public class MediaPlayerActivity
         public void onServiceDisconnected(ComponentName componentName) {
             mediaPlayerServiceIsBound = false;
             mediaPlayerServiceBinder = null;
+            mediaPlayerSession = null;
+            transportControls = null;
+            mediaController = null;
         }
     };
 
@@ -153,7 +158,7 @@ public class MediaPlayerActivity
         }
 
         // TODO: Fix this, renderer shouldn't be going black on pause.
-        if (mediaPlayerServiceBinder.getSelectedRendererItem() == null) {
+        if (mediaPlayerSession.getSelectedRendererItem() == null) {
             setLocalRenderer();
         }
     }
@@ -313,7 +318,7 @@ public class MediaPlayerActivity
     }
 
     private void setLocalRenderer() {
-        mediaPlayerServiceBinder.setRenderer(
+        mediaPlayerSession.setRenderer(
                 mediaPlayerComponent.getMediaSurfaceView(),
                 mediaPlayerComponent.getSubtitleSurfaceView(),
                 mediaPlayerComponent
@@ -334,7 +339,7 @@ public class MediaPlayerActivity
             return;
         }
 
-        mediaPlayerServiceBinder.setRenderer(rendererItem);
+        mediaPlayerSession.setRenderer(rendererItem);
     }
 
 

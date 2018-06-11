@@ -97,8 +97,11 @@ public class VlcMediaPlayerSession
     ) {
         this.selectedRendererItem = null;
 
-        // Clear any previous renderer
+        // Clear any previous renderer.
         mediaPlayer.setRenderer(null);
+
+        // Detach any previously attached surface views.
+        detachSurfaceViews();
 
         attachSurfaceViews(
                 mediaSurfaceView,

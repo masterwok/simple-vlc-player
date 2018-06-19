@@ -1,4 +1,4 @@
-package com.masterwok.simplevlcplayer.dagger;
+package com.masterwok.simplevlcplayer.dagger.modules;
 
 import android.content.Context;
 
@@ -18,7 +18,7 @@ import dagger.Provides;
  * This module is responsible for providing VLC dependencies.
  */
 @Module
-class VlcModule {
+public class VlcModule {
 
     @Singleton
     @Provides

@@ -1,4 +1,4 @@
-package com.masterwok.simplevlcplayer.dagger;
+package com.masterwok.simplevlcplayer.dagger.modules;
 
 import android.content.Context;
 

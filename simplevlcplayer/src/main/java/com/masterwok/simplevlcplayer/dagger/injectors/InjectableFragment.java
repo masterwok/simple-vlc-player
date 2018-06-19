@@ -1,4 +1,4 @@
-package com.masterwok.simplevlcplayer.fragments;
+package com.masterwok.simplevlcplayer.dagger.injectors;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;

@@ -1,6 +1,12 @@
-package com.masterwok.simplevlcplayer.dagger;
+package com.masterwok.simplevlcplayer.dagger.components;
 
 import android.content.Context;
+
+import com.masterwok.simplevlcplayer.dagger.DaggerInjector;
+import com.masterwok.simplevlcplayer.dagger.modules.ActivityModule;
+import com.masterwok.simplevlcplayer.dagger.modules.AppModule;
+import com.masterwok.simplevlcplayer.dagger.modules.FragmentModule;
+import com.masterwok.simplevlcplayer.dagger.modules.VlcModule;
 
 import javax.inject.Singleton;
 

@@ -3,6 +3,7 @@ package com.masterwok.simplevlcplayer.activities;
 import android.os.Bundle;
 
 import com.masterwok.simplevlcplayer.R;
+import com.masterwok.simplevlcplayer.dagger.injectors.InjectableAppCompatActivity;
 import com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment;
 import com.masterwok.simplevlcplayer.fragments.RendererPlayerFragment;
 

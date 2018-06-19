@@ -14,6 +14,7 @@ import com.masterwok.simplevlcplayer.PlayerViewBinder;
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.contracts.PlayerView;
+import com.masterwok.simplevlcplayer.dagger.injectors.InjectableFragment;
 
 public abstract class BasePlayerFragment
         extends InjectableFragment

@@ -7,6 +7,8 @@ import android.content.ContentProvider;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 
+import com.masterwok.simplevlcplayer.dagger.components.DaggerMainComponent;
+
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjector;

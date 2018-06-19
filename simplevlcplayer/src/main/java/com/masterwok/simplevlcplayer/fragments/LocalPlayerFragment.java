@@ -9,18 +9,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.masterwok.simplevlcplayer.R;
-import com.masterwok.simplevlcplayer.components.PlayerComponent;
+import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 
 import javax.inject.Inject;
 
 public class LocalPlayerFragment
-        extends InjectableFragment {
+        extends InjectableFragment
+        implements PlayerControlComponent.Callback {
 
     @Inject
     public MediaPlayer mediaPlayer;
 
-    private PlayerComponent componentPlayer;
+    private PlayerControlComponent componentControls;
     private SurfaceView surfaceSubtitle;
     private SurfaceView surfaceMedia;
 
@@ -34,10 +35,6 @@ public class LocalPlayerFragment
         return inflater.inflate(R.layout.fragment_player_local, container, false);
     }
 
-    // TODO: Should this be delegated to another class?
-    private void togglePlayback() {
-    }
-
     @Override
     public void onViewCreated(
             @NonNull View view,
@@ -47,12 +44,27 @@ public class LocalPlayerFragment
 
         bindViewComponents(view);
 
-        componentPlayer.init(this::togglePlayback);
+        componentControls.registerCallback(this);
     }
 
     private void bindViewComponents(View view) {
-        componentPlayer = view.findViewById(R.id.component_player);
+        componentControls = view.findViewById(R.id.component_player);
         surfaceMedia = view.findViewById(R.id.surface_media);
         surfaceSubtitle = view.findViewById(R.id.surface_subtitle);
+    }
+
+    @Override
+    public void togglePlayback() {
+        // TODO: Implement..
+    }
+
+    @Override
+    public void onProgressChanged(int progress) {
+        // TODO: Implement..
+    }
+
+    @Override
+    public void onCastButtonTapped() {
+        // TODO: Implement..
     }
 }

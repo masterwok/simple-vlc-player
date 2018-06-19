@@ -17,7 +17,7 @@ import com.masterwok.simplevlcplayer.utils.ViewUtil;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class PlayerComponent
+public class PlayerControlComponent
         extends RelativeLayout
         implements SeekBar.OnSeekBarChangeListener {
 
@@ -29,32 +29,39 @@ public class PlayerComponent
     private AppCompatImageButton imageButtonPlayPause;
     private Timer toolbarHideTimer;
     private boolean toolbarsAreVisible = true;
-    private Runnable onPlaybackButtonTapped;
     private boolean isTrackingTouch;
+    private Callback callback;
 
+    public interface Callback {
+        void togglePlayback();
 
-    public PlayerComponent(Context context) {
+        void onProgressChanged(int progress);
+
+        void onCastButtonTapped();
+    }
+
+    public PlayerControlComponent(Context context) {
         super(context);
         inflate(context);
     }
 
-    public PlayerComponent(Context context, AttributeSet attrs) {
+    public PlayerControlComponent(Context context, AttributeSet attrs) {
         super(context, attrs);
         inflate(context);
     }
 
-    public PlayerComponent(Context context, AttributeSet attrs, int defStyleAttr) {
+    public PlayerControlComponent(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         inflate(context);
     }
 
-    public PlayerComponent(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public PlayerControlComponent(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         inflate(context);
     }
 
     private void inflate(Context context) {
-        inflate(context, R.layout.component_player, this);
+        inflate(context, R.layout.component_player_control, this);
     }
 
     @Override
@@ -64,12 +71,12 @@ public class PlayerComponent
         bindViewComponents();
         subscribeToViewComponents();
         startToolbarHideTimer();
+
+        toolbarHeader.inflateMenu(R.menu.media_player);
     }
 
-    public void init(
-            Runnable onPlaybackButtonTapped
-    ) {
-        this.onPlaybackButtonTapped = onPlaybackButtonTapped;
+    public void registerCallback(Callback callback) {
+        this.callback = callback;
     }
 
     private void bindViewComponents() {
@@ -85,7 +92,12 @@ public class PlayerComponent
     private void subscribeToViewComponents() {
         seekBarPosition.setOnSeekBarChangeListener(this);
 
-        imageButtonPlayPause.setOnClickListener(view -> onPlaybackButtonTapped.run());
+        imageButtonPlayPause.setOnClickListener(view -> callback.togglePlayback());
+
+        toolbarHeader.setOnMenuItemClickListener(item -> {
+            callback.onCastButtonTapped();
+            return true;
+        });
 
         setOnClickListener((view) -> {
             toolbarHideTimer.cancel();
@@ -198,22 +210,12 @@ public class PlayerComponent
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
         isTrackingTouch = true;
-
-//        final int state = mediaController.getPlaybackState().getState();
-//
-//        if (state != PlaybackStateCompat.STATE_PLAYING) {
-//            return;
-//        }
-//
-//        player.pause();
     }
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         isTrackingTouch = false;
-//        player.setTime((long) ((float) seekBar.getProgress() / 100 * player.getLength()));
-//        ThreadUtil.onMain(this::showProgressBar);
-//
-//        player.play();
+
+        callback.onProgressChanged(seekBar.getProgress());
     }
 }

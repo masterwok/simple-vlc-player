@@ -3,14 +3,14 @@
 
     <include
         android:id="@+id/toolbar_header"
-        layout="@layout/toolbar_player_header"
+        layout="@layout/toolbar_player_control_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"/>
 
     <include
         android:id="@+id/toolbar_footer"
-        layout="@layout/toolbar_player_footer"
+        layout="@layout/toolbar_player_control_footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"/>

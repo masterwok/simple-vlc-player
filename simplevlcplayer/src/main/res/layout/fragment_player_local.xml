@@ -25,7 +25,7 @@
 
     </FrameLayout>
 
-    <com.masterwok.simplevlcplayer.components.PlayerComponent
+    <com.masterwok.simplevlcplayer.components.PlayerControlComponent
         android:id="@+id/component_player"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

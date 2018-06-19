@@ -25,6 +25,12 @@ public interface MediaPlayer {
 
     void setTime(long time);
 
+    long getLength();
+
+    boolean isPlaying();
+
+    void onSurfaceChanged(int width, int height);
+
 
     interface Callback {
         void onOpening();
@@ -44,5 +50,7 @@ public interface MediaPlayer {
         void onTimeChange(long timeChanged);
 
         void onPositionChange(float positionChanged);
+
+        void onUpdateSurfaceView(int width, int height);
     }
 }

@@ -2,6 +2,7 @@ package com.masterwok.simplevlcplayer;
 
 import android.net.Uri;
 
+import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 
@@ -23,8 +24,10 @@ import static org.videolan.libvlc.MediaPlayer.Event.TimeChanged;
  */
 public class MediaPlayer
         implements
-        com.masterwok.simplevlcplayer.contracts.MediaPlayer,
-        org.videolan.libvlc.MediaPlayer.EventListener {
+        com.masterwok.simplevlcplayer.contracts.MediaPlayer
+        , org.videolan.libvlc.MediaPlayer.EventListener
+        , IVLCVout.OnNewVideoLayoutListener
+        , IVLCVout.Callback {
 
 
     private final org.videolan.libvlc.MediaPlayer player;
@@ -99,6 +102,16 @@ public class MediaPlayer
     }
 
     @Override
+    public long getLength() {
+        return player.getLength();
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return player.isPlaying();
+    }
+
+    @Override
     public void onEvent(org.videolan.libvlc.MediaPlayer.Event event) {
         if (callback == null) {
             return;
@@ -137,4 +150,31 @@ public class MediaPlayer
         }
     }
 
+    @Override
+    public void onSurfacesCreated(IVLCVout vlcVout) {
+        // Nothing to do..
+    }
+
+    @Override
+    public void onSurfacesDestroyed(IVLCVout vlcVout) {
+        // Nothing to do..
+    }
+
+
+    @Override
+    public void onSurfaceChanged(int width, int height) {
+    }
+
+    @Override
+    public void onNewVideoLayout(
+            IVLCVout vlcVout,
+            int width,
+            int height,
+            int visibleWidth,
+            int visibleHeight,
+            int sarNum,
+            int sarDen
+    ) {
+        callback.onUpdateSurfaceView(width, height);
+    }
 }

@@ -32,14 +32,6 @@ public class PlayerControlComponent
     private boolean isTrackingTouch;
     private Callback callback;
 
-    public interface Callback {
-        void togglePlayback();
-
-        void onProgressChanged(int progress);
-
-        void onCastButtonTapped();
-    }
-
     public PlayerControlComponent(Context context) {
         super(context);
         inflate(context);
@@ -64,6 +56,18 @@ public class PlayerControlComponent
         inflate(context, R.layout.component_player_control, this);
     }
 
+    public interface Callback {
+        void onPlayPauseButtonClicked();
+
+        void onCastButtonClicked();
+
+        void onProgressChanged(int progress);
+    }
+
+    public void registerCallback(Callback callback) {
+        this.callback = callback;
+    }
+
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -73,10 +77,6 @@ public class PlayerControlComponent
         startToolbarHideTimer();
 
         toolbarHeader.inflateMenu(R.menu.media_player);
-    }
-
-    public void registerCallback(Callback callback) {
-        this.callback = callback;
     }
 
     private void bindViewComponents() {
@@ -92,10 +92,10 @@ public class PlayerControlComponent
     private void subscribeToViewComponents() {
         seekBarPosition.setOnSeekBarChangeListener(this);
 
-        imageButtonPlayPause.setOnClickListener(view -> callback.togglePlayback());
+        imageButtonPlayPause.setOnClickListener(view -> callback.onPlayPauseButtonClicked());
 
         toolbarHeader.setOnMenuItemClickListener(item -> {
-            callback.onCastButtonTapped();
+            callback.onCastButtonClicked();
             return true;
         });
 
@@ -175,7 +175,7 @@ public class PlayerControlComponent
     }
 
 
-    protected void configure(PlaybackStateCompat state) {
+    public void configure(PlaybackStateCompat state) {
         boolean isPlaying = state.getState() == PlaybackStateCompat.STATE_PLAYING;
         long time = state.getPosition();
         long length = state.getBufferedPosition();
@@ -218,4 +218,5 @@ public class PlayerControlComponent
 
         callback.onProgressChanged(seekBar.getProgress());
     }
+
 }

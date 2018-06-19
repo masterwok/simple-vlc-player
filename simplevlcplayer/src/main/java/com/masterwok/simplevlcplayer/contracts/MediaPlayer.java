@@ -19,5 +19,9 @@ public interface MediaPlayer {
 
     void setSubtitle(Uri uri);
 
+    void setCallback(com.masterwok.simplevlcplayer.MediaPlayer.Callback callback);
+
+    long getTime();
+
     void setTime(long time);
 }

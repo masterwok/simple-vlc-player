@@ -29,6 +29,7 @@ public class MediaPlayer
 
     private final org.videolan.libvlc.MediaPlayer player;
     private final LibVLC libVlc;
+    private Callback callback;
 
     public MediaPlayer(LibVLC libVlc) {
         this.libVlc = libVlc;
@@ -83,33 +84,76 @@ public class MediaPlayer
     }
 
     @Override
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
+
+    @Override
+    public long getTime() {
+        return player.getTime();
+    }
+
+    @Override
     public void setTime(long time) {
         player.setTime(time);
     }
 
     @Override
     public void onEvent(org.videolan.libvlc.MediaPlayer.Event event) {
+        if (callback == null) {
+            return;
+        }
+
         switch (event.type) {
             case Opening:
+                callback.onOpening();
                 break;
             case SeekableChanged:
+                callback.onSeekStateChange(event.getSeekable());
                 break;
             case Playing:
+                callback.onPlaying();
                 break;
             case Paused:
+                callback.onPaused();
                 break;
             case Stopped:
+                callback.onStopped();
                 break;
             case EndReached:
+                callback.onEndReached();
                 break;
             case EncounteredError:
+                callback.onError();
                 break;
             case TimeChanged:
+                callback.onTimeChange(event.getTimeChanged());
                 break;
             case PositionChanged:
+                callback.onPositionChange(event.getPositionChanged());
                 break;
             default:
                 break;
         }
+    }
+
+    public interface Callback {
+        void onOpening();
+
+        void onSeekStateChange(boolean canSeek);
+
+        void onPlaying();
+
+        void onPaused();
+
+        void onStopped();
+
+        void onEndReached();
+
+        void onError();
+
+        void onTimeChange(long timeChanged);
+
+        void onPositionChange(float positionChanged);
     }
 }

@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.masterwok.simplevlcplayer.components.PlayerComponent;
-import com.masterwok.simplevlcplayer.contracts.VlcPlayer;
+import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 
 import javax.inject.Inject;
 
@@ -16,7 +16,7 @@ public class LocalPlayerFragment
         extends InjectableFragment {
 
     @Inject
-    public VlcPlayer vlcPlayer;
+    public MediaPlayer mediaPlayer;
 
     @Nullable
     @Override

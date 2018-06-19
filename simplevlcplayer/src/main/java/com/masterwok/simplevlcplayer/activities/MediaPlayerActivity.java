@@ -48,4 +48,11 @@ public class MediaPlayerActivity
         ));
     }
 
+    private void stopMediaPlayerService() {
+        stopService(new Intent(
+                getApplicationContext(),
+                MediaPlayerService.class
+        ));
+    }
+
 }

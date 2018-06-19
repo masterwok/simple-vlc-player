@@ -19,17 +19,18 @@ public class RendererItemObservable
         extends Observable
         implements RendererDiscoverer.EventListener {
 
+    private final LibVLC libVlc;
     private ArrayList<RendererItem> rendererItems = new ArrayList<>();
     private ArrayList<RendererDiscoverer> rendererDiscoverers = new ArrayList<>();
 
     public RendererItemObservable(LibVLC libVlc) {
-        start(libVlc);
+        this.libVlc = libVlc;
     }
 
     /**
      * Start listening for renderer item events.
      */
-    private void start(LibVLC libVlc) {
+    public void start() {
         for (RendererDiscoverer.Description discoverer : RendererDiscoverer.list(libVlc)) {
             RendererDiscoverer rendererDiscoverer = new RendererDiscoverer(
                     libVlc,
@@ -46,7 +47,7 @@ public class RendererItemObservable
     /**
      * Stop listening for renderer item events.
      */
-    private void stop() {
+    public void stop() {
         for (RendererDiscoverer discover : rendererDiscoverers) {
             discover.stop();
         }

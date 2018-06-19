@@ -87,14 +87,10 @@ public class PlayerViewBinder
     }
 
     private void updatePlaybackState() {
-        long length = mediaPlayer.getLength();
-        long time = mediaPlayer.getTime();
-        boolean isPlaying = mediaPlayer.isPlaying();
-
         view.updatePlaybackState(
-                isPlaying,
-                length,
-                time
+                mediaPlayer.isPlaying(),
+                mediaPlayer.getLength(),
+                mediaPlayer.getTime()
         );
     }
 

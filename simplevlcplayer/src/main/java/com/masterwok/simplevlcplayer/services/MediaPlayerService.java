@@ -1,5 +1,6 @@
 package com.masterwok.simplevlcplayer.services;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -26,7 +27,7 @@ public class MediaPlayerService extends InjectableService {
 
     public class Binder extends android.os.Binder {
 
-        public RendererItemObservable getRenderItemObservable() {
+        public RendererItemObservable getRendererItemObservable() {
             return rendererItemObservable;
         }
 

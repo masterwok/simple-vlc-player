@@ -5,7 +5,11 @@ public interface PlayerView {
 
     void registerCallback(Callback callback);
 
-    void updatePlaybackState();
+    void updatePlaybackState(
+            boolean isPlaying,
+            long length,
+            long time
+    );
 
     interface Callback {
         void togglePlayback();

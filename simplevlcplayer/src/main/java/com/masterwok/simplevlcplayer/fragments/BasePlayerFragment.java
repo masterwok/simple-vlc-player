@@ -10,7 +10,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.View;
 
-import com.masterwok.simplevlcplayer.components.MediaPlayerManager;
+import com.masterwok.simplevlcplayer.PlayerViewBinder;
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.contracts.PlayerView;
@@ -22,7 +22,7 @@ public abstract class BasePlayerFragment
 
     public static final String SimpleVlcSessionTag = "tag.simplevlcsession";
 
-    private MediaPlayerManager mediaPlayerManager;
+    private PlayerViewBinder playerViewBinder;
     private PlaybackStateCompat.Builder stateBuilder;
     private MediaControllerCompat mediaController;
     private MediaSessionCompat mediaSession;
@@ -81,20 +81,23 @@ public abstract class BasePlayerFragment
     }
 
     @Override
-    public void updatePlaybackState() {
-        final MediaPlayer player = getPlayer();
-
-        stateBuilder.setBufferedPosition(player.getLength());
+    public void updatePlaybackState(
+            boolean isPlaying,
+            long length,
+            long time
+    ) {
+        stateBuilder.setBufferedPosition(length);
         stateBuilder.setState(
-                player.isPlaying()
+                isPlaying
                         ? PlaybackStateCompat.STATE_PLAYING
                         : PlaybackStateCompat.STATE_PAUSED,
-                player.getTime(),
+                time,
                 1
         );
 
         mediaSession.setPlaybackState(stateBuilder.build());
     }
+
 
     public void detachMediaSession() {
         mediaSession.release();
@@ -140,7 +143,7 @@ public abstract class BasePlayerFragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mediaPlayerManager = new MediaPlayerManager(
+        playerViewBinder = new PlayerViewBinder(
                 getPlayer(),
                 this
         );

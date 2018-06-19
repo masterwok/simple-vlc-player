@@ -1,17 +1,23 @@
-package com.masterwok.simplevlcplayer.components;
+package com.masterwok.simplevlcplayer;
 
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.contracts.PlayerView;
 
 
-public class MediaPlayerManager
+/**
+ * This class is responsible for binding player view callbacks to the
+ * media player, and media player callbacks to the view. This means that
+ * player view callbacks directly control the media player, and media player
+ * events are reflected in the display view.
+ */
+public class PlayerViewBinder
         implements PlayerView.Callback
         , MediaPlayer.Callback {
 
     private final MediaPlayer mediaPlayer;
     private final PlayerView view;
 
-    public MediaPlayerManager(
+    public PlayerViewBinder(
             MediaPlayer mediaPlayer,
             PlayerView view
 
@@ -26,58 +32,71 @@ public class MediaPlayerManager
     @Override
     public void togglePlayback() {
         mediaPlayer.togglePlayback();
-        view.updatePlaybackState();
+        updatePlaybackState();
     }
 
     @Override
     public void onProgressChanged(int progress) {
         mediaPlayer.setTime((long) ((float) progress / 100 * mediaPlayer.getLength()));
-        view.updatePlaybackState();
+        updatePlaybackState();
     }
 
     @Override
     public void onPlayerOpening() {
-        view.updatePlaybackState();
+        updatePlaybackState();
     }
 
     @Override
     public void onPlayerSeekStateChange(boolean canSeek) {
-        view.updatePlaybackState();
+        updatePlaybackState();
     }
 
     @Override
     public void onPlayerPlaying() {
-        view.updatePlaybackState();
+        updatePlaybackState();
     }
 
     @Override
     public void onPlayerPaused() {
-        view.updatePlaybackState();
+        updatePlaybackState();
     }
 
     @Override
     public void onPlayerStopped() {
-        view.updatePlaybackState();
+        updatePlaybackState();
     }
 
     @Override
     public void onPlayerEndReached() {
-        view.updatePlaybackState();
+        updatePlaybackState();
     }
 
     @Override
     public void onPlayerError() {
-        view.updatePlaybackState();
+        updatePlaybackState();
     }
 
     @Override
     public void onPlayerTimeChange(long timeChanged) {
-        view.updatePlaybackState();
+        updatePlaybackState();
     }
 
     @Override
     public void onPlayerPositionChange(float positionChanged) {
-        view.updatePlaybackState();
+        updatePlaybackState();
     }
+
+    private void updatePlaybackState() {
+        long length = mediaPlayer.getLength();
+        long time = mediaPlayer.getTime();
+        boolean isPlaying = mediaPlayer.isPlaying();
+
+        view.updatePlaybackState(
+                isPlaying,
+                length,
+                time
+        );
+    }
+
 
 }

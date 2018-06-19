@@ -5,8 +5,7 @@ import com.masterwok.simplevlcplayer.contracts.PlayerView;
 
 
 public class MediaPlayerManager
-        implements com.masterwok.simplevlcplayer.contracts.MediaPlayerManager
-        , PlayerView.Callback
+        implements PlayerView.Callback
         , MediaPlayer.Callback {
 
     private final MediaPlayer mediaPlayer;
@@ -27,75 +26,58 @@ public class MediaPlayerManager
     @Override
     public void togglePlayback() {
         mediaPlayer.togglePlayback();
-        updatePlaybackState();
+        view.updatePlaybackState();
     }
 
     @Override
     public void onProgressChanged(int progress) {
         mediaPlayer.setTime((long) ((float) progress / 100 * mediaPlayer.getLength()));
-        updatePlaybackState();
-    }
-
-    @Override
-    public void onOpening() {
-        updatePlaybackState();
-    }
-
-    @Override
-    public void onSeekStateChange(boolean canSeek) {
-        updatePlaybackState();
-    }
-
-    @Override
-    public void onPlaying() {
-        updatePlaybackState();
-    }
-
-    @Override
-    public void onPaused() {
-        updatePlaybackState();
-    }
-
-    @Override
-    public void onStopped() {
-        updatePlaybackState();
-    }
-
-    @Override
-    public void onEndReached() {
-        updatePlaybackState();
-    }
-
-    @Override
-    public void onError() {
-        updatePlaybackState();
-    }
-
-    @Override
-    public void onTimeChange(long timeChanged) {
-        updatePlaybackState();
-    }
-
-    @Override
-    public void onPositionChange(float positionChanged) {
-        updatePlaybackState();
-    }
-
-    @Override
-    public void onUpdateSurfaceView(
-            int width,
-            int height
-    ) {
-        view.setSurfaceSize(width, height);
-    }
-
-    private void updatePlaybackState() {
         view.updatePlaybackState();
     }
 
+    @Override
+    public void onPlayerOpening() {
+        view.updatePlaybackState();
+    }
 
     @Override
-    public void surfaceChanged(int width, int height) {
-        mediaPlayer.onSurfaceChanged(width, height);
+    public void onPlayerSeekStateChange(boolean canSeek) {
+        view.updatePlaybackState();
     }
+
+    @Override
+    public void onPlayerPlaying() {
+        view.updatePlaybackState();
+    }
+
+    @Override
+    public void onPlayerPaused() {
+        view.updatePlaybackState();
+    }
+
+    @Override
+    public void onPlayerStopped() {
+        view.updatePlaybackState();
+    }
+
+    @Override
+    public void onPlayerEndReached() {
+        view.updatePlaybackState();
+    }
+
+    @Override
+    public void onPlayerError() {
+        view.updatePlaybackState();
+    }
+
+    @Override
+    public void onPlayerTimeChange(long timeChanged) {
+        view.updatePlaybackState();
+    }
+
+    @Override
+    public void onPlayerPositionChange(float positionChanged) {
+        view.updatePlaybackState();
+    }
+
 }

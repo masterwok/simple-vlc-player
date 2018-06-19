@@ -2,6 +2,8 @@ package com.masterwok.simplevlcplayer.contracts;
 
 import android.net.Uri;
 
+import com.masterwok.simplevlcplayer.VlcMediaPlayer;
+
 /**
  * This contract provides a way to interact with a media player.
  */
@@ -19,7 +21,7 @@ public interface MediaPlayer {
 
     void setSubtitle(Uri uri);
 
-    void setCallback(com.masterwok.simplevlcplayer.MediaPlayer.Callback callback);
+    void setCallback(VlcMediaPlayer.Callback callback);
 
     long getTime();
 
@@ -33,24 +35,23 @@ public interface MediaPlayer {
 
 
     interface Callback {
-        void onOpening();
+        void onPlayerOpening();
 
-        void onSeekStateChange(boolean canSeek);
+        void onPlayerSeekStateChange(boolean canSeek);
 
-        void onPlaying();
+        void onPlayerPlaying();
 
-        void onPaused();
+        void onPlayerPaused();
 
-        void onStopped();
+        void onPlayerStopped();
 
-        void onEndReached();
+        void onPlayerEndReached();
 
-        void onError();
+        void onPlayerError();
 
-        void onTimeChange(long timeChanged);
+        void onPlayerTimeChange(long timeChanged);
 
-        void onPositionChange(float positionChanged);
+        void onPlayerPositionChange(float positionChanged);
 
-        void onUpdateSurfaceView(int width, int height);
     }
 }

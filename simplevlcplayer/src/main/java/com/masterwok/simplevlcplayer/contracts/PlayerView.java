@@ -7,8 +7,6 @@ public interface PlayerView {
 
     void updatePlaybackState();
 
-    void setSurfaceSize(int width, int height);
-
     interface Callback {
         void togglePlayback();
 

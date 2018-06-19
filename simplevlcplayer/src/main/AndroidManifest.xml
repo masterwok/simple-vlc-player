@@ -2,12 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.masterwok.simplevlcplayer">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application>
         <activity
             android:name=".activities.MediaPlayerActivity"
             android:label="@string/title_activity_media_player"
             android:theme="@style/AppTheme.FullScreen">
         </activity>
+
+        <service android:name=".services.MediaPlayerService"/>
+
     </application>
 
 </manifest>

@@ -2,6 +2,7 @@ package com.masterwok.simplevlcplayer.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,7 +10,6 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.LayoutInflater;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +17,8 @@ import android.view.ViewGroup;
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.components.MediaPlayerManager;
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
-import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.contracts.PlayerView;
+import com.masterwok.simplevlcplayer.contracts.SurfaceMediaPlayer;
 
 import javax.inject.Inject;
 
@@ -28,13 +28,14 @@ public class LocalPlayerFragment
 
     public static final String SimpleVlcSessionTag = "tag.simplevlcsession";
 
+    private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v";
+
     private PlaybackStateCompat.Builder stateBuilder;
     private MediaControllerCompat mediaController;
     private MediaSessionCompat mediaSession;
 
-
     @Inject
-    public MediaPlayer mediaPlayer;
+    public SurfaceMediaPlayer player;
 
     private PlayerControlComponent componentControls;
     private SurfaceView surfaceSubtitle;
@@ -47,17 +48,17 @@ public class LocalPlayerFragment
     private class PlayerSessionCallback extends MediaSessionCompat.Callback {
         @Override
         public void onPlay() {
-            mediaPlayer.play();
+            player.play();
         }
 
         @Override
         public void onPause() {
-            mediaPlayer.pause();
+            player.pause();
         }
 
         @Override
         public void onSeekTo(final long pos) {
-            mediaPlayer.setTime(pos);
+            player.setTime(pos);
         }
     }
 
@@ -94,27 +95,16 @@ public class LocalPlayerFragment
 
     @Override
     public void updatePlaybackState() {
-        stateBuilder.setBufferedPosition(mediaPlayer.getLength());
+        stateBuilder.setBufferedPosition(player.getLength());
         stateBuilder.setState(
-                mediaPlayer.isPlaying()
+                player.isPlaying()
                         ? PlaybackStateCompat.STATE_PLAYING
                         : PlaybackStateCompat.STATE_PAUSED,
-                mediaPlayer.getTime(),
+                player.getTime(),
                 1
         );
 
         mediaSession.setPlaybackState(stateBuilder.build());
-    }
-
-    @Override
-    public void setSurfaceSize(int width, int height) {
-        SurfaceHolder holder = surfaceMedia.getHolder();
-        holder.setFixedSize(width, height);
-
-        ViewGroup.LayoutParams lp = surfaceMedia.getLayoutParams();
-        lp.width = width;
-        lp.height = height;
-        surfaceMedia.setLayoutParams(lp);
     }
 
 
@@ -152,12 +142,13 @@ public class LocalPlayerFragment
         bindViewComponents(view);
 
         mediaPlayerManager = new MediaPlayerManager(
-                mediaPlayer,
+                player,
                 this
         );
 
         registerSurfaceLayoutListener();
     }
+
 
     @Override
     public void onDestroyView() {
@@ -173,7 +164,7 @@ public class LocalPlayerFragment
     private void registerSurfaceLayoutListener() {
         surfaceLayoutListener = (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             if (left != oldLeft || top != oldTop || right != oldRight && bottom != oldBottom) {
-                mediaPlayerManager.surfaceChanged(v.getWidth(), v.getHeight());
+                player.onSurfaceChanged(v.getWidth(), v.getHeight());
             }
         };
 
@@ -185,11 +176,26 @@ public class LocalPlayerFragment
         super.onStart();
 
         attachMediaSession();
+
+        player.attachSurfaces(
+                surfaceMedia,
+                surfaceSubtitle
+        );
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        player.setMedia(Uri.parse(SAMPLE_URL));
+        player.play();
     }
 
     @Override
     public void onStop() {
         detachMediaSession();
+        player.detachSurfaces();
+        player.stop();
 
         super.onStop();
     }

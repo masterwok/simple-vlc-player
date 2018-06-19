@@ -1,6 +1,9 @@
 package com.masterwok.simplevlcplayer;
 
 import android.net.Uri;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.ViewGroup;
 
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
@@ -22,9 +25,10 @@ import static org.videolan.libvlc.MediaPlayer.Event.TimeChanged;
  * This class is an implementation of the media player contract and wraps
  * the VLC media player.
  */
-public class MediaPlayer
+public class VlcMediaPlayer
         implements
         com.masterwok.simplevlcplayer.contracts.MediaPlayer
+        , com.masterwok.simplevlcplayer.contracts.SurfaceMediaPlayer
         , org.videolan.libvlc.MediaPlayer.EventListener
         , IVLCVout.OnNewVideoLayoutListener
         , IVLCVout.Callback {
@@ -33,8 +37,11 @@ public class MediaPlayer
     private final org.videolan.libvlc.MediaPlayer player;
     private final LibVLC libVlc;
     private Callback callback;
+    private SurfaceView surfaceMedia;
 
-    public MediaPlayer(LibVLC libVlc) {
+    public VlcMediaPlayer(
+            LibVLC libVlc
+    ) {
         this.libVlc = libVlc;
 
         player = new org.videolan.libvlc.MediaPlayer(libVlc);
@@ -119,31 +126,31 @@ public class MediaPlayer
 
         switch (event.type) {
             case Opening:
-                callback.onOpening();
+                callback.onPlayerOpening();
                 break;
             case SeekableChanged:
-                callback.onSeekStateChange(event.getSeekable());
+                callback.onPlayerSeekStateChange(event.getSeekable());
                 break;
             case Playing:
-                callback.onPlaying();
+                callback.onPlayerPlaying();
                 break;
             case Paused:
-                callback.onPaused();
+                callback.onPlayerPaused();
                 break;
             case Stopped:
-                callback.onStopped();
+                callback.onPlayerStopped();
                 break;
             case EndReached:
-                callback.onEndReached();
+                callback.onPlayerEndReached();
                 break;
             case EncounteredError:
-                callback.onError();
+                callback.onPlayerError();
                 break;
             case TimeChanged:
-                callback.onTimeChange(event.getTimeChanged());
+                callback.onPlayerTimeChange(event.getTimeChanged());
                 break;
             case PositionChanged:
-                callback.onPositionChange(event.getPositionChanged());
+                callback.onPlayerPositionChange(event.getPositionChanged());
                 break;
             default:
                 break;
@@ -163,6 +170,7 @@ public class MediaPlayer
 
     @Override
     public void onSurfaceChanged(int width, int height) {
+        setSurfaceSize(width, height);
     }
 
     @Override
@@ -175,6 +183,42 @@ public class MediaPlayer
             int sarNum,
             int sarDen
     ) {
-        callback.onUpdateSurfaceView(width, height);
+        setSurfaceSize(width, height);
+    }
+
+    private void setSurfaceSize(int width, int height) {
+        SurfaceHolder holder = surfaceMedia.getHolder();
+        holder.setFixedSize(width, height);
+
+        ViewGroup.LayoutParams lp = surfaceMedia.getLayoutParams();
+        lp.width = width;
+        lp.height = height;
+        surfaceMedia.setLayoutParams(lp);
+    }
+
+    @Override
+    public void attachSurfaces(
+            SurfaceView surfaceMedia,
+            SurfaceView surfaceSubtitle
+    ) {
+        this.surfaceMedia = surfaceMedia;
+
+        final IVLCVout vlcOut = player.getVLCVout();
+        vlcOut.setVideoView(surfaceMedia);
+        vlcOut.setSubtitlesView(surfaceSubtitle);
+        vlcOut.attachViews(this);
+    }
+
+    @Override
+    public void detachSurfaces() {
+        final IVLCVout vlcOut = player.getVLCVout();
+
+        if (!vlcOut.areViewsAttached()) {
+            return;
+        }
+
+        vlcOut.detachViews();
+
+        surfaceMedia = null;
     }
 }

@@ -6,7 +6,7 @@
         <activity
             android:name=".activities.MediaPlayerActivity"
             android:label="@string/title_activity_media_player"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.FullScreen">
         </activity>
     </application>
 

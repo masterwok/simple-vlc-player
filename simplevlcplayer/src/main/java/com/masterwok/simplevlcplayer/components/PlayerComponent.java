@@ -6,7 +6,6 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
@@ -22,8 +21,6 @@ public class PlayerComponent
         extends RelativeLayout
         implements SeekBar.OnSeekBarChangeListener {
 
-    private RelativeLayout relativeLayoutContainer;
-    private FrameLayout frameLayoutContentView;
     private Toolbar toolbarHeader;
     private Toolbar toolbarFooter;
     private SeekBar seekBarPosition;
@@ -32,7 +29,6 @@ public class PlayerComponent
     private AppCompatImageButton imageButtonPlayPause;
     private Timer toolbarHideTimer;
     private boolean toolbarsAreVisible = true;
-    private int contentView;
     private Runnable onPlaybackButtonTapped;
     private boolean isTrackingTouch;
 
@@ -73,14 +69,10 @@ public class PlayerComponent
     public void init(
             Runnable onPlaybackButtonTapped
     ) {
-        this.contentView = contentView;
         this.onPlaybackButtonTapped = onPlaybackButtonTapped;
     }
 
     private void bindViewComponents() {
-        relativeLayoutContainer = findViewById(R.id.relativelayout_container);
-        frameLayoutContentView = findViewById(R.id.framelayout_content);
-
         toolbarHeader = findViewById(R.id.toolbar_header);
         toolbarFooter = findViewById(R.id.toolbar_footer);
 
@@ -95,7 +87,7 @@ public class PlayerComponent
 
         imageButtonPlayPause.setOnClickListener(view -> onPlaybackButtonTapped.run());
 
-        relativeLayoutContainer.setOnClickListener((view) -> {
+        setOnClickListener((view) -> {
             toolbarHideTimer.cancel();
 
             toggleToolbarVisibility();

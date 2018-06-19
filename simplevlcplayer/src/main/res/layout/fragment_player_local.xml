@@ -11,10 +11,7 @@
         android:id="@+id/framelayout_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/black"
-        android:baselineAligned="false"
-        android:fitsSystemWindows="false"
-        android:orientation="vertical">
+        android:background="@android:color/black">
 
         <SurfaceView
             android:id="@+id/surface_media"

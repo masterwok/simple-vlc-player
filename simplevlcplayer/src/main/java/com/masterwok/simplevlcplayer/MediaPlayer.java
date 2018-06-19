@@ -137,23 +137,4 @@ public class MediaPlayer
         }
     }
 
-    public interface Callback {
-        void onOpening();
-
-        void onSeekStateChange(boolean canSeek);
-
-        void onPlaying();
-
-        void onPaused();
-
-        void onStopped();
-
-        void onEndReached();
-
-        void onError();
-
-        void onTimeChange(long timeChanged);
-
-        void onPositionChange(float positionChanged);
-    }
 }

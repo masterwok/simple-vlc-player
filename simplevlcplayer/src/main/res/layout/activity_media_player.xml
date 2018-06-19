@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent">
-
-    <android.support.v7.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:text="@string/next_stop_akebonobashi"/>
-
-</RelativeLayout>
+    android:id="@+id/framelayout_fragment_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+</FrameLayout>

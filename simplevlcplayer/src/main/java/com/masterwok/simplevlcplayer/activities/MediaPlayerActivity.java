@@ -1,11 +1,13 @@
 package com.masterwok.simplevlcplayer.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableAppCompatActivity;
 import com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment;
 import com.masterwok.simplevlcplayer.fragments.RendererPlayerFragment;
+import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 
 public class MediaPlayerActivity
         extends InjectableAppCompatActivity {
@@ -18,6 +20,8 @@ public class MediaPlayerActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_media_player);
+
+        startMediaPlayerService();
 
 //        showLocalPlayerFragment();
         showRendererPlayerFragment();
@@ -35,6 +39,13 @@ public class MediaPlayerActivity
                 .beginTransaction()
                 .replace(R.id.framelayout_fragment_container, localPlayerFragment)
                 .commit();
+    }
+
+    private void startMediaPlayerService() {
+        startService(new Intent(
+                getApplicationContext(),
+                MediaPlayerService.class
+        ));
     }
 
 }

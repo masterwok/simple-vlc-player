@@ -6,6 +6,7 @@ import com.masterwok.simplevlcplayer.dagger.DaggerInjector;
 import com.masterwok.simplevlcplayer.dagger.modules.ActivityModule;
 import com.masterwok.simplevlcplayer.dagger.modules.AppModule;
 import com.masterwok.simplevlcplayer.dagger.modules.FragmentModule;
+import com.masterwok.simplevlcplayer.dagger.modules.ServiceModule;
 import com.masterwok.simplevlcplayer.dagger.modules.VlcModule;
 
 import javax.inject.Singleton;
@@ -21,6 +22,7 @@ import dagger.android.support.AndroidSupportInjectionModule;
         AppModule.class,
         ActivityModule.class,
         FragmentModule.class,
+        ServiceModule.class,
         VlcModule.class
 })
 public interface MainComponent

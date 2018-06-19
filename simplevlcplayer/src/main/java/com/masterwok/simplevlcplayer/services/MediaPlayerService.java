@@ -1,25 +1,33 @@
 package com.masterwok.simplevlcplayer.services;
 
-import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
+import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
 
-import dagger.android.DaggerService;
+import org.videolan.libvlc.LibVLC;
 
-public class MediaPlayerService extends Service {
+import javax.inject.Inject;
+
+public class MediaPlayerService extends InjectableService {
+
+    @Inject
+    public LibVLC libVlc;
+
 
     private final MediaPlayerServiceBinder mediaPlayerServiceBinder
             = new MediaPlayerServiceBinder();
 
 
-
     public class MediaPlayerServiceBinder extends Binder {
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
 
     @Nullable
     @Override

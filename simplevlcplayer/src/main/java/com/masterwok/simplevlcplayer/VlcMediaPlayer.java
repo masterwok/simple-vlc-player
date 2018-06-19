@@ -29,6 +29,7 @@ public class VlcMediaPlayer
         implements
         com.masterwok.simplevlcplayer.contracts.MediaPlayer
         , com.masterwok.simplevlcplayer.contracts.SurfaceMediaPlayer
+        , com.masterwok.simplevlcplayer.contracts.RendererItemMediaPlayer
         , org.videolan.libvlc.MediaPlayer.EventListener
         , IVLCVout.OnNewVideoLayoutListener
         , IVLCVout.Callback {

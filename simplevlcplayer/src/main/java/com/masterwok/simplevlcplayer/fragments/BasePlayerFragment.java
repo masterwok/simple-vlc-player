@@ -1,8 +1,12 @@
 package com.masterwok.simplevlcplayer.fragments;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -15,6 +19,7 @@ import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.contracts.PlayerView;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableFragment;
+import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 
 public abstract class BasePlayerFragment
         extends InjectableFragment
@@ -23,14 +28,28 @@ public abstract class BasePlayerFragment
 
     public static final String SimpleVlcSessionTag = "tag.simplevlcsession";
 
+    protected abstract MediaPlayer getPlayer();
+
+    protected abstract PlayerControlComponent getControls();
+
     private PlayerViewBinder playerViewBinder;
     private PlaybackStateCompat.Builder stateBuilder;
     private MediaControllerCompat mediaController;
     private MediaSessionCompat mediaSession;
+    private MediaPlayerService.Binder serviceBinder;
 
-    protected abstract MediaPlayer getPlayer();
+    private ServiceConnection serviceConnection = new ServiceConnection() {
 
-    protected abstract PlayerControlComponent getControls();
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            serviceBinder = (MediaPlayerService.Binder) iBinder;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            serviceBinder = null;
+        }
+    };
 
     private MediaControllerCompat.Callback controllerCallback = new MediaControllerCompat.Callback() {
         @Override
@@ -42,6 +61,24 @@ public abstract class BasePlayerFragment
             getControls().configure(state);
         }
     };
+
+    private class PlayerSessionCallback extends MediaSessionCompat.Callback {
+        @Override
+        public void onPlay() {
+            getPlayer().play();
+        }
+
+        @Override
+        public void onPause() {
+            getPlayer().pause();
+        }
+
+        @Override
+        public void onSeekTo(final long pos) {
+            getPlayer().setTime(pos);
+        }
+    }
+
 
     @Override
     public void registerCallback(Callback callback) {
@@ -64,23 +101,6 @@ public abstract class BasePlayerFragment
         });
     }
 
-    private class PlayerSessionCallback extends MediaSessionCompat.Callback {
-        @Override
-        public void onPlay() {
-            getPlayer().play();
-        }
-
-        @Override
-        public void onPause() {
-            getPlayer().pause();
-        }
-
-        @Override
-        public void onSeekTo(final long pos) {
-            getPlayer().setTime(pos);
-        }
-    }
-
     @Override
     public void updatePlaybackState(
             boolean isPlaying,
@@ -97,31 +117,6 @@ public abstract class BasePlayerFragment
         );
 
         mediaSession.setPlaybackState(stateBuilder.build());
-    }
-
-
-    public void detachMediaSession() {
-        mediaSession.release();
-        mediaController.unregisterCallback(controllerCallback);
-    }
-
-    public void attachMediaSession() {
-        final Activity activity = getActivity();
-
-        if (activity == null) {
-            return;
-        }
-
-        mediaSession = new MediaSessionCompat(activity, SimpleVlcSessionTag);
-        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-        mediaSession.setMediaButtonReceiver(null);
-        mediaSession.setCallback(new PlayerSessionCallback());
-        mediaSession.setPlaybackState(stateBuilder.build());
-
-        mediaController = new MediaControllerCompat(activity, mediaSession);
-        mediaController.registerCallback(controllerCallback);
-
-        MediaControllerCompat.setMediaController(activity, mediaController);
     }
 
 
@@ -154,6 +149,7 @@ public abstract class BasePlayerFragment
     public void onStart() {
         super.onStart();
 
+        bindService();
         attachMediaSession();
     }
 
@@ -161,7 +157,60 @@ public abstract class BasePlayerFragment
     public void onStop() {
         super.onStop();
 
+        unbindService();
         detachMediaSession();
         getPlayer().stop();
+    }
+
+    public void detachMediaSession() {
+        mediaSession.release();
+        mediaController.unregisterCallback(controllerCallback);
+    }
+
+    public void attachMediaSession() {
+        final Activity activity = getActivity();
+
+        if (activity == null) {
+            return;
+        }
+
+        mediaSession = new MediaSessionCompat(activity, SimpleVlcSessionTag);
+        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mediaSession.setMediaButtonReceiver(null);
+        mediaSession.setCallback(new PlayerSessionCallback());
+        mediaSession.setPlaybackState(stateBuilder.build());
+
+        mediaController = new MediaControllerCompat(activity, mediaSession);
+        mediaController.registerCallback(controllerCallback);
+
+        MediaControllerCompat.setMediaController(activity, mediaController);
+    }
+
+    private void bindService() {
+        Context context = getContext();
+
+        if (context == null) {
+            return;
+        }
+
+        context.bindService(
+                new Intent(
+                        context.getApplicationContext(),
+                        MediaPlayerService.class
+                ),
+                serviceConnection,
+                Context.BIND_AUTO_CREATE
+        );
+
+    }
+
+    private void unbindService() {
+        Context context = getContext();
+
+        if (context == null) {
+            return;
+        }
+
+        context.unbindService(serviceConnection);
     }
 }

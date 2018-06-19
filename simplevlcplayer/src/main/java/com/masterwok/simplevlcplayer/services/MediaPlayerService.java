@@ -8,6 +8,7 @@ import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 
 import org.videolan.libvlc.LibVLC;
+import org.videolan.libvlc.RendererItem;
 
 import javax.inject.Inject;
 
@@ -20,8 +21,23 @@ public class MediaPlayerService extends InjectableService {
 
     private RendererItemObservable rendererItemObservable;
 
+    private RendererItem rendererItem;
+
 
     public class Binder extends android.os.Binder {
+
+        public RendererItemObservable getRenderItemObservable() {
+            return rendererItemObservable;
+        }
+
+        public void setSelectedRendererItem(RendererItem rendererItem) {
+            MediaPlayerService.this.rendererItem = rendererItem;
+        }
+
+        public RendererItem getRendererItem() {
+            return rendererItem;
+        }
+
     }
 
     @Override

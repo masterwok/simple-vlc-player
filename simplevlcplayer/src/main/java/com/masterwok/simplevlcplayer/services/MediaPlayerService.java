@@ -37,7 +37,6 @@ public class MediaPlayerService extends InjectableService {
         public RendererItem getRendererItem() {
             return rendererItem;
         }
-
     }
 
     @Override

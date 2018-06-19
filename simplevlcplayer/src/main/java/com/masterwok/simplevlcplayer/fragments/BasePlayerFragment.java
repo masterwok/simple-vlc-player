@@ -1,12 +1,8 @@
 package com.masterwok.simplevlcplayer.fragments;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -19,7 +15,6 @@ import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.contracts.PlayerView;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableFragment;
-import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 
 public abstract class BasePlayerFragment
         extends InjectableFragment
@@ -36,20 +31,7 @@ public abstract class BasePlayerFragment
     private PlaybackStateCompat.Builder stateBuilder;
     private MediaControllerCompat mediaController;
     private MediaSessionCompat mediaSession;
-    private MediaPlayerService.Binder serviceBinder;
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            serviceBinder = (MediaPlayerService.Binder) iBinder;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            serviceBinder = null;
-        }
-    };
 
     private MediaControllerCompat.Callback controllerCallback = new MediaControllerCompat.Callback() {
         @Override
@@ -149,7 +131,6 @@ public abstract class BasePlayerFragment
     public void onStart() {
         super.onStart();
 
-        bindService();
         attachMediaSession();
     }
 
@@ -157,7 +138,6 @@ public abstract class BasePlayerFragment
     public void onStop() {
         super.onStop();
 
-        unbindService();
         detachMediaSession();
         getPlayer().stop();
     }
@@ -186,31 +166,4 @@ public abstract class BasePlayerFragment
         MediaControllerCompat.setMediaController(activity, mediaController);
     }
 
-    private void bindService() {
-        Context context = getContext();
-
-        if (context == null) {
-            return;
-        }
-
-        context.bindService(
-                new Intent(
-                        context.getApplicationContext(),
-                        MediaPlayerService.class
-                ),
-                serviceConnection,
-                Context.BIND_AUTO_CREATE
-        );
-
-    }
-
-    private void unbindService() {
-        Context context = getContext();
-
-        if (context == null) {
-            return;
-        }
-
-        context.unbindService(serviceConnection);
-    }
 }

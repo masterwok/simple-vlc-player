@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:baselineAligned="false"
+    android:fitsSystemWindows="false">
+
+    <FrameLayout
+        android:id="@+id/framelayout_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        android:baselineAligned="false"
+        android:fitsSystemWindows="false"
+        android:orientation="vertical">
+
+        <SurfaceView
+            android:id="@+id/surface_media"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <SurfaceView
+            android:id="@+id/surface_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </FrameLayout>
+
+    <com.masterwok.simplevlcplayer.components.PlayerComponent
+        android:id="@+id/component_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</RelativeLayout>

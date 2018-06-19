@@ -16,6 +16,11 @@ import static org.videolan.libvlc.MediaPlayer.Event.SeekableChanged;
 import static org.videolan.libvlc.MediaPlayer.Event.Stopped;
 import static org.videolan.libvlc.MediaPlayer.Event.TimeChanged;
 
+
+/**
+ * This class is an implementation of the media player contract and wraps
+ * the VLC media player.
+ */
 public class MediaPlayer
         implements
         com.masterwok.simplevlcplayer.contracts.MediaPlayer,

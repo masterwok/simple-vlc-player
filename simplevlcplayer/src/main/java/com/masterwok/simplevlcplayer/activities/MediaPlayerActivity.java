@@ -18,7 +18,26 @@ public class MediaPlayerActivity
 
     public LocalPlayerFragment localPlayerFragment = new LocalPlayerFragment();
     public RendererPlayerFragment rendererPlayerFragment = new RendererPlayerFragment();
-    private BroadcastReceiver broadCastReceiver;
+
+    private final BroadcastReceiver broadCastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            if (action == null) {
+                return;
+            }
+
+            switch (action) {
+                case MediaPlayerService.RendererClearedAction:
+                    showLocalPlayerFragment();
+                    break;
+                case MediaPlayerService.RendererSelectionAction:
+                    showRendererPlayerFragment();
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,26 +58,6 @@ public class MediaPlayerActivity
     }
 
     private void registerRendererBroadcastReceiver() {
-        broadCastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-
-                if (action == null) {
-                    return;
-                }
-
-                switch (action) {
-                    case MediaPlayerService.RendererClearedAction:
-                        showLocalPlayerFragment();
-                        break;
-                    case MediaPlayerService.RendererSelectionAction:
-                        showRendererPlayerFragment();
-                        break;
-                }
-            }
-        };
-
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(MediaPlayerService.RendererClearedAction);
         intentFilter.addAction(MediaPlayerService.RendererSelectionAction);

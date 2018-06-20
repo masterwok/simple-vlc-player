@@ -20,6 +20,7 @@ public abstract class BasePlayerFragment
         extends InjectableFragment
         implements PlayerView {
 
+    protected static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v";
 
     public static final String SimpleVlcSessionTag = "tag.simplevlcsession";
 
@@ -142,7 +143,6 @@ public abstract class BasePlayerFragment
         super.onStop();
 
         detachMediaSession();
-        getPlayer().stop();
     }
 
     public void detachMediaSession() {

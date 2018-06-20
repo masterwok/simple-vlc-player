@@ -1,5 +1,6 @@
 package com.masterwok.simplevlcplayer.fragments;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -70,7 +71,7 @@ public class RendererItemDialogFragment
         //noinspection unchecked
         configure(
                 (List<RendererItem>) o,
-                serviceBinder.getRendererItem()
+                serviceBinder.getSelectedRendererItem()
         );
     };
 
@@ -93,7 +94,7 @@ public class RendererItemDialogFragment
             // Configure display state with initial renderer items.
             configure(
                     rendererItemObservable.getRenderItems(),
-                    serviceBinder.getRendererItem()
+                    serviceBinder.getSelectedRendererItem()
             );
 
             // Register renderer item observer.
@@ -245,7 +246,7 @@ public class RendererItemDialogFragment
     public void onStart() {
         super.onStart();
 
-        startAndBindMediaPlayerService();
+        bindMediaPlayerService();
     }
 
     @Override
@@ -261,17 +262,18 @@ public class RendererItemDialogFragment
         super.onStop();
     }
 
-    private void startAndBindMediaPlayerService() {
-        Intent intent = new Intent(
-                getActivity().getApplicationContext(),
-                MediaPlayerService.class
-        );
+    private void bindMediaPlayerService() {
+        final Activity activity = getActivity();
 
-        //noinspection ConstantConditions
-        getActivity().startService(intent);
+        if (activity == null) {
+            return;
+        }
 
         getActivity().bindService(
-                intent,
+                new Intent(
+                        activity.getApplicationContext(),
+                        MediaPlayerService.class
+                ),
                 mediaPlayerServiceConnection,
                 Context.BIND_AUTO_CREATE
         );

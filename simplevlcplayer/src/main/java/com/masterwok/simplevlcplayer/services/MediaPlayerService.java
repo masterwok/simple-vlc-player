@@ -5,6 +5,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.masterwok.simplevlcplayer.contracts.RendererItemMediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 
@@ -26,6 +27,7 @@ public class MediaPlayerService extends InjectableService {
     private RendererItemObservable rendererItemObservable;
 
     private RendererItem rendererItem;
+    private RendererItemMediaPlayer player;
 
 
     public class Binder extends android.os.Binder {
@@ -39,10 +41,13 @@ public class MediaPlayerService extends InjectableService {
             sendRendererSelectedBroadcast(rendererItem);
         }
 
-        public RendererItem getRendererItem() {
+        public RendererItem getSelectedRendererItem() {
             return rendererItem;
         }
 
+        public void setRendererMediaPlayer(RendererItemMediaPlayer player) {
+            MediaPlayerService.this.player = player;
+        }
     }
 
     private void sendRendererSelectedBroadcast(RendererItem rendererItem) {

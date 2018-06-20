@@ -19,8 +19,6 @@ import javax.inject.Inject;
 public class LocalPlayerFragment
         extends BasePlayerFragment {
 
-    private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v";
-
     @Inject
     public SurfaceMediaPlayer player;
 
@@ -98,6 +96,7 @@ public class LocalPlayerFragment
 
     @Override
     public void onStop() {
+        getPlayer().stop();
         player.detachSurfaces();
 
         super.onStop();

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
+import org.videolan.libvlc.RendererItem;
 
 import static org.videolan.libvlc.Media.Slave.Type.Subtitle;
 import static org.videolan.libvlc.MediaPlayer.Event.EncounteredError;
@@ -221,5 +222,10 @@ public class VlcMediaPlayer
         vlcOut.detachViews();
 
         surfaceMedia = null;
+    }
+
+    @Override
+    public void setRendererItem(RendererItem rendererItem) {
+        player.setRenderer(rendererItem);
     }
 }

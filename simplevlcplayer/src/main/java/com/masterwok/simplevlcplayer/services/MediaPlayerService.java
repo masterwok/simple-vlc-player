@@ -1,9 +1,9 @@
 package com.masterwok.simplevlcplayer.services;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
@@ -14,6 +14,9 @@ import org.videolan.libvlc.RendererItem;
 import javax.inject.Inject;
 
 public class MediaPlayerService extends InjectableService {
+
+    public static final String RendererClearedAction = "action.rendererclearedaction";
+    public static final String RendererSelectionAction = "action.rendererselectionaction";
 
     @Inject
     public LibVLC libVlc;
@@ -33,12 +36,23 @@ public class MediaPlayerService extends InjectableService {
 
         public void setSelectedRendererItem(RendererItem rendererItem) {
             MediaPlayerService.this.rendererItem = rendererItem;
+            sendRendererSelectedBroadcast(rendererItem);
         }
 
         public RendererItem getRendererItem() {
             return rendererItem;
         }
 
+    }
+
+    private void sendRendererSelectedBroadcast(RendererItem rendererItem) {
+        Intent intent = rendererItem == null
+                ? new Intent(RendererClearedAction)
+                : new Intent(RendererSelectionAction);
+
+        LocalBroadcastManager
+                .getInstance(getApplicationContext())
+                .sendBroadcast(intent);
     }
 
     @Override

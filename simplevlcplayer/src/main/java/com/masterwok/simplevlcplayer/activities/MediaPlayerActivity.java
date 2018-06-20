@@ -1,7 +1,11 @@
 package com.masterwok.simplevlcplayer.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableAppCompatActivity;
@@ -14,6 +18,7 @@ public class MediaPlayerActivity
 
     public LocalPlayerFragment localPlayerFragment = new LocalPlayerFragment();
     public RendererPlayerFragment rendererPlayerFragment = new RendererPlayerFragment();
+    private BroadcastReceiver broadCastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +28,53 @@ public class MediaPlayerActivity
 
         startMediaPlayerService();
 
-//        showLocalPlayerFragment();
-        showRendererPlayerFragment();
+        showLocalPlayerFragment();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        registerRendererBroadcastReceiver();
+    }
+
+    private void registerRendererBroadcastReceiver() {
+        broadCastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+
+                if (action == null) {
+                    return;
+                }
+
+                switch (action) {
+                    case MediaPlayerService.RendererClearedAction:
+                        showLocalPlayerFragment();
+                        break;
+                    case MediaPlayerService.RendererSelectionAction:
+                        showRendererPlayerFragment();
+                        break;
+                }
+            }
+        };
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MediaPlayerService.RendererClearedAction);
+        intentFilter.addAction(MediaPlayerService.RendererSelectionAction);
+
+        LocalBroadcastManager
+                .getInstance(this)
+                .registerReceiver(broadCastReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onStop() {
+        LocalBroadcastManager
+                .getInstance(this)
+                .unregisterReceiver(broadCastReceiver);
+
+        super.onStop();
     }
 
     private void showRendererPlayerFragment() {
@@ -43,13 +93,6 @@ public class MediaPlayerActivity
 
     private void startMediaPlayerService() {
         startService(new Intent(
-                getApplicationContext(),
-                MediaPlayerService.class
-        ));
-    }
-
-    private void stopMediaPlayerService() {
-        stopService(new Intent(
                 getApplicationContext(),
                 MediaPlayerService.class
         ));

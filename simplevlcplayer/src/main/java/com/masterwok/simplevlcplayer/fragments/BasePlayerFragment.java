@@ -21,6 +21,7 @@ public abstract class BasePlayerFragment
         implements PlayerView {
 
     protected static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v";
+//    protected static final String SAMPLE_URL = "https://cinelerra-cv.org/footage/bars_100.avi";
 
     public static final String SimpleVlcSessionTag = "tag.simplevlcsession";
 

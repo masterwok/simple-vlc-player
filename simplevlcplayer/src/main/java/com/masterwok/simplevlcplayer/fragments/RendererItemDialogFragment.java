@@ -1,5 +1,6 @@
 package com.masterwok.simplevlcplayer.fragments;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,7 +8,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.view.View;
@@ -15,8 +15,8 @@ import android.widget.ListView;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.adapters.SelectionListAdapter;
-import com.masterwok.simplevlcplayer.callbacks.RendererItemListener;
 import com.masterwok.simplevlcplayer.models.SelectionItem;
+import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 import com.masterwok.simplevlcplayer.utils.ResourceUtil;
 import com.masterwok.simplevlcplayer.utils.ThreadUtil;
@@ -35,6 +35,8 @@ import java.util.Observer;
 public class RendererItemDialogFragment
         extends AppCompatDialogFragment {
 
+    public static final String Tag = "tag.rendereritemdialogfragment";
+
     /**
      * This interface should be implemented by activities who started
      * the dialog fragment should they want a result when a renderer item
@@ -52,7 +54,7 @@ public class RendererItemDialogFragment
 
     private static final float DimAmount = 0.6f;
 
-    private MediaPlayerService.MediaPlayerServiceBinder mediaPlayerServiceBinder;
+    private MediaPlayerService.Binder serviceBinder;
 
     private ListView listViewRendererItems;
     private SelectionListAdapter<RendererItem> rendererItemAdapter;
@@ -69,9 +71,7 @@ public class RendererItemDialogFragment
         //noinspection unchecked
         configure(
                 (List<RendererItem>) o,
-                mediaPlayerServiceBinder
-                        .getMediaPlayerSession()
-                        .getSelectedRendererItem()
+                serviceBinder.getSelectedRendererItem()
         );
     };
 
@@ -86,18 +86,15 @@ public class RendererItemDialogFragment
                 ComponentName componentName,
                 IBinder iBinder
         ) {
-            mediaPlayerServiceBinder = (MediaPlayerService.MediaPlayerServiceBinder) iBinder;
+            serviceBinder = (MediaPlayerService.Binder) iBinder;
 
-            RendererItemListener rendererItemObservable = mediaPlayerServiceBinder
-                    .getMediaPlayerSession()
-                    .getRenderItemObservable();
+            RendererItemObservable rendererItemObservable = serviceBinder
+                    .getRendererItemObservable();
 
             // Configure display state with initial renderer items.
             configure(
                     rendererItemObservable.getRenderItems(),
-                    mediaPlayerServiceBinder
-                            .getMediaPlayerSession()
-                            .getSelectedRendererItem()
+                    serviceBinder.getSelectedRendererItem()
             );
 
             // Register renderer item observer.
@@ -106,7 +103,7 @@ public class RendererItemDialogFragment
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            mediaPlayerServiceBinder = null;
+            serviceBinder = null;
         }
     };
 
@@ -185,7 +182,7 @@ public class RendererItemDialogFragment
         rendererItemAdapter = new SelectionListAdapter<>(
                 getContext(),
                 R.drawable.ic_check_black,
-                R.color.media_player_dialog_check
+                R.color.player_dialog_check
         );
 
         listViewRendererItems.setAdapter(rendererItemAdapter);
@@ -197,21 +194,6 @@ public class RendererItemDialogFragment
      * @param position The position of the selected item.
      */
     private void notifyRendererItemListener(int position) {
-        FragmentActivity activity = getActivity();
-
-        // Activity is not a buddy, guy.
-        if (!(activity instanceof RendererItemSelectionListener)) {
-            return;
-        }
-
-        RendererItemSelectionListener listener = (RendererItemSelectionListener) getActivity();
-
-        // "None" selected, or renderer no longer exists.
-        if (position == 0) {
-            listener.onRendererUpdate(null);
-            return;
-        }
-
         RendererItem selectedItem = null;
 
         try {
@@ -222,7 +204,7 @@ public class RendererItemDialogFragment
             // Renderer item may not exist at this point.
         }
 
-        listener.onRendererUpdate(selectedItem);
+        serviceBinder.setSelectedRendererItem(selectedItem);
     }
 
     /**
@@ -264,7 +246,7 @@ public class RendererItemDialogFragment
     public void onStart() {
         super.onStart();
 
-        startAndBindMediaPlayerService();
+        bindMediaPlayerService();
     }
 
     @Override
@@ -273,25 +255,25 @@ public class RendererItemDialogFragment
         getActivity()
                 .unbindService(mediaPlayerServiceConnection);
 
-        mediaPlayerServiceBinder
-                .getMediaPlayerSession()
-                .getRenderItemObservable()
+        serviceBinder
+                .getRendererItemObservable()
                 .deleteObserver(rendererItemObserver);
 
         super.onStop();
     }
 
-    private void startAndBindMediaPlayerService() {
-        Intent intent = new Intent(
-                getActivity().getApplicationContext(),
-                MediaPlayerService.class
-        );
+    private void bindMediaPlayerService() {
+        final Activity activity = getActivity();
 
-        //noinspection ConstantConditions
-        getActivity().startService(intent);
+        if (activity == null) {
+            return;
+        }
 
         getActivity().bindService(
-                intent,
+                new Intent(
+                        activity.getApplicationContext(),
+                        MediaPlayerService.class
+                ),
                 mediaPlayerServiceConnection,
                 Context.BIND_AUTO_CREATE
         );

@@ -2,8 +2,8 @@
     <string name="app_name">SimpleVlcPlayer</string>
     <string name="title_activity_media_player">MediaPlayerActivity</string>
     <string name="next_stop_akebonobashi">Next stop, Akebonobashi!</string>
-    <string name="cast_connect">Cast Devices</string>
-    <string name="dialog_title_renderer">Select Device</string>
-    <string name="dialog_button_renderer_negative">CANCEL</string>
+    <string name="cast_connect">Select device</string>
     <string name="dialog_none">None</string>
+    <string name="dialog_title_renderer">Select device</string>
+    <string name="dialog_button_renderer_negative">Cancel</string>
 </resources>

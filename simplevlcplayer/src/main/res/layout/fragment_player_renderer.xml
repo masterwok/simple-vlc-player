@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:baselineAligned="false"
+    android:fitsSystemWindows="false">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:layout_width="@dimen/player_renderer_image_width"
+        android:layout_height="@dimen/player_renderer_image_height"
+        android:layout_gravity="center"
+        android:layout_centerInParent="true"
+        app:srcCompat="@drawable/ic_cast_connected_white_24dp"/>
+
+    <com.masterwok.simplevlcplayer.components.PlayerControlComponent
+        android:id="@+id/component_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</RelativeLayout>

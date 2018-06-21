@@ -1,263 +1,100 @@
 package com.masterwok.simplevlcplayer.activities;
 
-import android.content.ComponentName;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.net.Uri;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
-import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.masterwok.simplevlcplayer.R;
-import com.masterwok.simplevlcplayer.components.MediaPlayerComponent;
-import com.masterwok.simplevlcplayer.fragments.RendererItemDialogFragment;
+import com.masterwok.simplevlcplayer.dagger.injectors.InjectableAppCompatActivity;
+import com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment;
+import com.masterwok.simplevlcplayer.fragments.RendererPlayerFragment;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
-import com.masterwok.simplevlcplayer.sessions.VlcMediaPlayerSession;
-
-import org.videolan.libvlc.RendererItem;
-
-import java.io.File;
 
 public class MediaPlayerActivity
-        extends AppCompatActivity
-        implements RendererItemDialogFragment.RendererItemSelectionListener {
+        extends InjectableAppCompatActivity {
 
-    public static final String VideoPathExtra = "extra.videopath";
-    public static final String SubtitlePathExtra = "extra.subtitlepath";
-    public static final String RequestCodeExtra = "extra.requestcode";
-    public static final String PlaybackPositionExtra = "extra.playbackposition";
-    public static final String VlcOptions = "extra.vlcoptions";
-    public static final String RendererItemDialogTag = "tag.dialogrendereritem";
+    public LocalPlayerFragment localPlayerFragment = new LocalPlayerFragment();
+    public RendererPlayerFragment rendererPlayerFragment = new RendererPlayerFragment();
 
-    private String subtitleFilePath;
-    private String videoFilePath;
-    private long playbackPosition;
-    private int requestCode;
-
-    private MediaPlayerComponent mediaPlayerComponent;
-
-    private MediaPlayerService.MediaPlayerServiceBinder mediaPlayerServiceBinder;
-    private MediaControllerCompat.TransportControls transportControls;
-    private VlcMediaPlayerSession mediaPlayerSession;
-    private MediaControllerCompat mediaController;
-    private boolean mediaPlayerServiceIsBound;
-
-    private final ServiceConnection mediaPlayerServiceConnection = new ServiceConnection() {
-
-
+    private final BroadcastReceiver broadCastReceiver = new BroadcastReceiver() {
         @Override
-        public void onServiceConnected(
-                ComponentName componentName,
-                IBinder iBinder
-        ) {
-            mediaPlayerServiceBinder = (MediaPlayerService.MediaPlayerServiceBinder) iBinder;
-            mediaPlayerServiceIsBound = true;
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
 
-            mediaPlayerSession = mediaPlayerServiceBinder.getMediaPlayerSession();
-            mediaController = mediaPlayerServiceBinder.getMediaController();
-            transportControls = mediaController.getTransportControls();
-
-            mediaController.registerCallback(mediaControllerCallback);
-
-            setRenderer(mediaPlayerSession.getSelectedRendererItem());
-            prepareMedia(videoFilePath, subtitleFilePath);
-            transportControls.play();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            mediaPlayerServiceIsBound = false;
-            mediaPlayerServiceBinder = null;
-            mediaPlayerSession = null;
-            transportControls = null;
-            mediaController = null;
-        }
-    };
-
-    private final MediaControllerCompat.Callback mediaControllerCallback = new MediaControllerCompat.Callback() {
-        @Override
-        public void onPlaybackStateChanged(PlaybackStateCompat state) {
-            // End of media reached, finish the activity.
-            if (state.getState() == PlaybackStateCompat.STATE_STOPPED
-                    && state.getPosition() == 0) {
-                finish();
+            if (action == null) {
+                return;
             }
 
-            // Media is buffering, seek to the current playback position.
-            if (state.getState() == PlaybackStateCompat.STATE_BUFFERING) {
-                transportControls.seekTo(playbackPosition);
+            switch (action) {
+                case MediaPlayerService.RendererClearedAction:
+                    showLocalPlayerFragment();
+                    break;
+                case MediaPlayerService.RendererSelectionAction:
+                    showRendererPlayerFragment();
+                    break;
             }
-
-            // Always update display state when playback state changes.
-            configure(state);
         }
     };
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_media_player);
 
-        bindViewComponents();
-        readIntent();
+        startMediaPlayerService();
 
-        startAndBindMediaPlayerService();
+        showLocalPlayerFragment();
     }
 
     @Override
-    protected void onDestroy() {
-        if (!mediaPlayerServiceIsBound) {
-            return;
-        }
+    protected void onStart() {
+        super.onStart();
 
-        transportControls.stop();
-        unbindService(mediaPlayerServiceConnection);
-        mediaPlayerServiceIsBound = false;
-
-        super.onDestroy();
+        registerRendererBroadcastReceiver();
     }
 
-    /**
-     * Activity is finishing, add playback position to result if activity started
-     * with result code.
-     */
-    @Override
-    public void finish() {
-        // Activity wasn't started with result, do nothing.
-        if (requestCode < 0) {
-            super.finish();
-            return;
-        }
+    private void registerRendererBroadcastReceiver() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MediaPlayerService.RendererClearedAction);
+        intentFilter.addAction(MediaPlayerService.RendererSelectionAction);
 
-        Intent intent = new Intent();
-
-        // Add playback position to result.
-        intent.putExtra(
-                PlaybackPositionExtra,
-                mediaController
-                        .getPlaybackState()
-                        .getPosition()
-        );
-
-        setResult(requestCode, intent);
-
-        super.finish();
+        LocalBroadcastManager
+                .getInstance(this)
+                .registerReceiver(broadCastReceiver, intentFilter);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStop() {
+        LocalBroadcastManager
+                .getInstance(this)
+                .unregisterReceiver(broadCastReceiver);
 
-        if (!mediaPlayerServiceIsBound) {
-            return;
-        }
-
-        // TODO: Fix this, renderer shouldn't be going black on pause.
-        if (mediaPlayerSession.getSelectedRendererItem() == null) {
-            setLocalRenderer();
-        }
+        super.onStop();
     }
 
-    @Override
-    protected void onPause() {
-        transportControls.pause();
-
-        super.onPause();
+    private void showRendererPlayerFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.framelayout_fragment_container, rendererPlayerFragment)
+                .commit();
     }
 
-    private void readIntent() {
-        Intent intent = getIntent();
-
-        videoFilePath = intent.getStringExtra(VideoPathExtra);
-        subtitleFilePath = intent.getStringExtra(SubtitlePathExtra);
-        requestCode = intent.getIntExtra(RequestCodeExtra, Integer.MIN_VALUE);
-        playbackPosition = intent.getLongExtra(PlaybackPositionExtra, 0L);
+    private void showLocalPlayerFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.framelayout_fragment_container, localPlayerFragment)
+                .commit();
     }
 
-    private void bindViewComponents() {
-        mediaPlayerComponent = findViewById(R.id.component_media_player);
-        mediaPlayerComponent.init(
-                this::seekToPosition,
-                this::showRendererItemDialogFragment,
-                this::togglePlayback
-        );
-    }
-
-    private void startAndBindMediaPlayerService() {
-        Intent intent = new Intent(
+    private void startMediaPlayerService() {
+        startService(new Intent(
                 getApplicationContext(),
                 MediaPlayerService.class
-        );
-
-        startService(intent);
-
-        bindService(
-                intent,
-                mediaPlayerServiceConnection,
-                Context.BIND_AUTO_CREATE
-        );
-    }
-
-    /**
-     * Update the display state.
-     *
-     * @param state The current playback state.
-     */
-    private void configure(PlaybackStateCompat state) {
-        if (state == null
-                || state.getExtras() == null
-                || mediaPlayerComponent.isTrackingTouch()) {
-            return;
-        }
-
-        Bundle extras = state.getExtras();
-
-        long length = extras.getLong(VlcMediaPlayerSession.LengthExtra);
-        long time = extras.getLong(VlcMediaPlayerSession.TimeExtra);
-
-        mediaPlayerComponent.configure(
-                length,
-                time,
-                getPlaybackStateCompat() == PlaybackStateCompat.STATE_PLAYING
-        );
-    }
-
-    /**
-     * Toggle the playback of the media by pausing or playing the media.
-     */
-    private void togglePlayback() {
-        if (getPlaybackStateCompat() == PlaybackStateCompat.STATE_PLAYING) {
-            transportControls.pause();
-            return;
-        }
-
-        transportControls.play();
-    }
-
-    /**
-     * Show the renderer item dialog fragment.
-     */
-    private void showRendererItemDialogFragment() {
-        RendererItemDialogFragment rendererItemDialog = new RendererItemDialogFragment();
-
-        rendererItemDialog.show(
-                getSupportFragmentManager(),
-                RendererItemDialogTag
-        );
-    }
-
-    /**
-     * Seek to a position that is a percentage of the total length of the media.
-     *
-     * @param position The percentage value to seek to.
-     */
-    private void seekToPosition(Float position) {
-        transportControls.seekTo((long) (position * getMediaLength()));
+        ));
     }
 
     /**

@@ -1,3 +1,4 @@
 <resources>
-    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="player_renderer_image_width">100dp</dimen>
+    <dimen name="player_renderer_image_height">100dp</dimen>
 </resources>

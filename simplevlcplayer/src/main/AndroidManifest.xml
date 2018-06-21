@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.masterwok.simplevlcplayer">
 
-
-    <!-- Permission required for VLC microdns_renderer -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application>

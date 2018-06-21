@@ -1,16 +1,15 @@
 package com.masterwok.simplevlcplayer.models;
 
-
 /**
  * This model represents a selection list item that has a display
  * name and backing value.
  *
- * @param <T> The backing value type.
+ * @param <R> The backing value type.
  */
-public class SelectionItem<T> {
+public class SelectionItem<R> {
     private boolean isSelected;
     private String displayName;
-    private T value;
+    private R value;
 
     /**
      * Create a new SelectionItem instance.
@@ -22,7 +21,7 @@ public class SelectionItem<T> {
     public SelectionItem(
             boolean isSelected,
             String displayName,
-            T value
+            R value
     ) {
 
         this.isSelected = isSelected;
@@ -44,7 +43,7 @@ public class SelectionItem<T> {
      *
      * @return The backing value.
      */
-    public T getValue() {
+    public R getValue() {
         return value;
     }
 

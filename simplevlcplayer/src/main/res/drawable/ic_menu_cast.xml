@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="oval">
-            <solid android:color="@color/media_player_menu_cast_background"/>
+            <solid android:color="@color/player_menu_cast_background"/>
         </shape>
     </item>
     <item

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.masterwok.simplevlcplayer.R;
@@ -16,8 +17,8 @@ import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 public class MediaPlayerActivity
         extends InjectableAppCompatActivity {
 
-    public LocalPlayerFragment localPlayerFragment = new LocalPlayerFragment();
-    public RendererPlayerFragment rendererPlayerFragment = new RendererPlayerFragment();
+    public LocalPlayerFragment localPlayerFragment;
+    public RendererPlayerFragment rendererPlayerFragment;
 
     private final BroadcastReceiver broadCastReceiver = new BroadcastReceiver() {
         @Override
@@ -39,6 +40,18 @@ public class MediaPlayerActivity
         }
     };
 
+    private void showLocalPlayerFragment() {
+        rendererPlayerFragment = null;
+        localPlayerFragment = new LocalPlayerFragment();
+        showFragment(localPlayerFragment);
+    }
+
+    private void showRendererPlayerFragment() {
+        localPlayerFragment = null;
+        rendererPlayerFragment = new RendererPlayerFragment();
+        showFragment(rendererPlayerFragment);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +59,6 @@ public class MediaPlayerActivity
         setContentView(R.layout.activity_media_player);
 
         startMediaPlayerService();
-
         showLocalPlayerFragment();
     }
 
@@ -76,17 +88,10 @@ public class MediaPlayerActivity
         super.onStop();
     }
 
-    private void showRendererPlayerFragment() {
+    private void showFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.framelayout_fragment_container, rendererPlayerFragment)
-                .commit();
-    }
-
-    private void showLocalPlayerFragment() {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.framelayout_fragment_container, localPlayerFragment)
+                .replace(R.id.framelayout_fragment_container, fragment)
                 .commit();
     }
 
@@ -96,5 +101,4 @@ public class MediaPlayerActivity
                 MediaPlayerService.class
         ));
     }
-
 }

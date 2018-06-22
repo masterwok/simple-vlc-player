@@ -51,6 +51,11 @@ public class VlcMediaPlayer
     }
 
     @Override
+    public void release() {
+        player.release();
+    }
+
+    @Override
     public void play() {
         player.play();
     }

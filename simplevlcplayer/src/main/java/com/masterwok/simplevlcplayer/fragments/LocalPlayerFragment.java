@@ -96,10 +96,17 @@ public class LocalPlayerFragment
 
     @Override
     public void onStop() {
-        getPlayer().stop();
+        player.stop();
         player.detachSurfaces();
 
         super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        player.release();
+
+        super.onDestroy();
     }
 
     private void bindViewComponents(View view) {

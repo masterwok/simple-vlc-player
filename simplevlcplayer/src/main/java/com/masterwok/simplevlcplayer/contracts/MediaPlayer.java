@@ -9,6 +9,8 @@ import com.masterwok.simplevlcplayer.VlcMediaPlayer;
  */
 public interface MediaPlayer {
 
+    void release();
+
     void play();
 
     void pause();

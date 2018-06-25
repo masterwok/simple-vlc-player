@@ -1,7 +1,6 @@
 package com.masterwok.simplevlcplayer.components;
 
 import android.content.Context;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
@@ -175,11 +174,11 @@ public class PlayerControlComponent
     }
 
 
-    public void configure(PlaybackStateCompat state) {
-        boolean isPlaying = state.getState() == PlaybackStateCompat.STATE_PLAYING;
-        long time = state.getPosition();
-        long length = state.getBufferedPosition();
-
+    public void configure(
+            boolean isPlaying,
+            long time,
+            long length
+    ) {
         String lengthText = TimeUtil.getTimeString(length);
         String positionText = TimeUtil.getTimeString(time);
         int progress = (int) (((float) time / length) * 100);

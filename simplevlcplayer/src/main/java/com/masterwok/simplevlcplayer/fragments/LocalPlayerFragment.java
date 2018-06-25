@@ -1,17 +1,10 @@
 package com.masterwok.simplevlcplayer.fragments;
 
-import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -19,40 +12,45 @@ import android.view.ViewGroup;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
-import com.masterwok.simplevlcplayer.dagger.injectors.InjectableFragment;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 
 public class LocalPlayerFragment
-        extends InjectableFragment implements PlayerControlComponent.Callback {
+        extends BasePlayerFragment {
 
     private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v";
 
     private View.OnLayoutChangeListener surfaceLayoutListener;
-    private MediaPlayerService.Binder serviceBinder;
 
     private PlayerControlComponent componentControls;
     private SurfaceView surfaceSubtitle;
     private SurfaceView surfaceMedia;
 
-    private MediaControllerCompat mediaController;
+    private MediaPlayerService.Binder serviceBinder;
+
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    protected void configure(
+            boolean isPlaying,
+            long time,
+            long length
+    ) {
+        componentControls.configure(
+                isPlaying,
+                time,
+                length
+        );
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    protected void onConnected(MediaPlayerService.Binder binder) {
+        this.serviceBinder = binder;
 
-        bindMediaPlayerService();
+        startPlayback();
     }
 
     @Override
-    public void onStop() {
-        unbindMediaPlayerService();
-
-        super.onStop();
+    protected void onDisconnected() {
+        this.serviceBinder = null;
     }
 
     @Nullable
@@ -81,6 +79,13 @@ public class LocalPlayerFragment
         registerSurfaceLayoutListener();
     }
 
+    @Override
+    public void onStop() {
+        stopPlayback();
+
+        super.onStop();
+    }
+
     private void subscribeToViewComponents() {
         componentControls.registerCallback(this);
     }
@@ -98,35 +103,6 @@ public class LocalPlayerFragment
         surfaceMedia = view.findViewById(R.id.surface_media);
         surfaceSubtitle = view.findViewById(R.id.surface_subtitle);
     }
-
-
-    private void unbindMediaPlayerService() {
-        Activity activity = getActivity();
-
-        if (activity == null) {
-            return;
-        }
-
-        activity.unbindService(mediaPlayerServiceConnection);
-    }
-
-    private void bindMediaPlayerService() {
-        Activity activity = getActivity();
-
-        if (activity == null) {
-            return;
-        }
-
-        activity.bindService(
-                new Intent(
-                        activity.getApplicationContext(),
-                        MediaPlayerService.class
-                ),
-                mediaPlayerServiceConnection,
-                Context.BIND_AUTO_CREATE
-        );
-    }
-
 
     private void unregisterSurfaceLayoutListener() {
         surfaceMedia.removeOnLayoutChangeListener(surfaceLayoutListener);
@@ -151,14 +127,17 @@ public class LocalPlayerFragment
             return;
         }
 
-        registerMediaController();
+        serviceBinder.setCallback(this);
         serviceBinder.attachSurfaceViews(
                 surfaceMedia,
                 surfaceSubtitle
         );
 
         serviceBinder.setMedia(Uri.parse(SAMPLE_URL));
-        serviceBinder.play();
+
+        if (resumeIsPlaying) {
+            serviceBinder.play();
+        }
     }
 
     private void stopPlayback() {
@@ -166,52 +145,8 @@ public class LocalPlayerFragment
             return;
         }
 
-        mediaController.unregisterCallback(controllerCallback);
-        serviceBinder.detachSurfaceViews();
         serviceBinder.stop();
-    }
-
-    private ServiceConnection mediaPlayerServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            serviceBinder = (MediaPlayerService.Binder) iBinder;
-            startPlayback();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            serviceBinder = null;
-        }
-    };
-
-
-    private MediaControllerCompat.Callback controllerCallback = new MediaControllerCompat.Callback() {
-        @Override
-        public void onPlaybackStateChanged(PlaybackStateCompat state) {
-            if (state.getBufferedPosition() <= 0) {
-                return;
-            }
-
-            componentControls.configure(state);
-        }
-    };
-
-    public void registerMediaController() {
-        final Activity activity = getActivity();
-
-        if (activity == null) {
-            return;
-        }
-
-        mediaController = new MediaControllerCompat(
-                activity,
-                serviceBinder.getMediaSession()
-        );
-
-        mediaController.registerCallback(controllerCallback);
-
-        MediaControllerCompat.setMediaController(activity, mediaController);
+        serviceBinder.detachSurfaceViews();
     }
 
     @Override
@@ -225,7 +160,16 @@ public class LocalPlayerFragment
 
     @Override
     public void onCastButtonClicked() {
-        // TODO: Show renderer item dialog fragment.
+        FragmentManager fragmentManager = getFragmentManager();
+
+        if (fragmentManager == null) {
+            return;
+        }
+
+        new RendererItemDialogFragment().show(
+                fragmentManager,
+                RendererItemDialogFragment.Tag
+        );
     }
 
     @Override
@@ -235,5 +179,17 @@ public class LocalPlayerFragment
         }
 
         serviceBinder.setProgress(progress);
+    }
+
+    @Override
+    public void onPlayerSeekStateChange(boolean canSeek) {
+        super.onPlayerSeekStateChange(canSeek);
+
+        if (!canSeek
+                || serviceBinder == null) {
+            return;
+        }
+
+        serviceBinder.setTime(resumeTime);
     }
 }

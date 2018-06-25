@@ -126,6 +126,15 @@ public class MediaPlayerService
         }
     }
 
+    @Override
+    public void onBuffering(float buffering) {
+        updatePlaybackState();
+
+        if (callback != null) {
+            callback.onBuffering(buffering);
+        }
+    }
+
     public void updatePlaybackState() {
         stateBuilder.setBufferedPosition(player.getLength());
         stateBuilder.setState(

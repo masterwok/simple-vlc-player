@@ -157,10 +157,6 @@ public abstract class BasePlayerFragment
             return;
         }
 
-        if (isProgressBarVisible()) {
-            ThreadUtil.onMain(this::hideProgressBar);
-        }
-
         serviceBinder.togglePlayback();
     }
 
@@ -193,8 +189,6 @@ public abstract class BasePlayerFragment
             return;
         }
 
-        ThreadUtil.onMain(this::showProgressBar);
-
         serviceBinder.setProgress(progress);
         serviceBinder.play();
     }
@@ -225,22 +219,22 @@ public abstract class BasePlayerFragment
         ((ViewGroup) getView()).addView(progressBar, params);
     }
 
-    private void showProgressBar() {
-        progressBar.setVisibility(View.VISIBLE);
-    }
-
-    private void hideProgressBar() {
-        progressBar.setVisibility(View.GONE);
-    }
-
-
-    protected boolean isProgressBarVisible() {
-        return progressBar.getVisibility() == View.VISIBLE;
+    @Override
+    public void onPlayerOpening() {
     }
 
     @Override
-    public void onPlayerOpening() {
-        ThreadUtil.onMain(this::showProgressBar);
+    public void onBuffering(float buffering) {
+        if (buffering == 100f) {
+            ThreadUtil.onMain(() -> progressBar.setVisibility(View.GONE));
+            return;
+        }
+
+        if (progressBar.getVisibility() == View.VISIBLE) {
+            return;
+        }
+
+        ThreadUtil.onMain(() -> progressBar.setVisibility(View.VISIBLE));
     }
 
     @Override
@@ -269,14 +263,9 @@ public abstract class BasePlayerFragment
 
     @Override
     public void onPlayerTimeChange(long timeChanged) {
-        // Ensure the progress bar is hidden if the time changes.
-        if (isProgressBarVisible()) {
-            ThreadUtil.onMain(this::hideProgressBar);
-        }
     }
 
     @Override
     public void onPlayerPositionChange(float positionChanged) {
-
     }
 }

@@ -11,6 +11,7 @@ import org.videolan.libvlc.Media;
 import org.videolan.libvlc.RendererItem;
 
 import static org.videolan.libvlc.Media.Slave.Type.Subtitle;
+import static org.videolan.libvlc.MediaPlayer.Event.Buffering;
 import static org.videolan.libvlc.MediaPlayer.Event.EncounteredError;
 import static org.videolan.libvlc.MediaPlayer.Event.EndReached;
 import static org.videolan.libvlc.MediaPlayer.Event.Opening;
@@ -157,6 +158,8 @@ public class VlcMediaPlayer
             case PositionChanged:
                 callback.onPlayerPositionChange(event.getPositionChanged());
                 break;
+            case Buffering:
+                callback.onBuffering(event.getBuffering());
             default:
                 break;
         }

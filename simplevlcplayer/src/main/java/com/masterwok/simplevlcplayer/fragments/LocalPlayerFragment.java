@@ -1,9 +1,11 @@
 package com.masterwok.simplevlcplayer.fragments;
 
+import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
@@ -130,7 +132,6 @@ public class LocalPlayerFragment
             return;
         }
 
-        serviceBinder.setCallback(this);
         serviceBinder.attachSurfaceViews(
                 surfaceMedia,
                 surfaceSubtitle
@@ -186,7 +187,16 @@ public class LocalPlayerFragment
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        final PlaybackStateCompat playbackState = getPlaybackState();
+        final Activity activity = getActivity();
+
+        if (activity == null) {
+            super.onSaveInstanceState(outState);
+            return;
+        }
+
+        final PlaybackStateCompat playbackState = MediaControllerCompat
+                .getMediaController(activity)
+                .getPlaybackState();
 
         outState.putBoolean(IsPlayingKey, playbackState.getState() == PlaybackStateCompat.STATE_PLAYING);
         outState.putLong(TimeKey, playbackState.getPosition());

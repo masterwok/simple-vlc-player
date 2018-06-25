@@ -15,6 +15,7 @@ import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableFragment;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 
+
 public abstract class BasePlayerFragment
         extends InjectableFragment
         implements PlayerControlComponent.Callback
@@ -33,12 +34,13 @@ public abstract class BasePlayerFragment
 
     protected abstract void onDisconnected();
 
-
     private ServiceConnection mediaPlayerServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             BasePlayerFragment.this.serviceBinder = (MediaPlayerService.Binder) iBinder;
+
+            serviceBinder.setCallback(BasePlayerFragment.this);
 
             onConnected(serviceBinder);
 
@@ -76,8 +78,9 @@ public abstract class BasePlayerFragment
 
     @Override
     public void onStop() {
-        unbindMediaPlayerService();
+        serviceBinder.setCallback(null);
         mediaController.unregisterCallback(controllerCallback);
+        unbindMediaPlayerService();
 
         super.onStop();
     }
@@ -113,7 +116,7 @@ public abstract class BasePlayerFragment
     private void registerMediaController(MediaPlayerService.Binder serviceBinder) {
         final Activity activity = getActivity();
 
-        if (activity == null) {
+        if (activity == null || serviceBinder == null) {
             return;
         }
 
@@ -125,10 +128,6 @@ public abstract class BasePlayerFragment
         mediaController.registerCallback(controllerCallback);
 
         MediaControllerCompat.setMediaController(activity, mediaController);
-    }
-
-    protected PlaybackStateCompat getPlaybackState() {
-        return mediaController.getPlaybackState();
     }
 
     @Override
@@ -161,6 +160,7 @@ public abstract class BasePlayerFragment
         }
 
         serviceBinder.setProgress(progress);
+        serviceBinder.play();
     }
 
     @Override
@@ -175,7 +175,6 @@ public abstract class BasePlayerFragment
 
     @Override
     public void onPlayerPlaying() {
-
     }
 
     @Override

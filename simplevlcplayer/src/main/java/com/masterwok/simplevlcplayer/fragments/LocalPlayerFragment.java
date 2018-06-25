@@ -89,6 +89,29 @@ public class LocalPlayerFragment
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        updateResumeState();
+    }
+
+    private void updateResumeState() {
+        final Activity activity = getActivity();
+
+        if (activity == null) {
+            return;
+        }
+
+        final PlaybackStateCompat playbackState = MediaControllerCompat
+                .getMediaController(activity)
+                .getPlaybackState();
+
+        resumeIsPlaying = playbackState.getState() == PlaybackStateCompat.STATE_PLAYING;
+        resumeTime = playbackState.getPosition();
+        resumeLength = playbackState.getBufferedPosition();
+    }
+
+    @Override
     public void onStop() {
         stopPlayback();
 
@@ -187,20 +210,11 @@ public class LocalPlayerFragment
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        final Activity activity = getActivity();
+        updateResumeState();
 
-        if (activity == null) {
-            super.onSaveInstanceState(outState);
-            return;
-        }
-
-        final PlaybackStateCompat playbackState = MediaControllerCompat
-                .getMediaController(activity)
-                .getPlaybackState();
-
-        outState.putBoolean(IsPlayingKey, playbackState.getState() == PlaybackStateCompat.STATE_PLAYING);
-        outState.putLong(TimeKey, playbackState.getPosition());
-        outState.putLong(LengthKey, playbackState.getBufferedPosition());
+        outState.putBoolean(IsPlayingKey, resumeIsPlaying);
+        outState.putLong(TimeKey, resumeTime);
+        outState.putLong(LengthKey, resumeLength);
 
         super.onSaveInstanceState(outState);
     }

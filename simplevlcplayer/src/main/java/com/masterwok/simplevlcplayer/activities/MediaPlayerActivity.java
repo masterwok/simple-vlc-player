@@ -11,14 +11,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableAppCompatActivity;
 import com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment;
-import com.masterwok.simplevlcplayer.fragments.RendererPlayerFragment;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 
 public class MediaPlayerActivity
         extends InjectableAppCompatActivity {
 
     public LocalPlayerFragment localPlayerFragment;
-    public RendererPlayerFragment rendererPlayerFragment;
 
     private final BroadcastReceiver broadCastReceiver = new BroadcastReceiver() {
         @Override
@@ -41,15 +39,15 @@ public class MediaPlayerActivity
     };
 
     private void showLocalPlayerFragment() {
-        rendererPlayerFragment = null;
+//        rendererPlayerFragment = null;
         localPlayerFragment = new LocalPlayerFragment();
         showFragment(localPlayerFragment);
     }
 
     private void showRendererPlayerFragment() {
-        localPlayerFragment = null;
-        rendererPlayerFragment = new RendererPlayerFragment();
-        showFragment(rendererPlayerFragment);
+//        localPlayerFragment = null;
+//        rendererPlayerFragment = new RendererPlayerFragment();
+//        showFragment(rendererPlayerFragment);
     }
 
     @Override

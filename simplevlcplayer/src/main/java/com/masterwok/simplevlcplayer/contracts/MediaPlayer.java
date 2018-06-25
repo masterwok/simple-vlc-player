@@ -33,9 +33,6 @@ public interface MediaPlayer {
 
     boolean isPlaying();
 
-    void onSurfaceChanged(int width, int height);
-
-
     interface Callback {
         void onPlayerOpening();
 

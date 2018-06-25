@@ -3,8 +3,6 @@ package com.masterwok.simplevlcplayer.dagger.modules;
 import android.content.Context;
 
 import com.masterwok.simplevlcplayer.VlcMediaPlayer;
-import com.masterwok.simplevlcplayer.contracts.RendererItemMediaPlayer;
-import com.masterwok.simplevlcplayer.contracts.SurfaceMediaPlayer;
 
 import org.videolan.libvlc.LibVLC;
 
@@ -27,12 +25,7 @@ public class VlcModule {
     }
 
     @Provides
-    final SurfaceMediaPlayer provideSurfaceVlcPlayer(LibVLC libVlc) {
-        return new VlcMediaPlayer(libVlc);
-    }
-
-    @Provides
-    final RendererItemMediaPlayer provideRendererItemMediaPlayer(LibVLC libVlc) {
+    final com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer provideVlcMediaPlayer(LibVLC libVlc) {
         return new VlcMediaPlayer(libVlc);
     }
 

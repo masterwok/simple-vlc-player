@@ -4,7 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -18,6 +18,14 @@ public class LocalPlayerFragment
         extends BasePlayerFragment {
 
     private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v";
+    private static final String IsPlayingKey = "bundle.isplaying";
+    private static final String LengthKey = "bundle.length";
+    private static final String TimeKey = "bundle.time";
+
+    protected boolean resumeIsPlaying = true;
+    protected long resumeLength = 0;
+    protected long resumeTime = 0;
+
 
     private View.OnLayoutChangeListener surfaceLayoutListener;
 
@@ -26,7 +34,6 @@ public class LocalPlayerFragment
     private SurfaceView surfaceMedia;
 
     private MediaPlayerService.Binder serviceBinder;
-
 
     @Override
     protected void configure(
@@ -110,11 +117,7 @@ public class LocalPlayerFragment
 
     private void registerSurfaceLayoutListener() {
         surfaceLayoutListener = (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
-            if (serviceBinder != null
-                    && (left != oldLeft
-                    || top != oldTop
-                    || right != oldRight
-                    && bottom != oldBottom)) {
+            if (serviceBinder != null && (left != oldLeft || top != oldTop || right != oldRight && bottom != oldBottom)) {
                 serviceBinder.onSurfaceChanged(v.getWidth(), v.getHeight());
             }
         };
@@ -149,37 +152,6 @@ public class LocalPlayerFragment
         serviceBinder.detachSurfaceViews();
     }
 
-    @Override
-    public void onPlayPauseButtonClicked() {
-        if (serviceBinder == null) {
-            return;
-        }
-
-        serviceBinder.togglePlayback();
-    }
-
-    @Override
-    public void onCastButtonClicked() {
-        FragmentManager fragmentManager = getFragmentManager();
-
-        if (fragmentManager == null) {
-            return;
-        }
-
-        new RendererItemDialogFragment().show(
-                fragmentManager,
-                RendererItemDialogFragment.Tag
-        );
-    }
-
-    @Override
-    public void onProgressChanged(int progress) {
-        if (serviceBinder == null) {
-            return;
-        }
-
-        serviceBinder.setProgress(progress);
-    }
 
     @Override
     public void onPlayerSeekStateChange(boolean canSeek) {
@@ -191,5 +163,35 @@ public class LocalPlayerFragment
         }
 
         serviceBinder.setTime(resumeTime);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        if (savedInstanceState == null) {
+            return;
+        }
+
+        resumeIsPlaying = savedInstanceState.getBoolean(IsPlayingKey, true);
+        resumeTime = savedInstanceState.getLong(TimeKey, 0);
+        resumeLength = savedInstanceState.getLong(LengthKey, 0);
+
+        configure(
+                resumeIsPlaying,
+                resumeTime,
+                resumeLength
+        );
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        final PlaybackStateCompat playbackState = getPlaybackState();
+
+        outState.putBoolean(IsPlayingKey, playbackState.getState() == PlaybackStateCompat.STATE_PLAYING);
+        outState.putLong(TimeKey, playbackState.getPosition());
+        outState.putLong(LengthKey, playbackState.getBufferedPosition());
+
+        super.onSaveInstanceState(outState);
     }
 }

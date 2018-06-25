@@ -93,6 +93,7 @@ public class LocalPlayerFragment
         super.onPause();
 
         updateResumeState();
+        stopPlayback();
     }
 
     private void updateResumeState() {
@@ -109,13 +110,6 @@ public class LocalPlayerFragment
         resumeIsPlaying = playbackState.getState() == PlaybackStateCompat.STATE_PLAYING;
         resumeTime = playbackState.getPosition();
         resumeLength = playbackState.getBufferedPosition();
-    }
-
-    @Override
-    public void onStop() {
-        stopPlayback();
-
-        super.onStop();
     }
 
     private void subscribeToViewComponents() {

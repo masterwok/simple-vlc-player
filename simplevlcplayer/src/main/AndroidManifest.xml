@@ -7,7 +7,9 @@
     <application>
         <activity
             android:name=".activities.MediaPlayerActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:label="@string/title_activity_media_player"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme.FullScreen">
         </activity>
 

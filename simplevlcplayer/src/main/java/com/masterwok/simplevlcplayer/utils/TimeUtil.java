@@ -51,6 +51,10 @@ public class TimeUtil {
      * @return A formatted timestamp.
      */
     public static String getTimeString(long milliseconds) {
+        if (milliseconds < 0) {
+            return "0";
+        }
+
         long hours = getHours(milliseconds);
 
         milliseconds -= TimeUnit.HOURS.toMillis(hours);

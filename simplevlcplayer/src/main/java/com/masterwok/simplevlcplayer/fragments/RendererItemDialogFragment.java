@@ -121,7 +121,7 @@ public class RendererItemDialogFragment
 
         selectionItems.add(new SelectionItem<>(
                 rendererItems.size() == 0 || selectedRendererItem == null,
-                ResourceUtil.getStringResource(
+                ResourceUtil.getString(
                         getContext(),
                         R.string.dialog_none
                 ),

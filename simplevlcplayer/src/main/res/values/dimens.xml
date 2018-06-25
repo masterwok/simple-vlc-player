@@ -1,4 +1,6 @@
 <resources>
     <dimen name="player_renderer_image_width">100dp</dimen>
     <dimen name="player_renderer_image_height">100dp</dimen>
+    <dimen name="player_spinner_width">200dp</dimen>
+    <dimen name="player_spinner_height">200dp</dimen>
 </resources>

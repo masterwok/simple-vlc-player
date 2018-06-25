@@ -61,6 +61,8 @@ public class PlayerControlComponent
         void onCastButtonClicked();
 
         void onProgressChanged(int progress);
+
+        void onProgressChangeStarted();
     }
 
     public void registerCallback(Callback callback) {
@@ -209,6 +211,8 @@ public class PlayerControlComponent
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
         isTrackingTouch = true;
+
+        callback.onProgressChangeStarted();
     }
 
     @Override

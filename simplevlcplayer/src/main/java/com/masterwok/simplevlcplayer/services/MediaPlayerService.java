@@ -208,6 +208,10 @@ public class MediaPlayerService
 
             player.play();
         }
+
+        public void pause() {
+            player.pause();
+        }
     }
 
     private void sendRendererSelectedBroadcast(RendererItem rendererItem) {

@@ -56,6 +56,10 @@ public class MediaPlayerActivity
 
         setContentView(R.layout.activity_media_player);
 
+        if (savedInstanceState != null) {
+            return;
+        }
+
         startMediaPlayerService();
         showLocalPlayerFragment();
     }

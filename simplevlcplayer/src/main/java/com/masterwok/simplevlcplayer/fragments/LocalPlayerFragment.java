@@ -19,7 +19,7 @@ import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 public class LocalPlayerFragment
         extends BasePlayerFragment {
 
-    private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_640x360.m4v";
+    private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_h264.mov";
     private static final String IsPlayingKey = "bundle.isplaying";
     private static final String LengthKey = "bundle.length";
     private static final String TimeKey = "bundle.time";

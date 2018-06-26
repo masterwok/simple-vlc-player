@@ -118,7 +118,6 @@ public class LocalPlayerFragment
 
     @Override
     public void onDestroyView() {
-        stopPlayback();
         unregisterSurfaceLayoutListener();
 
         super.onDestroyView();

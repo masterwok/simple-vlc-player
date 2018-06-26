@@ -211,6 +211,7 @@ public class VlcMediaPlayer
     ) {
         this.surfaceMedia = surfaceMedia;
 
+
         final IVLCVout vlcOut = player.getVLCVout();
         vlcOut.setVideoView(surfaceMedia);
         vlcOut.setSubtitlesView(surfaceSubtitle);

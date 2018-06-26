@@ -1,20 +1,19 @@
 package com.masterwok.simplevlcplayer.contracts;
 
-import android.view.SurfaceView;
-
+import org.videolan.libvlc.IVLCVout;
+import org.videolan.libvlc.Media;
 import org.videolan.libvlc.RendererItem;
 
 public interface VlcMediaPlayer
         extends MediaPlayer {
 
+    IVLCVout getVout();
+
     void setRendererItem(RendererItem rendererItem);
 
-    void onSurfaceChanged(int width, int height);
+    void setAspectRatio(String aspectRatio);
 
-    void attachSurfaces(
-            SurfaceView surfaceMedia,
-            SurfaceView surfaceSubtitle
-    );
+    void setScale(float scale);
 
-    void detachSurfaces();
+    Media.VideoTrack getCurrentVideoTrack();
 }

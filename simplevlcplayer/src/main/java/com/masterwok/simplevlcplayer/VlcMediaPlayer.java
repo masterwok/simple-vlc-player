@@ -1,9 +1,7 @@
 package com.masterwok.simplevlcplayer;
 
 import android.net.Uri;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.ViewGroup;
 
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
@@ -31,7 +29,6 @@ public class VlcMediaPlayer
         implements
         com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer
         , org.videolan.libvlc.MediaPlayer.EventListener
-        , IVLCVout.OnNewVideoLayoutListener
         , IVLCVout.Callback {
 
 
@@ -62,6 +59,11 @@ public class VlcMediaPlayer
     @Override
     public void pause() {
         player.pause();
+    }
+
+    @Override
+    public IVLCVout getVout() {
+        return player.getVLCVout();
     }
 
     @Override
@@ -175,64 +177,23 @@ public class VlcMediaPlayer
         // Nothing to do..
     }
 
-
-    @Override
-    public void onSurfaceChanged(int width, int height) {
-        setSurfaceSize(width, height);
-    }
-
-    @Override
-    public void onNewVideoLayout(
-            IVLCVout vlcVout,
-            int width,
-            int height,
-            int visibleWidth,
-            int visibleHeight,
-            int sarNum,
-            int sarDen
-    ) {
-        setSurfaceSize(width, height);
-    }
-
-    private void setSurfaceSize(int width, int height) {
-        SurfaceHolder holder = surfaceMedia.getHolder();
-        holder.setFixedSize(width, height);
-
-        ViewGroup.LayoutParams lp = surfaceMedia.getLayoutParams();
-        lp.width = width;
-        lp.height = height;
-        surfaceMedia.setLayoutParams(lp);
-    }
-
-    @Override
-    public void attachSurfaces(
-            SurfaceView surfaceMedia,
-            SurfaceView surfaceSubtitle
-    ) {
-        this.surfaceMedia = surfaceMedia;
-
-
-        final IVLCVout vlcOut = player.getVLCVout();
-        vlcOut.setVideoView(surfaceMedia);
-        vlcOut.setSubtitlesView(surfaceSubtitle);
-        vlcOut.attachViews(this);
-    }
-
-    @Override
-    public void detachSurfaces() {
-        final IVLCVout vlcOut = player.getVLCVout();
-
-        if (!vlcOut.areViewsAttached()) {
-            return;
-        }
-
-        vlcOut.detachViews();
-
-        surfaceMedia = null;
-    }
-
     @Override
     public void setRendererItem(RendererItem rendererItem) {
         player.setRenderer(rendererItem);
+    }
+
+    @Override
+    public void setAspectRatio(String aspectRatio) {
+        player.setAspectRatio(aspectRatio);
+    }
+
+    @Override
+    public void setScale(float scale) {
+        player.setScale(scale);
+    }
+
+    @Override
+    public Media.VideoTrack getCurrentVideoTrack() {
+        return player.getCurrentVideoTrack();
     }
 }

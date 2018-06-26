@@ -13,10 +13,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
@@ -209,12 +210,12 @@ public abstract class BasePlayerFragment
                                 R.color.player_spinner
                         )));
 
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 ResourceUtil.getDimenDp(getContext(), R.dimen.player_spinner_width),
                 ResourceUtil.getDimenDp(getContext(), R.dimen.player_spinner_height)
         );
 
-        params.addRule(RelativeLayout.CENTER_IN_PARENT);
+        params.gravity = Gravity.CENTER;
 
         ((ViewGroup) getView()).addView(progressBar, params);
     }

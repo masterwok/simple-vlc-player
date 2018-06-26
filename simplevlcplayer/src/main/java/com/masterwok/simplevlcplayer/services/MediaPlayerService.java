@@ -7,14 +7,15 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.view.SurfaceView;
 
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 
+import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
+import org.videolan.libvlc.Media;
 import org.videolan.libvlc.RendererItem;
 
 import javax.inject.Inject;
@@ -163,22 +164,8 @@ public class MediaPlayerService
             return rendererItem;
         }
 
-        public void onSurfaceChanged(int width, int height) {
-            player.onSurfaceChanged(width, height);
-        }
-
-        public void attachSurfaceViews(
-                SurfaceView surfaceMedia,
-                SurfaceView surfaceSubtitle
-        ) {
-            player.attachSurfaces(
-                    surfaceMedia,
-                    surfaceSubtitle
-            );
-        }
-
-        public void detachSurfaceViews() {
-            player.detachSurfaces();
+        public IVLCVout getVout() {
+            return player.getVout();
         }
 
         public void setMedia(Uri mediaUri) {
@@ -220,6 +207,18 @@ public class MediaPlayerService
 
         public void pause() {
             player.pause();
+        }
+
+        public void setAspectRatio(String aspectRatio) {
+            player.setAspectRatio(aspectRatio);
+        }
+
+        public void setScale(float scale) {
+            player.setScale(scale);
+        }
+
+        public Media.VideoTrack getCurrentVideoTrack() {
+            return player.getCurrentVideoTrack();
         }
     }
 

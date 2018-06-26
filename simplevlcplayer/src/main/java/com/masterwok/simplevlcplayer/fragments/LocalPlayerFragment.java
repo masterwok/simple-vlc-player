@@ -1,8 +1,12 @@
 package com.masterwok.simplevlcplayer.fragments;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -11,23 +15,43 @@ import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 
+import org.videolan.libvlc.IVLCVout;
+import org.videolan.libvlc.Media;
+
 public class LocalPlayerFragment
-        extends BasePlayerFragment {
+        extends BasePlayerFragment
+        implements IVLCVout.OnNewVideoLayoutListener {
 
     private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_h264.mov";
     private static final String IsPlayingKey = "bundle.isplaying";
     private static final String LengthKey = "bundle.length";
     private static final String TimeKey = "bundle.time";
 
-    protected boolean resumeIsPlaying = true;
-    protected long resumeLength = 0;
-    protected long resumeTime = 0;
+    private static final int SURFACE_BEST_FIT = 0;
+    private static final int SURFACE_FIT_SCREEN = 1;
+    private static final int SURFACE_FILL = 2;
+    private static final int SURFACE_16_9 = 3;
+    private static final int SURFACE_4_3 = 4;
+    private static final int SURFACE_ORIGINAL = 5;
+    private static int CURRENT_SIZE = SURFACE_BEST_FIT;
 
+
+    private int mVideoHeight = 0;
+    private int mVideoWidth = 0;
+    private int mVideoVisibleHeight = 0;
+    private int mVideoVisibleWidth = 0;
+    private int mVideoSarNum = 0;
+    private int mVideoSarDen = 0;
+
+    private boolean resumeIsPlaying = true;
+    private long resumeLength = 0;
+    private long resumeTime = 0;
 
     private View.OnLayoutChangeListener surfaceLayoutListener;
 
@@ -36,6 +60,7 @@ public class LocalPlayerFragment
     private SurfaceView surfaceMedia;
 
     private MediaPlayerService.Binder serviceBinder;
+    private FrameLayout surfaceFrame;
 
     @Override
     protected void configure(
@@ -85,15 +110,19 @@ public class LocalPlayerFragment
 
         bindViewComponents(view);
         subscribeToViewComponents();
-        registerSurfaceLayoutListener();
     }
 
     @Override
     public void onPause() {
-        super.onPause();
-
-        updateResumeState();
         stopPlayback();
+
+        super.onPause();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        updateVideoSurfaces();
     }
 
     private void updateResumeState() {
@@ -116,29 +145,41 @@ public class LocalPlayerFragment
         componentControls.registerCallback(this);
     }
 
-    @Override
-    public void onDestroyView() {
-        unregisterSurfaceLayoutListener();
-
-        super.onDestroyView();
-    }
-
     private void bindViewComponents(View view) {
+        surfaceFrame = view.findViewById(R.id.video_surface_frame);
         componentControls = view.findViewById(R.id.component_player);
         surfaceMedia = view.findViewById(R.id.surface_media);
         surfaceSubtitle = view.findViewById(R.id.surface_subtitle);
     }
 
-    private void unregisterSurfaceLayoutListener() {
-        surfaceMedia.removeOnLayoutChangeListener(surfaceLayoutListener);
-    }
+    private final Handler mHandler = new Handler();
 
     private void registerSurfaceLayoutListener() {
-        surfaceLayoutListener = (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
-            if (serviceBinder != null && (left != oldLeft || top != oldTop || right != oldRight && bottom != oldBottom)) {
-                serviceBinder.onSurfaceChanged(v.getWidth(), v.getHeight());
+        surfaceLayoutListener = new View.OnLayoutChangeListener() {
+            private final Runnable mRunnable = () -> updateVideoSurfaces();
+
+            @Override
+            public void onLayoutChange(
+                    View v,
+                    int left,
+                    int top,
+                    int right,
+                    int bottom,
+                    int oldLeft,
+                    int oldTop,
+                    int oldRight,
+                    int oldBottom
+            ) {
+                if (left != oldLeft
+                        || top != oldTop
+                        || right != oldRight
+                        || bottom != oldBottom) {
+                    mHandler.removeCallbacks(mRunnable);
+                    mHandler.post(mRunnable);
+                }
             }
         };
+
 
         surfaceMedia.addOnLayoutChangeListener(surfaceLayoutListener);
     }
@@ -148,10 +189,9 @@ public class LocalPlayerFragment
             return;
         }
 
-        serviceBinder.attachSurfaceViews(
-                surfaceMedia,
-                surfaceSubtitle
-        );
+        attachSurfaces();
+        registerSurfaceLayoutListener();
+        updateVideoSurfaces();
 
         serviceBinder.setMedia(Uri.parse(SAMPLE_URL));
 
@@ -165,8 +205,10 @@ public class LocalPlayerFragment
             return;
         }
 
+        updateResumeState();
         serviceBinder.stop();
-        serviceBinder.detachSurfaceViews();
+        surfaceMedia.removeOnLayoutChangeListener(surfaceLayoutListener);
+        detachSurfaces();
     }
 
 
@@ -203,12 +245,229 @@ public class LocalPlayerFragment
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        updateResumeState();
-
         outState.putBoolean(IsPlayingKey, resumeIsPlaying);
         outState.putLong(TimeKey, resumeTime);
         outState.putLong(LengthKey, resumeLength);
 
         super.onSaveInstanceState(outState);
     }
+
+    private void attachSurfaces() {
+        if (serviceBinder == null) {
+            return;
+        }
+
+        final IVLCVout vlcOut = serviceBinder.getVout();
+        vlcOut.setVideoView(surfaceMedia);
+        vlcOut.setSubtitlesView(surfaceSubtitle);
+        vlcOut.attachViews(this);
+    }
+
+    private void detachSurfaces() {
+        if (serviceBinder == null) {
+            return;
+        }
+
+        serviceBinder
+                .getVout()
+                .detachViews();
+
+        surfaceMedia = null;
+    }
+
+
+    private void changeMediaPlayerLayout(int displayW, int displayH) {
+        /* Change the video placement using the MediaPlayer API */
+        switch (CURRENT_SIZE) {
+            case SURFACE_BEST_FIT:
+                serviceBinder.setAspectRatio(null);
+                serviceBinder.setScale(0);
+                break;
+            case SURFACE_FIT_SCREEN:
+            case SURFACE_FILL: {
+                Media.VideoTrack vtrack = serviceBinder.getCurrentVideoTrack();
+                if (vtrack == null)
+                    return;
+                final boolean videoSwapped = vtrack.orientation == Media.VideoTrack.Orientation.LeftBottom
+                        || vtrack.orientation == Media.VideoTrack.Orientation.RightTop;
+                if (CURRENT_SIZE == SURFACE_FIT_SCREEN) {
+                    int videoW = vtrack.width;
+                    int videoH = vtrack.height;
+
+                    if (videoSwapped) {
+                        int swap = videoW;
+                        videoW = videoH;
+                        videoH = swap;
+                    }
+                    if (vtrack.sarNum != vtrack.sarDen)
+                        videoW = videoW * vtrack.sarNum / vtrack.sarDen;
+
+                    float ar = videoW / (float) videoH;
+                    float dar = displayW / (float) displayH;
+
+                    float scale;
+                    if (dar >= ar)
+                        scale = displayW / (float) videoW; /* horizontal */
+                    else
+                        scale = displayH / (float) videoH; /* vertical */
+                    serviceBinder.setScale(scale);
+                    serviceBinder.setAspectRatio(null);
+                } else {
+                    serviceBinder.setScale(0);
+                    serviceBinder.setAspectRatio(!videoSwapped ? "" + displayW + ":" + displayH
+                            : "" + displayH + ":" + displayW);
+                }
+                break;
+            }
+            case SURFACE_16_9:
+                serviceBinder.setAspectRatio("16:9");
+                serviceBinder.setScale(0);
+                break;
+            case SURFACE_4_3:
+                serviceBinder.setAspectRatio("4:3");
+                serviceBinder.setScale(0);
+                break;
+            case SURFACE_ORIGINAL:
+                serviceBinder.setAspectRatio(null);
+                serviceBinder.setScale(1);
+                break;
+        }
+    }
+
+    private void updateVideoSurfaces() {
+        if (serviceBinder == null) {
+            return;
+        }
+
+        int sw = getActivity().getWindow().getDecorView().getWidth();
+        int sh = getActivity().getWindow().getDecorView().getHeight();
+
+        // sanity check
+        if (sw * sh == 0) {
+//            Log.e(TAG, "Invalid surface size");
+            return;
+        }
+
+        serviceBinder.getVout().setWindowSize(sw, sh);
+
+        ViewGroup.LayoutParams lp = surfaceMedia.getLayoutParams();
+
+        if (mVideoWidth * mVideoHeight == 0) {
+            /* Case of OpenGL vouts: handles the placement of the video using MediaPlayer API */
+            lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            surfaceMedia.setLayoutParams(lp);
+            lp = surfaceFrame.getLayoutParams();
+            lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            surfaceFrame.setLayoutParams(lp);
+            changeMediaPlayerLayout(sw, sh);
+            return;
+        }
+
+        if (lp.width == lp.height && lp.width == ViewGroup.LayoutParams.MATCH_PARENT) {
+            /* We handle the placement of the video using Android View LayoutParams */
+            serviceBinder.setAspectRatio(null);
+            serviceBinder.setScale(0);
+        }
+
+        double dw = sw, dh = sh;
+        final boolean isPortrait = getResources()
+                .getConfiguration()
+                .orientation == Configuration.ORIENTATION_PORTRAIT;
+
+        if (sw > sh && isPortrait || sw < sh && !isPortrait) {
+            dw = sh;
+            dh = sw;
+        }
+
+        // compute the aspect ratio
+        double ar, vw;
+        if (mVideoSarDen == mVideoSarNum) {
+            /* No indication about the density, assuming 1:1 */
+            vw = mVideoVisibleWidth;
+            ar = (double) mVideoVisibleWidth / (double) mVideoVisibleHeight;
+        } else {
+            /* Use the specified aspect ratio */
+            vw = mVideoVisibleWidth * (double) mVideoSarNum / mVideoSarDen;
+            ar = vw / mVideoVisibleHeight;
+        }
+
+        // compute the display aspect ratio
+        double dar = dw / dh;
+
+        switch (CURRENT_SIZE) {
+            case SURFACE_BEST_FIT:
+                if (dar < ar)
+                    dh = dw / ar;
+                else
+                    dw = dh * ar;
+                break;
+            case SURFACE_FIT_SCREEN:
+                if (dar >= ar)
+                    dh = dw / ar; /* horizontal */
+                else
+                    dw = dh * ar; /* vertical */
+                break;
+            case SURFACE_FILL:
+                break;
+            case SURFACE_16_9:
+                ar = 16.0 / 9.0;
+                if (dar < ar)
+                    dh = dw / ar;
+                else
+                    dw = dh * ar;
+                break;
+            case SURFACE_4_3:
+                ar = 4.0 / 3.0;
+                if (dar < ar)
+                    dh = dw / ar;
+                else
+                    dw = dh * ar;
+                break;
+            case SURFACE_ORIGINAL:
+                dh = mVideoVisibleHeight;
+                dw = vw;
+                break;
+        }
+
+        // set display size
+        lp.width = (int) Math.ceil(dw * mVideoWidth / mVideoVisibleWidth);
+        lp.height = (int) Math.ceil(dh * mVideoHeight / mVideoVisibleHeight);
+        surfaceMedia.setLayoutParams(lp);
+        if (surfaceSubtitle != null)
+            surfaceSubtitle.setLayoutParams(lp);
+
+        // set frame size (crop if necessary)
+        lp = surfaceFrame.getLayoutParams();
+        lp.width = (int) Math.floor(dw);
+        lp.height = (int) Math.floor(dh);
+        surfaceFrame.setLayoutParams(lp);
+
+        surfaceMedia.invalidate();
+        if (surfaceSubtitle != null)
+            surfaceSubtitle.invalidate();
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Override
+    public void onNewVideoLayout(
+            IVLCVout vOut,
+            int width,
+            int height,
+            int visibleWidth,
+            int visibleHeight,
+            int sarNum,
+            int sarDen
+    ) {
+        mVideoWidth = width;
+        mVideoHeight = height;
+        mVideoVisibleWidth = visibleWidth;
+        mVideoVisibleHeight = visibleHeight;
+        mVideoSarNum = sarNum;
+        mVideoSarDen = sarDen;
+        updateVideoSurfaces();
+    }
+
+
 }

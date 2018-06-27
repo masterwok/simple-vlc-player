@@ -1,13 +1,14 @@
 package com.masterwok.simplevlcplayer.utils;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.support.annotation.NonNull;
 
 /**
  * This class provides static convenience methods for Android resources.
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class ResourceUtil {
 
     private ResourceUtil() {
@@ -78,4 +79,38 @@ public class ResourceUtil {
 
         return (int) (getDimen(context, id) / density);
     }
+
+    /**
+     * Get the device's current orientation.
+     *
+     * @param context The context used to get resources.
+     * @return The Configuration.Orientation value of the device.
+     */
+    public static int getDeviceOrientation(Context context) {
+        return context
+                .getResources()
+                .getConfiguration()
+                .orientation;
+    }
+
+    /**
+     * Get whether or not the device is oriented in portrait mode.
+     *
+     * @param context The context used to get resources.
+     * @return If portrait orientation true, else false.
+     */
+    public static boolean deviceIsPortraitOriented(Context context) {
+        return getDeviceOrientation(context) == Configuration.ORIENTATION_PORTRAIT;
+    }
+
+    /**
+     * Get whether or not the device is oriented in landscape mode.
+     *
+     * @param context The context used to get resources.
+     * @return If landscape orientation true, else false.
+     */
+    public static boolean deviceIsLandscapeOriented(Context context) {
+        return getDeviceOrientation(context) == Configuration.ORIENTATION_LANDSCAPE;
+    }
+
 }

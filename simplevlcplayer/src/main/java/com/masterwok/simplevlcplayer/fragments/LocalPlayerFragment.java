@@ -20,9 +20,12 @@ import android.widget.FrameLayout;
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
+import com.masterwok.simplevlcplayer.utils.ResourceUtil;
 
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.Media;
+
+import static com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment.SizePolicy.SURFACE_FIT_SCREEN;
 
 public class LocalPlayerFragment
         extends BasePlayerFragment
@@ -33,14 +36,16 @@ public class LocalPlayerFragment
     private static final String LengthKey = "bundle.length";
     private static final String TimeKey = "bundle.time";
 
-    private static final int SURFACE_BEST_FIT = 0;
-    private static final int SURFACE_FIT_SCREEN = 1;
-    private static final int SURFACE_FILL = 2;
-    private static final int SURFACE_16_9 = 3;
-    private static final int SURFACE_4_3 = 4;
-    private static final int SURFACE_ORIGINAL = 5;
-    private static int CURRENT_SIZE = SURFACE_BEST_FIT;
+    private SizePolicy sizePolicy = SizePolicy.SURFACE_BEST_FIT;
 
+    public enum SizePolicy {
+        SURFACE_BEST_FIT,
+        SURFACE_FIT_SCREEN,
+        SURFACE_FILL,
+        SURFACE_16_9,
+        SURFACE_4_3,
+        SURFACE_ORIGINAL
+    }
 
     private int mVideoHeight = 0;
     private int mVideoWidth = 0;
@@ -278,29 +283,29 @@ public class LocalPlayerFragment
 
     private void changeMediaPlayerLayout(int displayW, int displayH) {
         /* Change the video placement using the MediaPlayer API */
-        switch (CURRENT_SIZE) {
+        switch (sizePolicy) {
             case SURFACE_BEST_FIT:
                 serviceBinder.setAspectRatio(null);
                 serviceBinder.setScale(0);
                 break;
             case SURFACE_FIT_SCREEN:
             case SURFACE_FILL: {
-                Media.VideoTrack vtrack = serviceBinder.getCurrentVideoTrack();
-                if (vtrack == null)
+                Media.VideoTrack videoTrack = serviceBinder.getCurrentVideoTrack();
+                if (videoTrack == null)
                     return;
-                final boolean videoSwapped = vtrack.orientation == Media.VideoTrack.Orientation.LeftBottom
-                        || vtrack.orientation == Media.VideoTrack.Orientation.RightTop;
-                if (CURRENT_SIZE == SURFACE_FIT_SCREEN) {
-                    int videoW = vtrack.width;
-                    int videoH = vtrack.height;
+                final boolean videoSwapped = videoTrack.orientation == Media.VideoTrack.Orientation.LeftBottom
+                        || videoTrack.orientation == Media.VideoTrack.Orientation.RightTop;
+                if (sizePolicy == SURFACE_FIT_SCREEN) {
+                    int videoW = videoTrack.width;
+                    int videoH = videoTrack.height;
 
                     if (videoSwapped) {
                         int swap = videoW;
                         videoW = videoH;
                         videoH = swap;
                     }
-                    if (vtrack.sarNum != vtrack.sarDen)
-                        videoW = videoW * vtrack.sarNum / vtrack.sarDen;
+                    if (videoTrack.sarNum != videoTrack.sarDen)
+                        videoW = videoW * videoTrack.sarNum / videoTrack.sarDen;
 
                     float ar = videoW / (float) videoH;
                     float dar = displayW / (float) displayH;
@@ -344,8 +349,7 @@ public class LocalPlayerFragment
 
         // sanity check
         if (sw * sh == 0) {
-//            Log.e(TAG, "Invalid surface size");
-            return;
+           return;
         }
 
         serviceBinder.getVout().setWindowSize(sw, sh);
@@ -372,9 +376,7 @@ public class LocalPlayerFragment
         }
 
         double dw = sw, dh = sh;
-        final boolean isPortrait = getResources()
-                .getConfiguration()
-                .orientation == Configuration.ORIENTATION_PORTRAIT;
+        final boolean isPortrait = ResourceUtil.deviceIsPortraitOriented(getContext());
 
         if (sw > sh && isPortrait || sw < sh && !isPortrait) {
             dw = sh;
@@ -396,7 +398,7 @@ public class LocalPlayerFragment
         // compute the display aspect ratio
         double dar = dw / dh;
 
-        switch (CURRENT_SIZE) {
+        switch (sizePolicy) {
             case SURFACE_BEST_FIT:
                 if (dar < ar)
                     dh = dw / ar;

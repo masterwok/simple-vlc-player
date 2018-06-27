@@ -34,8 +34,10 @@ public class VlcMediaPlayer
 
     private final org.videolan.libvlc.MediaPlayer player;
     private final LibVLC libVlc;
+
+    private RendererItem selectedRendererItem;
+
     private Callback callback;
-    private SurfaceView surfaceMedia;
 
     public VlcMediaPlayer(
             LibVLC libVlc
@@ -178,8 +180,39 @@ public class VlcMediaPlayer
     }
 
     @Override
+    public void attachSurfaces(
+            SurfaceView surfaceMedia,
+            SurfaceView surfaceSubtitles,
+            IVLCVout.OnNewVideoLayoutListener layoutListener
+    ) {
+        selectedRendererItem = null;
+
+        final IVLCVout vlcOut = getVout();
+        vlcOut.setVideoView(surfaceMedia);
+        vlcOut.setSubtitlesView(surfaceSubtitles);
+        vlcOut.attachViews(layoutListener);
+    }
+
+    @Override
+    public void detachSurfaces() {
+        getVout().detachViews();
+    }
+
+    @Override
     public void setRendererItem(RendererItem rendererItem) {
+        if (isPlaying()) {
+            stop();
+        }
+
+        detachSurfaces();
+
+        selectedRendererItem = rendererItem;
         player.setRenderer(rendererItem);
+    }
+
+    @Override
+    public RendererItem getSelectedRendererItem() {
+        return selectedRendererItem;
     }
 
     @Override

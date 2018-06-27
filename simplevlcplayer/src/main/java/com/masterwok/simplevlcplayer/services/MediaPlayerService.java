@@ -7,10 +7,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.view.SurfaceView;
 
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
+import com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 
 import org.videolan.libvlc.IVLCVout;
@@ -38,8 +40,6 @@ public class MediaPlayerService
     private final Binder binder = new Binder();
 
     private RendererItemObservable rendererItemObservable;
-
-    private RendererItem rendererItem;
 
     private MediaSessionCompat mediaSession;
     private PlaybackStateCompat.Builder stateBuilder;
@@ -156,12 +156,9 @@ public class MediaPlayerService
         }
 
         public void setSelectedRendererItem(RendererItem rendererItem) {
-            MediaPlayerService.this.rendererItem = rendererItem;
-            sendRendererSelectedBroadcast(rendererItem);
-        }
+            player.setRendererItem(rendererItem);
 
-        public RendererItem getSelectedRendererItem() {
-            return rendererItem;
+            sendRendererSelectedBroadcast(rendererItem);
         }
 
         public IVLCVout getVout() {
@@ -219,6 +216,26 @@ public class MediaPlayerService
 
         public Media.VideoTrack getCurrentVideoTrack() {
             return player.getCurrentVideoTrack();
+        }
+
+        public void attachSurfaces(
+                SurfaceView surfaceMedia,
+                SurfaceView surfaceSubtitle,
+                LocalPlayerFragment localPlayerFragment
+        ) {
+            player.attachSurfaces(
+                    surfaceMedia,
+                    surfaceSubtitle,
+                    localPlayerFragment
+            );
+        }
+
+        public void detachSurfaces() {
+            player.detachSurfaces();
+        }
+
+        public RendererItem getSelectedRendererItem() {
+            return player.getSelectedRendererItem();
         }
     }
 

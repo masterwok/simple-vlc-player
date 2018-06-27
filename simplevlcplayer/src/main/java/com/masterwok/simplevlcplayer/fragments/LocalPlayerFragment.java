@@ -262,10 +262,11 @@ public class LocalPlayerFragment
             return;
         }
 
-        final IVLCVout vlcOut = serviceBinder.getVout();
-        vlcOut.setVideoView(surfaceMedia);
-        vlcOut.setSubtitlesView(surfaceSubtitle);
-        vlcOut.attachViews(this);
+        serviceBinder.attachSurfaces(
+                surfaceMedia,
+                surfaceSubtitle,
+                this
+        );
     }
 
     private void detachSurfaces() {
@@ -273,9 +274,7 @@ public class LocalPlayerFragment
             return;
         }
 
-        serviceBinder
-                .getVout()
-                .detachViews();
+        serviceBinder.detachSurfaces();
 
         surfaceMedia = null;
     }
@@ -349,7 +348,7 @@ public class LocalPlayerFragment
 
         // sanity check
         if (sw * sh == 0) {
-           return;
+            return;
         }
 
         serviceBinder.getVout().setWindowSize(sw, sh);

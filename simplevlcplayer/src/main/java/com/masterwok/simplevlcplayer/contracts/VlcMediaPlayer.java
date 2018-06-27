@@ -1,5 +1,7 @@
 package com.masterwok.simplevlcplayer.contracts;
 
+import android.view.SurfaceView;
+
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.RendererItem;
@@ -9,7 +11,17 @@ public interface VlcMediaPlayer
 
     IVLCVout getVout();
 
+    void attachSurfaces(
+            SurfaceView surfaceMedia,
+            SurfaceView surfaceSubtitles,
+            IVLCVout.OnNewVideoLayoutListener layoutListener
+    );
+
+    void detachSurfaces();
+
     void setRendererItem(RendererItem rendererItem);
+
+    RendererItem getSelectedRendererItem();
 
     void setAspectRatio(String aspectRatio);
 

@@ -3,7 +3,6 @@ package com.masterwok.simplevlcplayer.fragments;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -31,8 +30,6 @@ public class LocalPlayerFragment
         extends BasePlayerFragment
         implements IVLCVout.OnNewVideoLayoutListener {
 
-    //    private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_h264.mov";
-    private static final String SAMPLE_URL = "http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_stereo.avi";
     private static final String IsPlayingKey = "bundle.isplaying";
     private static final String LengthKey = "bundle.length";
     private static final String TimeKey = "bundle.time";
@@ -199,7 +196,7 @@ public class LocalPlayerFragment
         registerSurfaceLayoutListener();
         updateVideoSurfaces();
 
-        serviceBinder.setMedia(Uri.parse(SAMPLE_URL));
+        serviceBinder.setMedia(mediaUri);
 
         if (resumeIsPlaying) {
             serviceBinder.play();

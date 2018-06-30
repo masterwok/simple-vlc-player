@@ -6,6 +6,8 @@ import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.RendererItem;
 
+import java.io.FileDescriptor;
+
 public interface VlcMediaPlayer
         extends MediaPlayer {
 
@@ -28,4 +30,6 @@ public interface VlcMediaPlayer
     void setScale(float scale);
 
     Media.VideoTrack getCurrentVideoTrack();
+
+    void setMedia(FileDescriptor fileDescriptor);
 }

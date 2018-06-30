@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -32,6 +33,10 @@ public abstract class BasePlayerFragment
         extends InjectableFragment
         implements PlayerControlComponent.Callback
         , MediaPlayer.Callback {
+
+    public static final String MediaUri = "extra.mediauri";
+
+    protected Uri mediaUri;
 
     private MediaControllerCompat mediaController;
     private MediaPlayerService.Binder serviceBinder;
@@ -96,6 +101,19 @@ public abstract class BasePlayerFragment
         unbindMediaPlayerService();
 
         super.onStop();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        readIntent();
+    }
+
+    private void readIntent() {
+        Intent intent = getActivity().getIntent();
+
+        mediaUri = intent.getParcelableExtra(MediaUri);
     }
 
     @Override

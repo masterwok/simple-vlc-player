@@ -8,8 +8,6 @@ import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.RendererItem;
 
-import java.io.FileDescriptor;
-
 import static org.videolan.libvlc.Media.Slave.Type.Subtitle;
 import static org.videolan.libvlc.MediaPlayer.Event.Buffering;
 import static org.videolan.libvlc.MediaPlayer.Event.EncounteredError;
@@ -89,23 +87,10 @@ public class VlcMediaPlayer
     public void setMedia(Uri uri) {
         final Media media = new Media(
                 libVlc,
-                uri
+                uri.getPath()
         );
 
         player.setMedia(media);
-        media.release();
-    }
-
-
-    @Override
-    public void setMedia(FileDescriptor fileDescriptor) {
-        final Media media = new Media(
-                libVlc,
-                fileDescriptor
-        );
-
-        player.setMedia(media);
-
         media.release();
     }
 

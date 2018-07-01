@@ -14,14 +14,12 @@ import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
 import com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
-import com.masterwok.simplevlcplayer.utils.FileUtil;
 
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.RendererItem;
 
-import java.io.FileDescriptor;
 
 import javax.inject.Inject;
 
@@ -169,13 +167,7 @@ public class MediaPlayerService
         }
 
         public void setMedia(Uri mediaUri) {
-            FileDescriptor fileDescriptor = FileUtil.getUriFileDescriptor(
-                    getApplicationContext(),
-                    mediaUri,
-                    "r"
-            );
-
-            player.setMedia(fileDescriptor);
+            player.setMedia(mediaUri);
         }
 
         public void play() {

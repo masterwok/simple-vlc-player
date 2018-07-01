@@ -4,12 +4,16 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 
 import com.masterwok.demosimplevlcplayer.R;
 import com.masterwok.simplevlcplayer.activities.MediaPlayerActivity;
-import com.masterwok.simplevlcplayer.utils.FileUtil;
+import com.nononsenseapps.filepicker.FilePickerActivity;
+import com.nononsenseapps.filepicker.Utils;
+
+import java.io.File;
 
 
 /**
@@ -59,15 +63,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Show the system activity for picking video files.
+     * Show the activity for picking file.
      */
     private void showOpenDocumentActivity() {
-        FileUtil.startOpenDocumentActivity(
-                this,
-                Intent.CATEGORY_OPENABLE,
-                "video/*",
-                OpenDocumentRequestCode
-        );
+        Intent i = new Intent(this, FilePickerActivity.class);
+
+        // Set these depending on your use case. These are the defaults.
+        i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
+        i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
+        i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
+        i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
+
+        startActivityForResult(i, OpenDocumentRequestCode);
     }
 
     @Override
@@ -78,7 +85,11 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        startMediaPlayerActivity(data.getData());
+        File file = Utils.getFileForUri(
+                Utils.getSelectedFilesFromResult(data).get(0)
+        );
+
+        startMediaPlayerActivity(Uri.fromFile(file));
     }
 
     /**

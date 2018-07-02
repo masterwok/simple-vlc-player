@@ -13,7 +13,9 @@
             android:theme="@style/AppTheme.FullScreen">
         </activity>
 
-        <service android:name=".services.MediaPlayerService"/>
+        <service
+            android:name=".services.MediaPlayerService"
+            android:stopWithTask="true"/>
 
     </application>
 

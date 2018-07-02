@@ -1,12 +1,18 @@
 package com.masterwok.simplevlcplayer.services;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
+import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
@@ -25,6 +31,8 @@ public final class MediaPlayerService
     public static final String RendererClearedAction = "action.rendererclearedaction";
     public static final String RendererSelectionAction = "action.rendererselectionaction";
 
+    private static final String MediaPlayerServiceName = "Media Player Service";
+    private static final String MediaPlayerServiceChannelId = "channel.mediaplayerservice";
     private static final String SimpleVlcSessionTag = "tag.simplevlcsession";
 
     @Inject
@@ -104,6 +112,10 @@ public final class MediaPlayerService
     public void onPlayerPlaying() {
         updatePlaybackState();
 
+        if (player.getSelectedRendererItem() != null) {
+            enterForeground();
+        }
+
         if (callback != null) {
             callback.onPlayerPlaying();
         }
@@ -121,6 +133,8 @@ public final class MediaPlayerService
     @Override
     public void onPlayerStopped() {
         updatePlaybackState();
+
+        stopForeground(true);
 
         if (callback != null) {
             callback.onPlayerStopped();
@@ -170,6 +184,38 @@ public final class MediaPlayerService
         if (callback != null) {
             callback.onBuffering(buffering);
         }
+    }
+
+    private void enterForeground() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return;
+        }
+
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+
+        NotificationChannel channel = new NotificationChannel(
+                MediaPlayerServiceChannelId,
+                MediaPlayerServiceName,
+                NotificationManager.IMPORTANCE_DEFAULT
+        );
+
+        channel.setSound(null, null);
+        channel.enableLights(false);
+        channel.enableVibration(false);
+
+        //noinspection ConstantConditions
+        notificationManager.createNotificationChannel(channel);
+
+        startForeground(1, buildNotification());
+    }
+
+    private Notification buildNotification() {
+        return new NotificationCompat.Builder(this, MediaPlayerServiceChannelId)
+                .setSmallIcon(R.drawable.ic_cast_connected_white_24dp)
+                .setContentTitle("Some Title")
+                .setContentText("Some content ay Charles?")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .build();
     }
 
     private void updatePlaybackState() {

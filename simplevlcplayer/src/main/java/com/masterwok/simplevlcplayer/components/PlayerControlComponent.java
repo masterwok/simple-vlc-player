@@ -1,6 +1,7 @@
 package com.masterwok.simplevlcplayer.components;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
@@ -13,12 +14,11 @@ import com.masterwok.simplevlcplayer.utils.ThreadUtil;
 import com.masterwok.simplevlcplayer.utils.TimeUtil;
 import com.masterwok.simplevlcplayer.utils.ViewUtil;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class PlayerControlComponent
         extends RelativeLayout
         implements SeekBar.OnSeekBarChangeListener {
+
+    private final Handler handler = new Handler();
 
     private Toolbar toolbarHeader;
     private Toolbar toolbarFooter;
@@ -26,7 +26,6 @@ public class PlayerControlComponent
     private AppCompatTextView textViewPosition;
     private AppCompatTextView textViewLength;
     private AppCompatImageButton imageButtonPlayPause;
-    private Timer toolbarHideTimer;
     private boolean toolbarsAreVisible = true;
     private boolean isTrackingTouch;
     private Callback callback;
@@ -101,7 +100,7 @@ public class PlayerControlComponent
         });
 
         setOnClickListener((view) -> {
-            toolbarHideTimer.cancel();
+            handler.removeCallbacksAndMessages(null);
 
             toggleToolbarVisibility();
         });
@@ -111,17 +110,10 @@ public class PlayerControlComponent
      * Start the timer that hides the toolbars after a predefined amount of time.
      */
     private void startToolbarHideTimer() {
-        toolbarHideTimer = new Timer();
-
         int timerDelay = getResources()
                 .getInteger(R.integer.player_toolbar_hide_timeout);
 
-        toolbarHideTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                hideToolbars();
-            }
-        }, timerDelay);
+        handler.postDelayed(this::hideToolbars, timerDelay);
     }
 
     /**

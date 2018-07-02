@@ -25,6 +25,7 @@ import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableFragment;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
+import com.masterwok.simplevlcplayer.services.MediaPlayerServiceBinder;
 import com.masterwok.simplevlcplayer.utils.ResourceUtil;
 import com.masterwok.simplevlcplayer.utils.ThreadUtil;
 
@@ -39,7 +40,7 @@ public abstract class BasePlayerFragment
     protected Uri mediaUri;
 
     private MediaControllerCompat mediaController;
-    private MediaPlayerService.Binder serviceBinder;
+    protected MediaPlayerServiceBinder serviceBinder;
     private ProgressBar progressBar;
 
     protected abstract void configure(
@@ -48,7 +49,7 @@ public abstract class BasePlayerFragment
             long length
     );
 
-    protected abstract void onConnected(MediaPlayerService.Binder binder);
+    protected abstract void onConnected();
 
     protected abstract void onDisconnected();
 
@@ -56,11 +57,11 @@ public abstract class BasePlayerFragment
 
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            BasePlayerFragment.this.serviceBinder = (MediaPlayerService.Binder) iBinder;
+            BasePlayerFragment.this.serviceBinder = (MediaPlayerServiceBinder) iBinder;
 
             serviceBinder.setCallback(BasePlayerFragment.this);
 
-            onConnected(serviceBinder);
+            onConnected();
 
             registerMediaController(serviceBinder);
         }
@@ -68,6 +69,8 @@ public abstract class BasePlayerFragment
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
+            serviceBinder = null;
+
             onDisconnected();
         }
     };
@@ -134,26 +137,26 @@ public abstract class BasePlayerFragment
         }
 
         activity.unbindService(mediaPlayerServiceConnection);
+        serviceBinder = null;
     }
 
     private void bindMediaPlayerService() {
-        final Activity activity = getActivity();
-
-        if (activity == null) {
-            return;
-        }
-
-        activity.bindService(
-                new Intent(
-                        activity.getApplicationContext(),
-                        MediaPlayerService.class
-                ),
+        getActivity().bindService(
+                getMediaPlayerServiceIntent(),
                 mediaPlayerServiceConnection,
                 Context.BIND_AUTO_CREATE
         );
     }
 
-    private void registerMediaController(MediaPlayerService.Binder serviceBinder) {
+    private Intent getMediaPlayerServiceIntent() {
+        return new Intent(
+                getActivity(),
+                MediaPlayerService.class
+        );
+
+    }
+
+    private void registerMediaController(MediaPlayerServiceBinder serviceBinder) {
         final Activity activity = getActivity();
 
         if (activity == null || serviceBinder == null) {

@@ -11,6 +11,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableAppCompatActivity;
 import com.masterwok.simplevlcplayer.fragments.BasePlayerFragment;
+import com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment;
 import com.masterwok.simplevlcplayer.fragments.RendererPlayerFragment;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 
@@ -19,9 +20,8 @@ public class MediaPlayerActivity
 
     public static final String MediaUri = BasePlayerFragment.MediaUri;
 
-    //    public LocalPlayerFragment localPlayerFragment;
+    public LocalPlayerFragment localPlayerFragment;
     public RendererPlayerFragment rendererPlayerFragment;
-
 
     private final BroadcastReceiver broadCastReceiver = new BroadcastReceiver() {
         @Override
@@ -34,23 +34,24 @@ public class MediaPlayerActivity
 
             switch (action) {
                 case MediaPlayerService.RendererClearedAction:
-//                    showLocalPlayerFragment();
+                    showLocalPlayerFragment();
                     break;
                 case MediaPlayerService.RendererSelectionAction:
-//                    showRendererPlayerFragment();
+                    showRendererPlayerFragment();
                     break;
             }
         }
     };
 
-//    private void showLocalPlayerFragment() {
-//        rendererPlayerFragment = null;
-//        localPlayerFragment = new LocalPlayerFragment();
-//        showFragment(localPlayerFragment);
-//    }
+
+    private void showLocalPlayerFragment() {
+        rendererPlayerFragment = null;
+        localPlayerFragment = new LocalPlayerFragment();
+        showFragment(localPlayerFragment);
+    }
 
     private void showRendererPlayerFragment() {
-//        localPlayerFragment = null;
+        localPlayerFragment = null;
         rendererPlayerFragment = new RendererPlayerFragment();
         showFragment(rendererPlayerFragment);
     }
@@ -65,8 +66,7 @@ public class MediaPlayerActivity
             return;
         }
 
-//        showLocalPlayerFragment();
-        showRendererPlayerFragment();
+        showLocalPlayerFragment();
     }
 
     @Override
@@ -91,6 +91,8 @@ public class MediaPlayerActivity
         LocalBroadcastManager
                 .getInstance(this)
                 .unregisterReceiver(broadCastReceiver);
+
+        rendererPlayerFragment = null;
 
         super.onStop();
     }

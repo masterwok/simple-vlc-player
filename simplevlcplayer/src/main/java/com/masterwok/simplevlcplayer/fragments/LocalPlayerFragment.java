@@ -18,13 +18,14 @@ import android.widget.FrameLayout;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
-import com.masterwok.simplevlcplayer.services.MediaPlayerService;
+import com.masterwok.simplevlcplayer.constants.SizePolicy;
 import com.masterwok.simplevlcplayer.utils.ResourceUtil;
 
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.Media;
 
-import static com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment.SizePolicy.SURFACE_FIT_SCREEN;
+import static com.masterwok.simplevlcplayer.constants.SizePolicy.SURFACE_FIT_SCREEN;
+
 
 public class LocalPlayerFragment
         extends BasePlayerFragment
@@ -35,15 +36,6 @@ public class LocalPlayerFragment
     private static final String TimeKey = "bundle.time";
 
     private SizePolicy sizePolicy = SizePolicy.SURFACE_BEST_FIT;
-
-    public enum SizePolicy {
-        SURFACE_BEST_FIT,
-        SURFACE_FIT_SCREEN,
-        SURFACE_FILL,
-        SURFACE_16_9,
-        SURFACE_4_3,
-        SURFACE_ORIGINAL
-    }
 
     private int mVideoHeight = 0;
     private int mVideoWidth = 0;
@@ -62,7 +54,6 @@ public class LocalPlayerFragment
     private SurfaceView surfaceSubtitle;
     private SurfaceView surfaceMedia;
 
-    private MediaPlayerService.Binder serviceBinder;
     private FrameLayout surfaceFrame;
 
     @Override
@@ -79,9 +70,7 @@ public class LocalPlayerFragment
     }
 
     @Override
-    protected void onConnected(MediaPlayerService.Binder binder) {
-        this.serviceBinder = binder;
-
+    protected void onConnected() {
         startPlayback();
     }
 

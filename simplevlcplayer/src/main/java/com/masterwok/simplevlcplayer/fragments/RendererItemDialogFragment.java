@@ -18,6 +18,7 @@ import com.masterwok.simplevlcplayer.adapters.SelectionListAdapter;
 import com.masterwok.simplevlcplayer.models.SelectionItem;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
+import com.masterwok.simplevlcplayer.services.MediaPlayerServiceBinder;
 import com.masterwok.simplevlcplayer.utils.ResourceUtil;
 import com.masterwok.simplevlcplayer.utils.ThreadUtil;
 import com.masterwok.simplevlcplayer.utils.ViewUtil;
@@ -37,24 +38,9 @@ public class RendererItemDialogFragment
 
     public static final String Tag = "tag.rendereritemdialogfragment";
 
-    /**
-     * This interface should be implemented by activities who started
-     * the dialog fragment should they want a result when a renderer item
-     * is selected.
-     */
-    public interface RendererItemSelectionListener {
-
-        /**
-         * Invoked when a renderer item is selected.
-         *
-         * @param rendererItem The selected renderer item. This value can be null.
-         */
-        void onRendererUpdate(RendererItem rendererItem);
-    }
-
     private static final float DimAmount = 0.6f;
 
-    private MediaPlayerService.Binder serviceBinder;
+    private MediaPlayerServiceBinder serviceBinder;
 
     private ListView listViewRendererItems;
     private SelectionListAdapter<RendererItem> rendererItemAdapter;
@@ -86,7 +72,7 @@ public class RendererItemDialogFragment
                 ComponentName componentName,
                 IBinder iBinder
         ) {
-            serviceBinder = (MediaPlayerService.Binder) iBinder;
+            serviceBinder = (MediaPlayerServiceBinder) iBinder;
 
             RendererItemObservable rendererItemObservable = serviceBinder
                     .getRendererItemObservable();

@@ -20,6 +20,7 @@ import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
 
 import org.videolan.libvlc.LibVLC;
+import org.videolan.libvlc.Media;
 import org.videolan.libvlc.RendererItem;
 
 import javax.inject.Inject;
@@ -210,10 +211,12 @@ public final class MediaPlayerService
     }
 
     private Notification buildNotification() {
+        final Media media = player.getMedia();
+
         return new NotificationCompat.Builder(this, MediaPlayerServiceChannelId)
                 .setSmallIcon(R.drawable.ic_cast_connected_white_24dp)
-                .setContentTitle("Some Title")
-                .setContentText("Some content ay Charles?")
+                .setContentTitle("Example Title")
+                .setContentText(media.getUri().getPath())
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .build();
     }

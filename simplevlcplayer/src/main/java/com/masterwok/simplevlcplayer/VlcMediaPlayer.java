@@ -229,4 +229,9 @@ public class VlcMediaPlayer
     public Media.VideoTrack getCurrentVideoTrack() {
         return player.getCurrentVideoTrack();
     }
+
+    @Override
+    public Media getMedia() {
+        return player.getMedia();
+    }
 }

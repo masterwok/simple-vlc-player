@@ -30,4 +30,6 @@ public interface VlcMediaPlayer
     void setScale(float scale);
 
     Media.VideoTrack getCurrentVideoTrack();
+
+    Media getMedia();
 }

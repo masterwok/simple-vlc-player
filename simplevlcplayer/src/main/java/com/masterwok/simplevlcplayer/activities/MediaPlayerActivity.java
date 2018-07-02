@@ -74,6 +74,23 @@ public class MediaPlayerActivity
         super.onStart();
 
         registerRendererBroadcastReceiver();
+
+        startService(getMediaPlayerServiceIntent());
+    }
+
+    public Intent getMediaPlayerServiceIntent() {
+        return new Intent(
+                getApplicationContext(),
+                MediaPlayerService.class
+        );
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Always ensure that we stop the media player service when navigating back.
+        stopService(getMediaPlayerServiceIntent());
+
+        super.onBackPressed();
     }
 
     private void registerRendererBroadcastReceiver() {

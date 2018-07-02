@@ -20,7 +20,6 @@ import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.RendererItem;
 
-
 import javax.inject.Inject;
 
 public class MediaPlayerService
@@ -291,6 +290,9 @@ public class MediaPlayerService
 
     @Override
     public void onDestroy() {
+        player.stop();
+        player.release();
+        libVlc.release();
         mediaSession.release();
         rendererItemObservable.stop();
 

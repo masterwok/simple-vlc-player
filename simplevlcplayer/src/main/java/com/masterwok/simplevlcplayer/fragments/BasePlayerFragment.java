@@ -25,7 +25,7 @@ import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableFragment;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
-import com.masterwok.simplevlcplayer.services.MediaPlayerServiceBinder;
+import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
 import com.masterwok.simplevlcplayer.utils.ResourceUtil;
 import com.masterwok.simplevlcplayer.utils.ThreadUtil;
 

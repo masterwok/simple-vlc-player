@@ -1,4 +1,4 @@
-package com.masterwok.simplevlcplayer.services;
+package com.masterwok.simplevlcplayer.services.binders;
 
 import android.net.Uri;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -8,6 +8,7 @@ import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
 import com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
+import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.Media;
@@ -15,6 +16,12 @@ import org.videolan.libvlc.RendererItem;
 
 import java.lang.ref.WeakReference;
 
+
+/**
+ * This is the binder for the media player service. It was created as a separate
+ * class to avoid an implicit reference to the service. The service is referenced
+ * through a weak reference to prevent memory leaks.
+ */
 public final class MediaPlayerServiceBinder extends android.os.Binder {
 
     private final WeakReference<MediaPlayerService> serviceWeakReference;

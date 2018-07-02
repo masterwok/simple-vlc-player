@@ -11,6 +11,7 @@ import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
+import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
 
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.RendererItem;

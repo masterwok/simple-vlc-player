@@ -18,7 +18,7 @@ import com.masterwok.simplevlcplayer.adapters.SelectionListAdapter;
 import com.masterwok.simplevlcplayer.models.SelectionItem;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
-import com.masterwok.simplevlcplayer.services.MediaPlayerServiceBinder;
+import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
 import com.masterwok.simplevlcplayer.utils.ResourceUtil;
 import com.masterwok.simplevlcplayer.utils.ThreadUtil;
 import com.masterwok.simplevlcplayer.utils.ViewUtil;

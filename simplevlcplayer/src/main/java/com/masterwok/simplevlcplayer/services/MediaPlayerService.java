@@ -50,21 +50,55 @@ public final class MediaPlayerService
     @Inject
     public VlcMediaPlayer player;
 
-    private MediaPlayerServiceBinder binder;
-
-    private PlaybackStateCompat.Builder stateBuilder;
-
     public RendererItemObservable rendererItemObservable;
     public MediaSessionCompat mediaSession;
     public MediaPlayer.Callback callback;
 
+    private NotificationManager notificationManager;
+    private PlaybackStateCompat.Builder stateBuilder;
+    private MediaPlayerServiceBinder binder;
     private Bitmap mediaBitmap;
+
+    private static NotificationCompat.Action getPauseAction(Context context) {
+        return new NotificationCompat.Action(
+                R.drawable.ic_pause_black_36dp,
+                "Pause",
+                MediaButtonReceiver.buildMediaButtonPendingIntent(
+                        context,
+                        PlaybackStateCompat.ACTION_PAUSE)
+        );
+    }
+
+    private static NotificationCompat.Action getPlayAction(Context context) {
+        return new NotificationCompat.Action(
+                R.drawable.ic_play_arrow_black_36dp,
+                "Play",
+                MediaButtonReceiver.buildMediaButtonPendingIntent(
+                        context,
+                        PlaybackStateCompat.ACTION_PLAY)
+        );
+    }
+
+    private static NotificationCompat.Action getStopAction(Context context) {
+        return new NotificationCompat.Action(
+                R.drawable.ic_clear_black_36dp,
+                "Stop",
+                MediaButtonReceiver.buildMediaButtonPendingIntent(
+                        context,
+                        PlaybackStateCompat.ACTION_STOP)
+        );
+    }
+
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         binder = new MediaPlayerServiceBinder(this);
+
+        notificationManager = NotificationUtil.getNotificationManager(
+                getApplicationContext()
+        );
 
         stateBuilder = new PlaybackStateCompat
                 .Builder()
@@ -78,6 +112,14 @@ public final class MediaPlayerService
 
         rendererItemObservable = new RendererItemObservable(libVlc);
         rendererItemObservable.start();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // Pass notification button intents to the media session callback.
+        MediaButtonReceiver.handleIntent(mediaSession, intent);
+
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
@@ -219,10 +261,7 @@ public final class MediaPlayerService
 
         startForeground(
                 MediaPlayerServiceNotificationId,
-                buildNotification(
-                        media,
-                        mediaBitmap
-                )
+                buildPlaybackNotification()
         );
     }
 
@@ -238,21 +277,6 @@ public final class MediaPlayerService
                 false,
                 false,
                 false
-        );
-    }
-
-    private Notification buildNotification(
-            Media media,
-            Bitmap bitmap
-    ) {
-        return buildPlaybackNotification(
-                getApplicationContext(),
-                mediaSession.getSessionToken(),
-                MediaPlayerServiceChannelId,
-                media.getUri().getLastPathSegment(),
-                null,
-                bitmap,
-                player.isPlaying()
         );
     }
 
@@ -274,14 +298,13 @@ public final class MediaPlayerService
                 1
         );
 
-        updateNotification(
-                getApplicationContext(),
-                MediaPlayerServiceNotificationId,
-                buildNotification(
-                        player.getMedia(),
-                        mediaBitmap
-                )
-        );
+        // Update playback notification when there is a renderer item.
+        if (player.getSelectedRendererItem() != null) {
+            notificationManager.notify(
+                    MediaPlayerService.MediaPlayerServiceNotificationId,
+                    buildPlaybackNotification()
+            );
+        }
 
         mediaSession.setPlaybackState(stateBuilder.build());
     }
@@ -305,14 +328,6 @@ public final class MediaPlayerService
                 MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
                         | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
         );
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        // Pass notification button intents to the media session callback.
-        MediaButtonReceiver.handleIntent(mediaSession, intent);
-
-        return super.onStartCommand(intent, flags, startId);
     }
 
     private class PlayerSessionCallback extends MediaSessionCompat.Callback {
@@ -353,61 +368,30 @@ public final class MediaPlayerService
         }
     }
 
-    private static NotificationCompat.Action getPauseAction(Context context) {
-        return new NotificationCompat.Action(
-                R.drawable.ic_pause_black_36dp,
-                "Pause",
-                MediaButtonReceiver.buildMediaButtonPendingIntent(
-                        context,
-                        PlaybackStateCompat.ACTION_PAUSE)
-        );
-    }
+    private Notification buildPlaybackNotification() {
+        final Context context = getApplicationContext();
 
-    private static NotificationCompat.Action getPlayAction(Context context) {
-        return new NotificationCompat.Action(
-                R.drawable.ic_play_arrow_black_36dp,
-                "Play",
-                MediaButtonReceiver.buildMediaButtonPendingIntent(
-                        context,
-                        PlaybackStateCompat.ACTION_PLAY)
-        );
-    }
+        final String title = player
+                .getMedia()
+                .getUri()
+                .getLastPathSegment();
 
-    private static NotificationCompat.Action getStopAction(Context context) {
-        return new NotificationCompat.Action(
-                R.drawable.ic_clear_black_36dp,
-                "Stop",
-                MediaButtonReceiver.buildMediaButtonPendingIntent(
-                        context,
-                        PlaybackStateCompat.ACTION_STOP)
-        );
-    }
-
-    private Notification buildPlaybackNotification(
-            Context context,
-            MediaSessionCompat.Token token,
-            String channelId,
-            String title,
-            String description,
-            Bitmap cover,
-            boolean isPlaying
-    ) {
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 context,
-                channelId
+                MediaPlayerService.MediaPlayerServiceChannelId
         );
 
-        builder.setSmallIcon(R.drawable.ic_play_arrow_black_36dp)
+        builder.setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setSmallIcon(R.drawable.ic_play_arrow_black_36dp)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setLargeIcon(mediaBitmap)
                 .setContentTitle(title)
-                .setContentText(description)
-                .setLargeIcon(cover)
+                .setContentText(null)
                 .setTicker(title)
                 .setAutoCancel(false)
-                .setOngoing(true)
-                .setCategory(NotificationCompat.CATEGORY_SERVICE);
+                .setOngoing(true);
 
-        if (isPlaying) {
+        if (player.isPlaying()) {
             builder.addAction(getPauseAction(context));
         } else {
             builder.addAction(getPlayAction(context));
@@ -416,29 +400,11 @@ public final class MediaPlayerService
         builder.addAction(getStopAction(context));
 
         builder.setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
-                .setMediaSession(token)
+                .setMediaSession(mediaSession.getSessionToken())
                 .setShowActionsInCompactView(0, 1)
         );
 
         return builder.build();
     }
-
-    private void updateNotification(
-            Context context,
-            int notificationId,
-            Notification notification
-    ) {
-        if (player.getSelectedRendererItem() == null) {
-            return;
-        }
-
-        final NotificationManager notificationManager = NotificationUtil.getNotificationManager(context);
-
-        notificationManager.notify(
-                notificationId,
-                notification
-        );
-    }
-
 
 }

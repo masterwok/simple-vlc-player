@@ -78,10 +78,6 @@ public abstract class BasePlayerFragment
     private MediaControllerCompat.Callback controllerCallback = new MediaControllerCompat.Callback() {
         @Override
         public void onPlaybackStateChanged(PlaybackStateCompat state) {
-            if (state.getBufferedPosition() <= 0) {
-                return;
-            }
-
             configure(
                     state.getState() == PlaybackStateCompat.STATE_PLAYING,
                     state.getPosition(),

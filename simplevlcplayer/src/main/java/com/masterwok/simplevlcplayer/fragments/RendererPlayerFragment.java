@@ -80,12 +80,4 @@ public class RendererPlayerFragment
         serviceBinder.play();
     }
 
-    @Override
-    public void onPlayerStopped() {
-        super.onPlayerStopped();
-
-        // We always want to stop the activity when the player stops when casting.
-        //noinspection ConstantConditions
-        getActivity().finish();
-    }
 }

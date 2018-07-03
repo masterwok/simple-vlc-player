@@ -182,10 +182,16 @@ public class PlayerControlComponent
                     getPlayPauseDrawableResourceId(isPlaying)
             );
 
+            if (time < 0 || length < 0) {
+                seekBarPosition.setProgress(0);
+                textViewPosition.setText(null);
+                textViewLength.setText(null);
+                return;
+            }
+
             seekBarPosition.setProgress(progress);
             textViewPosition.setText(positionText);
             textViewLength.setText(lengthText);
-
         });
     }
 

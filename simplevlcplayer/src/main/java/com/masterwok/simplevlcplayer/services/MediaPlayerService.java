@@ -384,7 +384,7 @@ public final class MediaPlayerService
         );
     }
 
-    public static Notification buildPlaybackNotification(
+    public Notification buildPlaybackNotification(
             Context context,
             MediaSessionCompat.Token token,
             String channelId,
@@ -424,11 +424,15 @@ public final class MediaPlayerService
         return builder.build();
     }
 
-    public static void updateNotification(
+    public void updateNotification(
             Context context,
             int notificationId,
             Notification notification
     ) {
+        if (player.getSelectedRendererItem() == null) {
+            return;
+        }
+
         final NotificationManager notificationManager = NotificationUtil.getNotificationManager(context);
 
         notificationManager.notify(

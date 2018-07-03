@@ -87,7 +87,7 @@ public class VlcMediaPlayer
     public void setMedia(Uri uri) {
         final Media media = new Media(
                 libVlc,
-                uri.getPath()
+                uri
         );
 
         player.setMedia(media);

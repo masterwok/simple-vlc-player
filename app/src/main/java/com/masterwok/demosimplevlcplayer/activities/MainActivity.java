@@ -102,6 +102,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MediaPlayerActivity.class);
 
         intent.putExtra(MediaPlayerActivity.MediaUri, videoUri);
+//        intent.putExtra(MediaPlayerActivity.MediaUri, Uri.parse(
+//                "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4"
+//        ));
 
         startActivity(intent);
     }

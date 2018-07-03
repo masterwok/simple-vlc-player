@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.MediaStore;
@@ -24,6 +25,7 @@ import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
+import com.masterwok.simplevlcplayer.utils.BitmapUtil;
 import com.masterwok.simplevlcplayer.utils.NotificationUtil;
 
 import org.videolan.libvlc.LibVLC;
@@ -57,7 +59,7 @@ public final class MediaPlayerService
     private NotificationManager notificationManager;
     private PlaybackStateCompat.Builder stateBuilder;
     private MediaPlayerServiceBinder binder;
-    private Bitmap mediaBitmap;
+    private Bitmap mediaBitmap; // cached value..access via getMediaBitmap()
 
     private static NotificationCompat.Action getPauseAction(Context context) {
         return new NotificationCompat.Action(
@@ -250,19 +252,30 @@ public final class MediaPlayerService
     }
 
     private void enterForeground() {
-        final Media media = player.getMedia();
-
-        mediaBitmap = ThumbnailUtils.createVideoThumbnail(
-                media.getUri().getPath(),
-                MediaStore.Images.Thumbnails.MINI_KIND
+        mediaSession.setMetadata(
+                getMediaMetadata(getMediaBitmap())
         );
-
-        mediaSession.setMetadata(getMediaMetadata(mediaBitmap));
 
         startForeground(
                 MediaPlayerServiceNotificationId,
                 buildPlaybackNotification()
         );
+    }
+
+    private Bitmap getMediaBitmap() {
+        final Media media = player.getMedia();
+
+        if (mediaBitmap != null || media == null) {
+            return mediaBitmap;
+        }
+
+        final Uri mediaUri = media.getUri();
+        final String schema = mediaUri.getScheme();
+
+        // Use stream bitmap when scheme is not set or not file.
+        return mediaBitmap = schema == null || !schema.equals("file")
+                ? BitmapUtil.drawableToBitmap(getResources().getDrawable(R.drawable.ic_stream_cover, null))
+                : ThumbnailUtils.createVideoThumbnail(mediaUri.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
     }
 
     private void createNotificationChannel() {
@@ -384,7 +397,7 @@ public final class MediaPlayerService
         builder.setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setSmallIcon(R.drawable.ic_play_arrow_black_36dp)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setLargeIcon(mediaBitmap)
+                .setLargeIcon(getMediaBitmap())
                 .setContentTitle(title)
                 .setContentText(null)
                 .setTicker(title)

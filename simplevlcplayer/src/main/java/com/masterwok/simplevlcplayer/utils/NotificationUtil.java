@@ -8,11 +8,13 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 
 import com.masterwok.simplevlcplayer.R;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class NotificationUtil {
 
     /**
@@ -53,6 +55,36 @@ public class NotificationUtil {
         notificationManager.createNotificationChannel(channel);
     }
 
+    private static NotificationCompat.Action getPauseAction(Context context) {
+        return new NotificationCompat.Action(
+                R.drawable.ic_pause_black_36dp,
+                "Pause",
+                MediaButtonReceiver.buildMediaButtonPendingIntent(
+                        context,
+                        PlaybackStateCompat.ACTION_PAUSE)
+        );
+    }
+
+    private static NotificationCompat.Action getPlayAction(Context context) {
+        return new NotificationCompat.Action(
+                R.drawable.ic_play_arrow_black_36dp,
+                "Play",
+                MediaButtonReceiver.buildMediaButtonPendingIntent(
+                        context,
+                        PlaybackStateCompat.ACTION_PLAY)
+        );
+    }
+
+    private static NotificationCompat.Action getStopAction(Context context) {
+        return new NotificationCompat.Action(
+                R.drawable.ic_clear_black_36dp,
+                "Stop",
+                MediaButtonReceiver.buildMediaButtonPendingIntent(
+                        context,
+                        PlaybackStateCompat.ACTION_STOP)
+        );
+    }
+
     public static Notification buildPlaybackNotification(
             Context context,
             MediaSessionCompat.Token token,
@@ -78,12 +110,12 @@ public class NotificationUtil {
                 .setCategory(NotificationCompat.CATEGORY_SERVICE);
 
         if (isPlaying) {
-            builder.addAction(R.drawable.ic_pause_black_36dp, "Pause", null);
+            builder.addAction(getPauseAction(context));
         } else {
-            builder.addAction(R.drawable.ic_play_arrow_black_36dp, "Play", null);
+            builder.addAction(getPlayAction(context));
         }
 
-        builder.addAction(R.drawable.ic_clear_black_36dp, "Stop", null);
+        builder.addAction(getStopAction(context));
 
         builder.setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
                 .setMediaSession(token)
@@ -91,6 +123,19 @@ public class NotificationUtil {
         );
 
         return builder.build();
+    }
+
+    public static void updateNotification(
+            Context context,
+            int notificationId,
+            Notification notification
+    ) {
+        final NotificationManager notificationManager = getNotificationManager(context);
+
+        notificationManager.notify(
+                notificationId,
+                notification
+        );
     }
 
 }

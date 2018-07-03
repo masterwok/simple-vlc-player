@@ -10,8 +10,10 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.view.KeyEvent;
 
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
@@ -119,6 +121,8 @@ public final class MediaPlayerService
     public void onPlayerPlaying() {
         updatePlaybackState();
 
+        mediaSession.setActive(true);
+
         if (player.getSelectedRendererItem() != null) {
             enterForeground();
         }
@@ -141,6 +145,8 @@ public final class MediaPlayerService
     public void onPlayerStopped() {
         updatePlaybackState();
 
+        mediaSession.setActive(false);
+
         stopForeground(true);
 
         if (callback != null) {
@@ -152,6 +158,8 @@ public final class MediaPlayerService
     public void onPlayerEndReached() {
         updatePlaybackState();
 
+        mediaSession.setActive(false);
+
         if (callback != null) {
             callback.onPlayerEndReached();
         }
@@ -160,6 +168,8 @@ public final class MediaPlayerService
     @Override
     public void onPlayerError() {
         updatePlaybackState();
+
+        mediaSession.setActive(false);
 
         if (callback != null) {
             callback.onPlayerError();
@@ -260,6 +270,14 @@ public final class MediaPlayerService
                 1
         );
 
+        NotificationUtil.updateNotification(
+                getApplicationContext(),
+                MediaPlayerServiceNotificationId,
+                buildNotification(
+                        player.getMedia(),
+                        mediaBitmap
+                )
+        );
         mediaSession.setPlaybackState(stateBuilder.build());
     }
 
@@ -275,10 +293,21 @@ public final class MediaPlayerService
 
     private void createMediaSession() {
         mediaSession = new MediaSessionCompat(this, SimpleVlcSessionTag);
-        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
         mediaSession.setMediaButtonReceiver(null);
         mediaSession.setCallback(new PlayerSessionCallback());
         mediaSession.setPlaybackState(stateBuilder.build());
+        mediaSession.setFlags(
+                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
+                        | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
+        );
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // Pass notification button intents to the media session callback.
+        MediaButtonReceiver.handleIntent(mediaSession, intent);
+
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private class PlayerSessionCallback extends MediaSessionCompat.Callback {
@@ -290,6 +319,32 @@ public final class MediaPlayerService
         @Override
         public void onPause() {
             player.pause();
+        }
+
+        @Override
+        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+            final String action = mediaButtonEvent.getAction();
+
+            if (action == null
+                    || !action.equals(Intent.ACTION_MEDIA_BUTTON)) {
+                return false;
+            }
+
+            KeyEvent keyEvent = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+
+            switch (keyEvent.getKeyCode()) {
+                case KeyEvent.KEYCODE_MEDIA_PLAY:
+                    player.play();
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                    player.pause();
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_STOP:
+                    player.stop();
+                    break;
+            }
+
+            return true;
         }
     }
 

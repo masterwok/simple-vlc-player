@@ -277,6 +277,8 @@ public abstract class BasePlayerFragment
 
     @Override
     public void onPlayerEndReached() {
+        //noinspection ConstantConditions
+        getActivity().finish();
     }
 
     @Override

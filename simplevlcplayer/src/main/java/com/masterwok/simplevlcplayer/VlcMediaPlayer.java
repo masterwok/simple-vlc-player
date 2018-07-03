@@ -234,4 +234,5 @@ public class VlcMediaPlayer
     public Media getMedia() {
         return player.getMedia();
     }
+
 }

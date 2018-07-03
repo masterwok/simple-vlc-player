@@ -13,9 +13,21 @@
             android:theme="@style/AppTheme.FullScreen">
         </activity>
 
+        <!-- Register a media button receiver so intents are sent to the media player service. -->
+        <receiver android:name="android.support.v4.media.session.MediaButtonReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON"/>
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".services.MediaPlayerService"
-            android:stopWithTask="true"/>
+            android:stopWithTask="true">
+            <intent-filter>
+                <!-- Accept media button events through onStartCommand(..) -->
+                <action android:name="android.intent.action.MEDIA_BUTTON"/>
+            </intent-filter>
+        </service>
 
     </application>
 

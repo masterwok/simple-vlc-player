@@ -353,7 +353,6 @@ public final class MediaPlayerService
         }
     }
 
-
     private static NotificationCompat.Action getPauseAction(Context context) {
         return new NotificationCompat.Action(
                 R.drawable.ic_pause_black_36dp,
@@ -384,7 +383,7 @@ public final class MediaPlayerService
         );
     }
 
-    public Notification buildPlaybackNotification(
+    private Notification buildPlaybackNotification(
             Context context,
             MediaSessionCompat.Token token,
             String channelId,
@@ -424,7 +423,7 @@ public final class MediaPlayerService
         return builder.build();
     }
 
-    public void updateNotification(
+    private void updateNotification(
             Context context,
             int notificationId,
             Notification notification

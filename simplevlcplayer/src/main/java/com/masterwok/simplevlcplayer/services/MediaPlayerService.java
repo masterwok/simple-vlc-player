@@ -1,23 +1,24 @@
 package com.masterwok.simplevlcplayer.services;
 
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
-import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
+import com.masterwok.simplevlcplayer.utils.NotificationUtil;
 
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
@@ -32,9 +33,10 @@ public final class MediaPlayerService
     public static final String RendererClearedAction = "action.rendererclearedaction";
     public static final String RendererSelectionAction = "action.rendererselectionaction";
 
-    private static final String MediaPlayerServiceName = "Media Player Service";
+    private static final String MediaPlayerServiceChannelName = "Media Player Service";
     private static final String MediaPlayerServiceChannelId = "channel.mediaplayerservice";
     private static final String SimpleVlcSessionTag = "tag.simplevlcsession";
+    private static final int MediaPlayerServiceNotificationId = 32106;
 
     @Inject
     public LibVLC libVlc;
@@ -50,6 +52,8 @@ public final class MediaPlayerService
     public MediaSessionCompat mediaSession;
     public MediaPlayer.Callback callback;
 
+    private Bitmap mediaBitmap;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -62,6 +66,7 @@ public final class MediaPlayerService
                 .setState(PlaybackStateCompat.STATE_PAUSED, 0L, 1);
 
         createMediaSession();
+        createNotificationChannel();
 
         player.setCallback(this);
 
@@ -189,37 +194,60 @@ public final class MediaPlayerService
     }
 
     private void enterForeground() {
+        final Media media = player.getMedia();
+
+        mediaBitmap = ThumbnailUtils.createVideoThumbnail(
+                media.getUri().getPath(),
+                MediaStore.Images.Thumbnails.MINI_KIND
+        );
+
+        mediaSession.setMetadata(getMediaMetadata(mediaBitmap));
+
+        startForeground(
+                MediaPlayerServiceNotificationId,
+                buildNotification(
+                        media,
+                        mediaBitmap
+                )
+        );
+    }
+
+    private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return;
         }
 
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-
-        NotificationChannel channel = new NotificationChannel(
+        NotificationUtil.createNotificationChannel(
+                getApplicationContext(),
                 MediaPlayerServiceChannelId,
-                MediaPlayerServiceName,
-                NotificationManager.IMPORTANCE_DEFAULT
+                MediaPlayerServiceChannelName,
+                false,
+                false,
+                false
         );
-
-        channel.setSound(null, null);
-        channel.enableLights(false);
-        channel.enableVibration(false);
-
-        //noinspection ConstantConditions
-        notificationManager.createNotificationChannel(channel);
-
-        startForeground(1, buildNotification());
     }
 
-    private Notification buildNotification() {
-        final Media media = player.getMedia();
+    private Notification buildNotification(
+            Media media,
+            Bitmap bitmap
+    ) {
+        return NotificationUtil.buildPlaybackNotification(
+                getApplicationContext(),
+                mediaSession.getSessionToken(),
+                MediaPlayerServiceChannelId,
+                media.getUri().getLastPathSegment(),
+                null,
+                bitmap,
+                player.isPlaying()
+        );
+    }
 
-        return new NotificationCompat.Builder(this, MediaPlayerServiceChannelId)
-                .setSmallIcon(R.drawable.ic_cast_connected_white_24dp)
-                .setContentTitle("Example Title")
-                .setContentText(media.getUri().getPath())
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .build();
+    private MediaMetadataCompat getMediaMetadata(Bitmap bitmap) {
+        final MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
+
+        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap);
+
+        return builder.build();
     }
 
     private void updatePlaybackState() {

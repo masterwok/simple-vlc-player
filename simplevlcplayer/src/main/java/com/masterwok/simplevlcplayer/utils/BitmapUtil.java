@@ -5,6 +5,9 @@ import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
+/**
+ * This class provides static convenience methods for bitmaps.
+ */
 public class BitmapUtil {
 
     /**

@@ -134,4 +134,9 @@ public final class MediaPlayerServiceBinder extends android.os.Binder {
     public RendererItem getSelectedRendererItem() {
         return getPlayer().getSelectedRendererItem();
     }
+
+    public boolean isPlaying() {
+        return getPlayer()
+                .isPlaying();
+    }
 }

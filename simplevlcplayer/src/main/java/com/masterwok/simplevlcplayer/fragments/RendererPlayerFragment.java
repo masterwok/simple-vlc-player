@@ -30,6 +30,10 @@ public class RendererPlayerFragment
 
     @Override
     protected void onConnected() {
+        if(serviceBinder.isPlaying()) {
+            return;
+        }
+
         startPlayback();
     }
 

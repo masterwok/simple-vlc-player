@@ -14,6 +14,7 @@ import com.nononsenseapps.filepicker.FilePickerActivity;
 import com.nononsenseapps.filepicker.Utils;
 
 import java.io.File;
+import java.util.List;
 
 
 /**
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(this, FilePickerActivity.class);
 
         // Set these depending on your use case. These are the defaults.
-        i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
+        i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, true);
         i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
         i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
         i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
@@ -85,23 +86,53 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        File file = Utils.getFileForUri(
-                Utils.getSelectedFilesFromResult(data).get(0)
+        final List<Uri> selectedFiles = Utils.getSelectedFilesFromResult(data);
+
+        File videoFile = Utils.getFileForUri(
+                selectedFiles.get(0)
         );
 
-        startMediaPlayerActivity(Uri.fromFile(file));
+        // If a second file was selected, assume it was a subtitle file.
+        startMediaPlayerActivity(
+                Uri.fromFile(videoFile),
+                selectedFiles.size() > 1
+                        ? filterSubtitleSelection(Utils.getFileForUri(selectedFiles.get(1)))
+                        : null
+        );
+    }
+
+    /**
+     * For the sake of the demo, assume that the second file selected is the subtitle.
+     *
+     * @param subtitleFile The selected subtitle file.
+     * @return If valid subtitle file type, the file uri. Else, null.
+     */
+    private Uri filterSubtitleSelection(File subtitleFile) {
+        if (subtitleFile == null) {
+            return null;
+        }
+
+        final String path = subtitleFile
+                .getAbsolutePath()
+                .toLowerCase();
+
+        return path.endsWith("vtt") || path.endsWith("srt")
+                ? Uri.fromFile(subtitleFile)
+                : null;
     }
 
     /**
      * Start the simple-vlc-player media player activity. This method
      * does not ensure activity is started on main thread.
      *
-     * @param videoUri The selected video URI.
+     * @param videoUri    The selected video URI.
+     * @param subtitleUri The selected subtitle URI.
      */
-    private void startMediaPlayerActivity(Uri videoUri) {
+    private void startMediaPlayerActivity(Uri videoUri, Uri subtitleUri) {
         Intent intent = new Intent(this, MediaPlayerActivity.class);
 
         intent.putExtra(MediaPlayerActivity.MediaUri, videoUri);
+        intent.putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri);
 //        intent.putExtra(MediaPlayerActivity.MediaUri, Uri.parse(
 //                "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4"
 //        ));

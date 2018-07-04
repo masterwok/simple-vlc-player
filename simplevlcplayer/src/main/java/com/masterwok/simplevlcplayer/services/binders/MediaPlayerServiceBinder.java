@@ -49,6 +49,10 @@ public final class MediaPlayerServiceBinder extends android.os.Binder {
     }
 
     public void setMedia(Uri mediaUri) {
+        if (mediaUri == null) {
+            return;
+        }
+
         getPlayer().setMedia(mediaUri);
     }
 
@@ -138,5 +142,13 @@ public final class MediaPlayerServiceBinder extends android.os.Binder {
     public boolean isPlaying() {
         return getPlayer()
                 .isPlaying();
+    }
+
+    public void setSubtitle(Uri subtitleUri) {
+        if (subtitleUri == null) {
+            return;
+        }
+
+        getPlayer().setSubtitle(subtitleUri);
     }
 }

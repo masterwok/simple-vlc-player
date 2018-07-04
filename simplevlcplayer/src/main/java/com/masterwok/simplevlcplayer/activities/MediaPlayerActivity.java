@@ -19,6 +19,7 @@ public class MediaPlayerActivity
         extends InjectableAppCompatActivity {
 
     public static final String MediaUri = BasePlayerFragment.MediaUri;
+    public static final String SubtitleUri = BasePlayerFragment.SubtitleUri;
 
     public LocalPlayerFragment localPlayerFragment;
     public RendererPlayerFragment rendererPlayerFragment;

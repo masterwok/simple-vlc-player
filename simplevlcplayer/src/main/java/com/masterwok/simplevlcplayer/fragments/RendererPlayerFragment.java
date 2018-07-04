@@ -81,6 +81,7 @@ public class RendererPlayerFragment
         }
 
         serviceBinder.setMedia(mediaUri);
+        serviceBinder.setSubtitle(subtitleUri);
         serviceBinder.play();
     }
 

@@ -36,11 +36,13 @@ public abstract class BasePlayerFragment
         , MediaPlayer.Callback {
 
     public static final String MediaUri = "extra.mediauri";
+    public static final String SubtitleUri = "extra.subtitleuri";
 
+    protected MediaPlayerServiceBinder serviceBinder;
+    protected Uri subtitleUri;
     protected Uri mediaUri;
 
     private MediaControllerCompat mediaController;
-    protected MediaPlayerServiceBinder serviceBinder;
     private ProgressBar progressBar;
 
     protected abstract void configure(
@@ -113,6 +115,7 @@ public abstract class BasePlayerFragment
         Intent intent = getActivity().getIntent();
 
         mediaUri = intent.getParcelableExtra(MediaUri);
+        subtitleUri = intent.getParcelableExtra(SubtitleUri);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.masterwok.simplevlcplayer.fragments;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,6 +37,8 @@ public class LocalPlayerFragment
     private static final String TimeKey = "bundle.time";
 
     private SizePolicy sizePolicy = SizePolicy.SURFACE_BEST_FIT;
+
+    private final Handler mHandler = new Handler();
 
     private int mVideoHeight = 0;
     private int mVideoWidth = 0;
@@ -101,6 +104,7 @@ public class LocalPlayerFragment
         super.onViewCreated(view, savedInstanceState);
 
         bindViewComponents(view);
+        configureSubtitleSurface();
         subscribeToViewComponents();
     }
 
@@ -144,7 +148,13 @@ public class LocalPlayerFragment
         surfaceSubtitle = view.findViewById(R.id.surface_subtitle);
     }
 
-    private final Handler mHandler = new Handler();
+    private void configureSubtitleSurface() {
+        surfaceSubtitle.setZOrderMediaOverlay(true);
+
+        surfaceSubtitle
+                .getHolder()
+                .setFormat(PixelFormat.TRANSLUCENT);
+    }
 
     private void registerSurfaceLayoutListener() {
         surfaceLayoutListener = new View.OnLayoutChangeListener() {
@@ -186,6 +196,7 @@ public class LocalPlayerFragment
         updateVideoSurfaces();
 
         serviceBinder.setMedia(mediaUri);
+        serviceBinder.setSubtitle(subtitleUri);
 
         if (resumeIsPlaying) {
             serviceBinder.play();

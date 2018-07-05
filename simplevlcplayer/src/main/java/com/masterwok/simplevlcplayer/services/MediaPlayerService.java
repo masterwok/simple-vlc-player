@@ -18,6 +18,7 @@ import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
+import android.widget.Toast;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
@@ -28,6 +29,7 @@ import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
 import com.masterwok.simplevlcplayer.utils.BitmapUtil;
 import com.masterwok.simplevlcplayer.utils.NotificationUtil;
 
+import org.videolan.libvlc.Dialog;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.RendererItem;
@@ -36,7 +38,8 @@ import javax.inject.Inject;
 
 public final class MediaPlayerService
         extends InjectableService
-        implements MediaPlayer.Callback {
+        implements MediaPlayer.Callback
+        , Dialog.Callbacks {
 
     public static final String RendererClearedAction = "action.rendererclearedaction";
     public static final String RendererSelectionAction = "action.rendererselectionaction";
@@ -95,6 +98,8 @@ public final class MediaPlayerService
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Dialog.setCallbacks(libVlc, this);
 
         binder = new MediaPlayerServiceBinder(this);
 
@@ -251,6 +256,45 @@ public final class MediaPlayerService
         }
     }
 
+    @Override
+    public void onDisplay(Dialog.ErrorMessage errorMessage) {
+
+    }
+
+    @Override
+    public void onDisplay(Dialog.LoginDialog loginDialog) {
+
+    }
+
+    @Override
+    public void onDisplay(Dialog.QuestionDialog questionDialog) {
+        // Ignore non-performance warning dialogs.
+        if (!questionDialog.getTitle().equals("Performance warning")) {
+            return;
+        }
+
+        // Let the user know casting will eat their battery.
+        Toast.makeText(
+                getApplicationContext(),
+                R.string.toast_casting_performance_warning,
+                Toast.LENGTH_SHORT
+        ).show();
+
+        // Accept and dismiss performance warning dialog.
+        questionDialog.postAction(1);
+        questionDialog.dismiss();
+    }
+
+    @Override
+    public void onDisplay(Dialog.ProgressDialog progressDialog) {
+
+    }
+
+    @Override
+    public void onCanceled(Dialog dialog) {
+
+    }
+
     private void enterForeground() {
         mediaSession.setMetadata(
                 getMediaMetadata(getMediaBitmap())
@@ -341,6 +385,12 @@ public final class MediaPlayerService
                 MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
                         | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
         );
+    }
+
+
+    @Override
+    public void onProgressUpdate(Dialog.ProgressDialog progressDialog) {
+
     }
 
     private class PlayerSessionCallback extends MediaSessionCompat.Callback {

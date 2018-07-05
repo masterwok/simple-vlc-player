@@ -6,4 +6,5 @@
     <string name="dialog_none">None</string>
     <string name="dialog_title_renderer">Select device</string>
     <string name="dialog_button_renderer_negative">Cancel</string>
+    <string name="toast_casting_performance_warning">Casting this video requires conversion. This conversion can use all the available power and could quickly drain your battery.</string>
 </resources>

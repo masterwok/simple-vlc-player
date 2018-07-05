@@ -48,8 +48,6 @@ public interface MediaPlayer {
 
         void onPlayerTimeChange(long timeChanged);
 
-        void onPlayerPositionChange(float positionChanged);
-
         void onBuffering(float buffering);
     }
 }

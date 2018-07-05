@@ -65,7 +65,7 @@ public final class MediaPlayerService
     private Bitmap mediaBitmap; // cached value..access via getMediaBitmap()
     private Bitmap defaultBitmap;
 
-    private long lastPublicationDate = 0L;
+    private long previousTimeChanged;
 
     private static NotificationCompat.Action getPauseAction(Context context) {
         return new NotificationCompat.Action(
@@ -236,9 +236,12 @@ public final class MediaPlayerService
 
     @Override
     public void onPlayerTimeChange(long timeChanged) {
-        if (shouldIgnoreEvent()) {
+        // Rate limit the number of time changed events to one a second.
+        if (timeChanged > 0 && timeChanged - previousTimeChanged < 1000L) {
             return;
         }
+
+        previousTimeChanged = timeChanged;
 
         updatePlaybackState();
 
@@ -247,35 +250,6 @@ public final class MediaPlayerService
         }
     }
 
-    /**
-     * Check whether or not an event should be ignored. An event should be ignored
-     * if the most recently published event was less than one second ago.
-     *
-     * @return If event should be ignored, true. Else, false.
-     */
-    private boolean shouldIgnoreEvent() {
-        final long time = System.currentTimeMillis();
-
-        if (time - lastPublicationDate <= 1000L) {
-            return true;
-        }
-
-        lastPublicationDate = time;
-        return false;
-    }
-
-    @Override
-    public void onPlayerPositionChange(float positionChanged) {
-        if (shouldIgnoreEvent()) {
-            return;
-        }
-
-        updatePlaybackState();
-
-        if (callback != null) {
-            callback.onPlayerPositionChange(positionChanged);
-        }
-    }
 
     @Override
     public void onBuffering(float buffering) {

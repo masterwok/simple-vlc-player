@@ -288,7 +288,4 @@ public abstract class BasePlayerFragment
     public void onPlayerTimeChange(long timeChanged) {
     }
 
-    @Override
-    public void onPlayerPositionChange(float positionChanged) {
-    }
 }

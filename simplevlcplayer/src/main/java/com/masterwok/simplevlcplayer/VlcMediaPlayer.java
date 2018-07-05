@@ -15,7 +15,6 @@ import static org.videolan.libvlc.MediaPlayer.Event.EndReached;
 import static org.videolan.libvlc.MediaPlayer.Event.Opening;
 import static org.videolan.libvlc.MediaPlayer.Event.Paused;
 import static org.videolan.libvlc.MediaPlayer.Event.Playing;
-import static org.videolan.libvlc.MediaPlayer.Event.PositionChanged;
 import static org.videolan.libvlc.MediaPlayer.Event.SeekableChanged;
 import static org.videolan.libvlc.MediaPlayer.Event.Stopped;
 import static org.videolan.libvlc.MediaPlayer.Event.TimeChanged;
@@ -148,9 +147,6 @@ public class VlcMediaPlayer
                 break;
             case TimeChanged:
                 callback.onPlayerTimeChange(event.getTimeChanged());
-                break;
-            case PositionChanged:
-                callback.onPlayerPositionChange(event.getPositionChanged());
                 break;
             case Buffering:
                 callback.onBuffering(event.getBuffering());

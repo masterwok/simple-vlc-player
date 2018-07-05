@@ -69,16 +69,6 @@ public class VlcMediaPlayer
     }
 
     @Override
-    public void togglePlayback() {
-        if (player.isPlaying()) {
-            player.pause();
-            return;
-        }
-
-        player.play();
-    }
-
-    @Override
     public void stop() {
         player.stop();
     }

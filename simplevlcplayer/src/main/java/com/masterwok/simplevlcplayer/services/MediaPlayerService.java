@@ -63,6 +63,9 @@ public final class MediaPlayerService
     private PlaybackStateCompat.Builder stateBuilder;
     private MediaPlayerServiceBinder binder;
     private Bitmap mediaBitmap; // cached value..access via getMediaBitmap()
+    private Bitmap defaultBitmap;
+
+    private long lastPublicationDate = 0L;
 
     private static NotificationCompat.Action getPauseAction(Context context) {
         return new NotificationCompat.Action(
@@ -101,6 +104,7 @@ public final class MediaPlayerService
 
         Dialog.setCallbacks(libVlc, this);
 
+        defaultBitmap = BitmapUtil.drawableToBitmap(getResources().getDrawable(R.drawable.ic_stream_cover, null));
         binder = new MediaPlayerServiceBinder(this);
 
         notificationManager = NotificationUtil.getNotificationManager(
@@ -232,6 +236,10 @@ public final class MediaPlayerService
 
     @Override
     public void onPlayerTimeChange(long timeChanged) {
+        if (shouldIgnoreEvent()) {
+            return;
+        }
+
         updatePlaybackState();
 
         if (callback != null) {
@@ -239,8 +247,29 @@ public final class MediaPlayerService
         }
     }
 
+    /**
+     * Check whether or not an event should be ignored. An event should be ignored
+     * if the most recently published event was less than one second ago.
+     *
+     * @return If event should be ignored, true. Else, false.
+     */
+    private boolean shouldIgnoreEvent() {
+        final long time = System.currentTimeMillis();
+
+        if (time - lastPublicationDate <= 1000L) {
+            return true;
+        }
+
+        lastPublicationDate = time;
+        return false;
+    }
+
     @Override
     public void onPlayerPositionChange(float positionChanged) {
+        if (shouldIgnoreEvent()) {
+            return;
+        }
+
         updatePlaybackState();
 
         if (callback != null) {
@@ -317,10 +346,22 @@ public final class MediaPlayerService
         final Uri mediaUri = media.getUri();
         final String schema = mediaUri.getScheme();
 
-        // Use stream bitmap when scheme is not set or not file.
-        return mediaBitmap = schema == null || !schema.equals("file")
-                ? BitmapUtil.drawableToBitmap(getResources().getDrawable(R.drawable.ic_stream_cover, null))
-                : ThumbnailUtils.createVideoThumbnail(mediaUri.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
+        if (schema == null || !schema.equals("file")) {
+            mediaBitmap = defaultBitmap;
+            return mediaBitmap;
+        }
+
+        mediaBitmap = ThumbnailUtils.createVideoThumbnail(
+                mediaUri.getPath(),
+                MediaStore.Images.Thumbnails.MINI_KIND
+        );
+
+        mediaBitmap = mediaBitmap == null
+                // Fallback to default bitmap.
+                ? defaultBitmap
+                : mediaBitmap;
+
+        return mediaBitmap;
     }
 
     private void createNotificationChannel() {
@@ -365,6 +406,7 @@ public final class MediaPlayerService
         }
 
         mediaSession.setPlaybackState(stateBuilder.build());
+
     }
 
     public void sendRendererSelectedBroadcast(RendererItem rendererItem) {

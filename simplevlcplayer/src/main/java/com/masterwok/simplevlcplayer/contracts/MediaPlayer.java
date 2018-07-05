@@ -15,8 +15,6 @@ public interface MediaPlayer {
 
     void pause();
 
-    void togglePlayback();
-
     void stop();
 
     void setMedia(Uri uri);

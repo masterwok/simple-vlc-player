@@ -272,6 +272,19 @@ public final class MediaPlayerService
 
     @Override
     public void onDisplay(Dialog.QuestionDialog questionDialog) {
+        final String dialogTitle = questionDialog.getTitle();
+
+        if (dialogTitle.equals("Insecure site")) {
+            if (questionDialog.getAction1Text().equals("View certificate")) {
+                questionDialog.postAction(1);
+            } else if (questionDialog.getAction2Text().equals("Accept permanently")) {
+                questionDialog.postAction(2);
+            }
+
+            questionDialog.dismiss();
+            return;
+        }
+
         // Ignore non-performance warning dialogs.
         if (!questionDialog.getTitle().equals("Performance warning")) {
             return;
@@ -281,7 +294,7 @@ public final class MediaPlayerService
         Toast.makeText(
                 getApplicationContext(),
                 R.string.toast_casting_performance_warning,
-                Toast.LENGTH_SHORT
+                Toast.LENGTH_LONG
         ).show();
 
         // Accept and dismiss performance warning dialog.

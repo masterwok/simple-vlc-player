@@ -1,6 +1,7 @@
 package com.masterwok.simplevlcplayer.components;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Handler;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.AppCompatTextView;
@@ -29,6 +30,7 @@ public class PlayerControlComponent
     private boolean toolbarsAreVisible = true;
     private boolean isTrackingTouch;
     private Callback callback;
+    private boolean hasSelectedRenderer;
 
     public PlayerControlComponent(Context context) {
         super(context);
@@ -37,16 +39,19 @@ public class PlayerControlComponent
 
     public PlayerControlComponent(Context context, AttributeSet attrs) {
         super(context, attrs);
+        readStyleAttributes(context, attrs);
         inflate(context);
     }
 
     public PlayerControlComponent(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        readStyleAttributes(context, attrs);
         inflate(context);
     }
 
     public PlayerControlComponent(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        readStyleAttributes(context, attrs);
         inflate(context);
     }
 
@@ -76,8 +81,34 @@ public class PlayerControlComponent
         subscribeToViewComponents();
         startToolbarHideTimer();
 
-        toolbarHeader.inflateMenu(R.menu.media_player);
+        if (hasSelectedRenderer) {
+            toolbarHeader.inflateMenu(R.menu.media_player_renderer);
+        } else {
+            toolbarHeader.inflateMenu(R.menu.media_player);
+        }
     }
+
+    private void readStyleAttributes(Context context, AttributeSet attrs) {
+        if (attrs == null) {
+            return;
+        }
+
+        TypedArray styledAttributes = context.obtainStyledAttributes(
+                attrs,
+                R.styleable.PlayerControlComponent,
+                0,
+                0
+        );
+
+        hasSelectedRenderer = styledAttributes.getBoolean(
+                R.styleable.PlayerControlComponent_hasSelectedRenderer,
+                false
+        );
+
+
+        styledAttributes.recycle();
+    }
+
 
     private void bindViewComponents() {
         toolbarHeader = findViewById(R.id.toolbar_header);

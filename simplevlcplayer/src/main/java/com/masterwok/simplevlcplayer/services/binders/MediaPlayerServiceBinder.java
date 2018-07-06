@@ -37,7 +37,10 @@ public final class MediaPlayerServiceBinder extends android.os.Binder {
     }
 
     public void setSelectedRendererItem(RendererItem rendererItem) {
-        getPlayer().setRendererItem(rendererItem);
+        final VlcMediaPlayer player = getPlayer();
+
+        player.detachSurfaces();
+        player.setRendererItem(rendererItem);
 
         serviceWeakReference
                 .get()

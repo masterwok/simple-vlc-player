@@ -190,12 +190,6 @@ public class VlcMediaPlayer
 
     @Override
     public void setRendererItem(RendererItem rendererItem) {
-        if (isPlaying()) {
-            stop();
-        }
-
-        detachSurfaces();
-
         selectedRendererItem = rendererItem;
         player.setRenderer(rendererItem);
     }

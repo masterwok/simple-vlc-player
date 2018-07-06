@@ -105,6 +105,10 @@ public class VlcMediaPlayer
 
     @Override
     public void setTime(long time) {
+        if (!player.isSeekable()) {
+            return;
+        }
+
         player.setTime(time);
     }
 

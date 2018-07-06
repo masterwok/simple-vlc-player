@@ -137,7 +137,6 @@ public final class MediaPlayerService
     public void onDestroy() {
         stopForeground(true);
         Dialog.setCallbacks(libVlc, null);
-        player.stop();
         player.release();
         libVlc.release();
         mediaSession.release();

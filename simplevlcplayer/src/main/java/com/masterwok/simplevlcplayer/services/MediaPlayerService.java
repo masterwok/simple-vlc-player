@@ -65,7 +65,7 @@ public final class MediaPlayerService
     private Bitmap mediaBitmap; // cached value..access via getMediaBitmap()
     private Bitmap defaultBitmap;
 
-    private long lastPublicationDate = 0L;
+    private long lastUpdateTime = 0L;
 
     private static NotificationCompat.Action getPauseAction(Context context) {
         return new NotificationCompat.Action(
@@ -158,9 +158,10 @@ public final class MediaPlayerService
 
     @Override
     public void onPlayerOpening() {
-        lastPublicationDate = 0L;
+        lastUpdateTime = 0L;
 
         updatePlaybackState();
+        updateNotification();
 
         if (callback != null) {
             callback.onPlayerOpening();
@@ -179,6 +180,7 @@ public final class MediaPlayerService
     @Override
     public void onPlayerPlaying() {
         updatePlaybackState();
+        updateNotification();
 
         mediaSession.setActive(true);
 
@@ -194,6 +196,7 @@ public final class MediaPlayerService
     @Override
     public void onPlayerPaused() {
         updatePlaybackState();
+        updateNotification();
 
         if (callback != null) {
             callback.onPlayerPaused();
@@ -203,6 +206,7 @@ public final class MediaPlayerService
     @Override
     public void onPlayerStopped() {
         updatePlaybackState();
+        updateNotification();
 
         mediaSession.setActive(false);
 
@@ -216,6 +220,7 @@ public final class MediaPlayerService
     @Override
     public void onPlayerEndReached() {
         updatePlaybackState();
+        updateNotification();
 
         mediaSession.setActive(false);
 
@@ -227,6 +232,7 @@ public final class MediaPlayerService
     @Override
     public void onPlayerError() {
         updatePlaybackState();
+        updateNotification();
 
         mediaSession.setActive(false);
 
@@ -237,6 +243,14 @@ public final class MediaPlayerService
 
     @Override
     public void onPlayerTimeChange(long timeChanged) {
+        final long time = player.getTime() / 1000L;
+
+        // At least one second has elapsed, update playback state.
+        if (time >= lastUpdateTime + 1) {
+            updatePlaybackState();
+            lastUpdateTime = time;
+        }
+
         if (callback != null) {
             callback.onPlayerTimeChange(timeChanged);
         }
@@ -253,11 +267,8 @@ public final class MediaPlayerService
 
     @Override
     public void onPlayerPositionChanged(float positionChanged) {
-        final long time = System.currentTimeMillis();
-
-        if (time - lastPublicationDate > 1000L) {
-            updatePlaybackState();
-            lastPublicationDate = time;
+        if (callback != null) {
+            callback.onPlayerPositionChanged(positionChanged);
         }
     }
 
@@ -385,15 +396,18 @@ public final class MediaPlayerService
                 1
         );
 
-        // Update playback notification when there is a renderer item.
-        if (player.getSelectedRendererItem() != null) {
-            notificationManager.notify(
-                    MediaPlayerService.MediaPlayerServiceNotificationId,
-                    buildPlaybackNotification()
-            );
+        mediaSession.setPlaybackState(stateBuilder.build());
+    }
+
+    private void updateNotification() {
+        if (player.getSelectedRendererItem() == null) {
+            return;
         }
 
-        mediaSession.setPlaybackState(stateBuilder.build());
+        notificationManager.notify(
+                MediaPlayerService.MediaPlayerServiceNotificationId,
+                buildPlaybackNotification()
+        );
 
     }
 

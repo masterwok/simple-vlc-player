@@ -65,7 +65,7 @@ public final class MediaPlayerService
     private Bitmap mediaBitmap; // cached value..access via getMediaBitmap()
     private Bitmap defaultBitmap;
 
-    private long previousTimeChanged;
+    private long lastPublicationDate = 0L;
 
     private static NotificationCompat.Action getPauseAction(Context context) {
         return new NotificationCompat.Action(
@@ -158,7 +158,7 @@ public final class MediaPlayerService
 
     @Override
     public void onPlayerOpening() {
-        previousTimeChanged = 0L;
+        lastPublicationDate = 0L;
 
         updatePlaybackState();
 
@@ -237,15 +237,6 @@ public final class MediaPlayerService
 
     @Override
     public void onPlayerTimeChange(long timeChanged) {
-        // Rate limit the number of time changed events to one a second.
-        if (timeChanged > 0 && timeChanged - previousTimeChanged < 1000L) {
-            return;
-        }
-
-        previousTimeChanged = timeChanged;
-
-        updatePlaybackState();
-
         if (callback != null) {
             callback.onPlayerTimeChange(timeChanged);
         }
@@ -257,6 +248,16 @@ public final class MediaPlayerService
 
         if (callback != null) {
             callback.onBuffering(buffering);
+        }
+    }
+
+    @Override
+    public void onPlayerPositionChanged(float positionChanged) {
+        final long time = System.currentTimeMillis();
+
+        if (time - lastPublicationDate > 1000L) {
+            updatePlaybackState();
+            lastPublicationDate = time;
         }
     }
 

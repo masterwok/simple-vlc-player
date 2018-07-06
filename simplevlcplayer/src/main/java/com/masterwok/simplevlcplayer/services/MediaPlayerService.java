@@ -159,6 +159,8 @@ public final class MediaPlayerService
 
     @Override
     public void onPlayerOpening() {
+        previousTimeChanged = 0L;
+
         updatePlaybackState();
 
         if (callback != null) {
@@ -249,7 +251,6 @@ public final class MediaPlayerService
             callback.onPlayerTimeChange(timeChanged);
         }
     }
-
 
     @Override
     public void onBuffering(float buffering) {

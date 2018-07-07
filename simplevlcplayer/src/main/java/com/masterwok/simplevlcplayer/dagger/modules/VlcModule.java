@@ -3,8 +3,11 @@ package com.masterwok.simplevlcplayer.dagger.modules;
 import android.content.Context;
 
 import com.masterwok.simplevlcplayer.VlcMediaPlayer;
+import com.masterwok.simplevlcplayer.VlcOptionsProvider;
 
 import org.videolan.libvlc.LibVLC;
+
+import java.util.ArrayList;
 
 import javax.inject.Singleton;
 
@@ -21,7 +24,15 @@ public class VlcModule {
     @Singleton
     @Provides
     final LibVLC provideLibVlc(Context context) {
-        return new LibVLC(context.getApplicationContext());
+        final Context appContext = context.getApplicationContext();
+
+        ArrayList<String> options = VlcOptionsProvider
+                .getInstance()
+                .getOptions();
+
+        return options == null || options.size() == 0
+                ? new LibVLC(appContext)
+                : new LibVLC(appContext, options);
     }
 
     @Provides

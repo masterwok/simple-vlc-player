@@ -8,7 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 
 import com.masterwok.demosimplevlcplayer.R;
+import com.masterwok.simplevlcplayer.VlcOptionsProvider;
 import com.masterwok.simplevlcplayer.activities.MediaPlayerActivity;
+
+import java.util.ArrayList;
 
 
 /**
@@ -92,6 +95,15 @@ public class MainActivity extends AppCompatActivity {
     @SuppressWarnings("SameParameterValue")
     private void startMediaPlayerActivity(Uri videoUri, Uri subtitleUri) {
         Intent intent = new Intent(this, MediaPlayerActivity.class);
+
+        ArrayList<String> options = new ArrayList<>();
+
+        options.add("-vvv");
+
+        // Override default options used to initialize LibVLC.
+        VlcOptionsProvider
+                .getInstance()
+                .setOptions(options);
 
         intent.putExtra(MediaPlayerActivity.MediaUri, videoUri);
         intent.putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri);

@@ -46,18 +46,44 @@ public final class VlcOptionsProvider {
     }
 
 
+    /**
+     * This builder class can be used to build a list of VLC options.
+     */
     public static class Builder {
+        private boolean hasSubtitleBackground = false;
+        private int subtitleBackgroundOpacity = 128;
+        private int subtitleColor = 16777215;
         private boolean isSubtitleBold = false;
         private int subtitleSize = 16;
+
         private boolean isVerbose;
 
-        public Builder setSubtitleBold(boolean isBold) {
+        public Builder withSubtitleBold(boolean isBold) {
             isSubtitleBold = isBold;
             return this;
         }
 
-        public Builder setSubtitleSize(int size) {
+        public Builder withSubtitleSize(int size) {
             subtitleSize = size;
+            return this;
+        }
+
+        public Builder withSubtitleColor(int color) {
+            subtitleColor = color;
+            return this;
+        }
+
+        public Builder withSubtitleBackgroundOpacity(int opacity) {
+            // Keep in bounds (0-255)
+            subtitleBackgroundOpacity = opacity < 0 || opacity > 255
+                    ? subtitleBackgroundOpacity
+                    : opacity;
+
+            return this;
+        }
+
+        public Builder withSubtitleBackground(boolean hasBackground) {
+            hasSubtitleBackground = hasBackground;
             return this;
         }
 
@@ -72,11 +98,18 @@ public final class VlcOptionsProvider {
 
             options.add(isVerbose ? "-vv" : "-v");
 
+            if (hasSubtitleBackground) {
+                options.add("--freetype-background-opacity=" + subtitleBackgroundOpacity);
+            } else {
+                options.add("--freetype-background-opacity=0");
+            }
+
             if (isSubtitleBold) {
                 options.add("--freetype-bold");
             }
 
             options.add("--freetype-rel-fontsize=" + subtitleSize);
+            options.add("--freetype-color=" + subtitleColor);
 
             return options;
         }

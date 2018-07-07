@@ -94,12 +94,13 @@ public class MainActivity extends AppCompatActivity {
     private void startMediaPlayerActivity(Uri videoUri, Uri subtitleUri) {
         Intent intent = new Intent(this, MediaPlayerActivity.class);
 
+        // For dev only..
+//        subtitleUri = Uri.parse("file:///storage/emulated/0/Download/Pi%20(1998)/Pi.1998.720p.BluRay.x264.YIFY.srt");
+
         // Override default options used to initialize LibVLC.
         VlcOptionsProvider
                 .getInstance()
                 .setOptions(new VlcOptionsProvider.Builder()
-                        .setSubtitleBold(true)
-                        .setSubtitleSize(20)
                         .setVerbose(true)
                         .build()
                 );

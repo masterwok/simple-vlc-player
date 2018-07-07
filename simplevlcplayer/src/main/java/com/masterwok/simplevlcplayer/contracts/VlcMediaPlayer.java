@@ -13,6 +13,8 @@ public interface VlcMediaPlayer
 
     IVLCVout getVout();
 
+    void setMedia(FileDescriptor fileDescriptor);
+
     void attachSurfaces(
             SurfaceView surfaceMedia,
             SurfaceView surfaceSubtitles,

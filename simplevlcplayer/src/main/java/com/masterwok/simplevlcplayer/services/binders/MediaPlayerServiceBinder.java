@@ -1,5 +1,7 @@
 package com.masterwok.simplevlcplayer.services.binders;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.net.Uri;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.view.SurfaceView;
@@ -9,11 +11,13 @@ import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
 import com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
+import com.masterwok.simplevlcplayer.utils.FileUtil;
 
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.RendererItem;
 
+import java.io.FileDescriptor;
 import java.lang.ref.WeakReference;
 
 
@@ -51,12 +55,42 @@ public final class MediaPlayerServiceBinder extends android.os.Binder {
         return getPlayer().getVout();
     }
 
-    public void setMedia(Uri mediaUri) {
-        if (mediaUri == null) {
+    public void setMedia(Context context, Uri mediaUri) {
+        if (context == null || mediaUri == null) {
             return;
         }
 
-        getPlayer().setMedia(mediaUri);
+        final VlcMediaPlayer player = getPlayer();
+        final String schema = mediaUri.getScheme();
+
+        // Use file descriptor when dealing with content schemas.
+        if (schema != null && schema.equals(ContentResolver.SCHEME_CONTENT)) {
+            player.setMedia(FileUtil.getUriFileDescriptor(
+                    context.getApplicationContext(),
+                    mediaUri,
+                    "r"
+            ));
+
+            return;
+        }
+
+        player.setMedia(mediaUri);
+    }
+
+    public void setMedia(FileDescriptor fileDescriptor) {
+        if (fileDescriptor == null) {
+            return;
+        }
+
+        getPlayer().setMedia(fileDescriptor);
+    }
+
+    public void setSubtitle(Uri subtitleUri) {
+        if (subtitleUri == null) {
+            return;
+        }
+
+        getPlayer().setSubtitle(subtitleUri);
     }
 
     public void play() {
@@ -147,11 +181,4 @@ public final class MediaPlayerServiceBinder extends android.os.Binder {
                 .isPlaying();
     }
 
-    public void setSubtitle(Uri subtitleUri) {
-        if (subtitleUri == null) {
-            return;
-        }
-
-        getPlayer().setSubtitle(subtitleUri);
-    }
 }

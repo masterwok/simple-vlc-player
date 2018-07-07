@@ -195,7 +195,7 @@ public class LocalPlayerFragment
         registerSurfaceLayoutListener();
         updateVideoSurfaces();
 
-        serviceBinder.setMedia(mediaUri);
+        serviceBinder.setMedia(getContext(), mediaUri);
         serviceBinder.setSubtitle(subtitleUri);
 
         if (resumeIsPlaying) {

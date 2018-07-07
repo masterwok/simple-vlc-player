@@ -1,20 +1,22 @@
 package com.masterwok.demosimplevlcplayer.activities;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 
 import com.masterwok.demosimplevlcplayer.R;
 import com.masterwok.simplevlcplayer.activities.MediaPlayerActivity;
-import com.nononsenseapps.filepicker.FilePickerActivity;
-import com.nononsenseapps.filepicker.Utils;
+import com.masterwok.simplevlcplayer.utils.FileUtil;
 
 import java.io.File;
-import java.util.List;
 
 
 /**
@@ -67,15 +69,11 @@ public class MainActivity extends AppCompatActivity {
      * Show the activity for picking file.
      */
     private void showOpenDocumentActivity() {
-        Intent i = new Intent(this, FilePickerActivity.class);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.setType("*/*");
 
-        // Set these depending on your use case. These are the defaults.
-        i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, true);
-        i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, false);
-        i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_FILE);
-        i.putExtra(FilePickerActivity.EXTRA_START_PATH, Environment.getExternalStorageDirectory().getPath());
-
-        startActivityForResult(i, OpenDocumentRequestCode);
+        startActivityForResult(intent, OpenDocumentRequestCode);
     }
 
     @Override
@@ -86,17 +84,22 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        final List<Uri> selectedFiles = Utils.getSelectedFilesFromResult(data);
+        ClipData clipData = data.getClipData();
 
-        File videoFile = Utils.getFileForUri(
-                selectedFiles.get(0)
-        );
+        if (clipData == null
+                || clipData.getItemCount() == 0) {
+            startMediaPlayerActivity(
+                    data.getData(),
+                    null
+            );
 
-        // If a second file was selected, assume it was a subtitle file.
+            return;
+        }
+
         startMediaPlayerActivity(
-                Uri.fromFile(videoFile),
-                selectedFiles.size() > 1
-                        ? filterSubtitleSelection(Utils.getFileForUri(selectedFiles.get(1)))
+                clipData.getItemAt(1).getUri(),
+                clipData.getItemCount() > 1
+                        ? clipData.getItemAt(0).getUri()
                         : null
         );
     }
@@ -133,10 +136,14 @@ public class MainActivity extends AppCompatActivity {
 
         intent.putExtra(MediaPlayerActivity.MediaUri, videoUri);
         intent.putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri);
+
 //        intent.putExtra(MediaPlayerActivity.MediaUri, Uri.parse(
 //                "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4"
 ////                "http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_stereo.avi"
 //        ));
+
+        // TODO: NEED TO GET CONTENT URIS FOR SUBTITLES WORKING
+        // TODO: Seek partial files setTime fails when seeking past downloaded portion of file.
 
         startActivity(intent);
     }

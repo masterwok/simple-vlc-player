@@ -30,7 +30,7 @@ public class RendererPlayerFragment
 
     @Override
     protected void onConnected() {
-        if(serviceBinder.isPlaying()) {
+        if (serviceBinder.isPlaying()) {
             return;
         }
 
@@ -80,7 +80,7 @@ public class RendererPlayerFragment
             return;
         }
 
-        serviceBinder.setMedia(mediaUri);
+        serviceBinder.setMedia(getContext(), mediaUri);
         serviceBinder.setSubtitle(subtitleUri);
         serviceBinder.play();
     }

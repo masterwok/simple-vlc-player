@@ -1,22 +1,14 @@
 package com.masterwok.demosimplevlcplayer.activities;
 
 import android.app.Activity;
-import android.content.ClipData;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 
 import com.masterwok.demosimplevlcplayer.R;
 import com.masterwok.simplevlcplayer.activities.MediaPlayerActivity;
-import com.masterwok.simplevlcplayer.utils.FileUtil;
-
-import java.io.File;
 
 
 /**
@@ -70,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private void showOpenDocumentActivity() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         intent.setType("*/*");
 
         startActivityForResult(intent, OpenDocumentRequestCode);
@@ -84,53 +75,21 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        ClipData clipData = data.getClipData();
-
-        if (clipData == null
-                || clipData.getItemCount() == 0) {
-            startMediaPlayerActivity(
-                    data.getData(),
-                    null
-            );
-
-            return;
-        }
-
         startMediaPlayerActivity(
-                clipData.getItemAt(1).getUri(),
-                clipData.getItemCount() > 1
-                        ? clipData.getItemAt(0).getUri()
-                        : null
+                data.getData(),
+                null
         );
     }
 
     /**
-     * For the sake of the demo, assume that the second file selected is the subtitle.
-     *
-     * @param subtitleFile The selected subtitle file.
-     * @return If valid subtitle file type, the file uri. Else, null.
-     */
-    private Uri filterSubtitleSelection(File subtitleFile) {
-        if (subtitleFile == null) {
-            return null;
-        }
-
-        final String path = subtitleFile
-                .getAbsolutePath()
-                .toLowerCase();
-
-        return path.endsWith("vtt") || path.endsWith("srt")
-                ? Uri.fromFile(subtitleFile)
-                : null;
-    }
-
-    /**
-     * Start the simple-vlc-player media player activity. This method
-     * does not ensure activity is started on main thread.
+     * Start the simple-vlc-player media player activity. Subtitle must be local
+     * file Uri as it appears libVLC does not support adding subtitle using a
+     * FileDescriptor (like Media instance).
      *
      * @param videoUri    The selected video URI.
-     * @param subtitleUri The selected subtitle URI.
+     * @param subtitleUri The selected subtitle URI (must be local file URI).
      */
+    @SuppressWarnings("SameParameterValue")
     private void startMediaPlayerActivity(Uri videoUri, Uri subtitleUri) {
         Intent intent = new Intent(this, MediaPlayerActivity.class);
 
@@ -142,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
 ////                "http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_stereo.avi"
 //        ));
 
-        // TODO: NEED TO GET CONTENT URIS FOR SUBTITLES WORKING
         // TODO: Seek partial files setTime fails when seeking past downloaded portion of file.
 
         startActivity(intent);

@@ -45,4 +45,43 @@ public final class VlcOptionsProvider {
         return options;
     }
 
+
+    public static class Builder {
+        private boolean isSubtitleBold = false;
+        private int subtitleSize = 16;
+        private boolean isVerbose;
+
+        public Builder setSubtitleBold(boolean isBold) {
+            isSubtitleBold = isBold;
+            return this;
+        }
+
+        public Builder setSubtitleSize(int size) {
+            subtitleSize = size;
+            return this;
+        }
+
+        public Builder setVerbose(boolean verbose) {
+            isVerbose = verbose;
+            return this;
+        }
+
+        @SuppressWarnings("SpellCheckingInspection")
+        public ArrayList<String> build() {
+            final ArrayList<String> options = new ArrayList<>();
+
+            options.add(isVerbose ? "-vv" : "-v");
+
+            if (isSubtitleBold) {
+                options.add("--freetype-bold");
+            }
+
+            options.add("--freetype-rel-fontsize=" + subtitleSize);
+
+            return options;
+        }
+
+
+    }
+
 }

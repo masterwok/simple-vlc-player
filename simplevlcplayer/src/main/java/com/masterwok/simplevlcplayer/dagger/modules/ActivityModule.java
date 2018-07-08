@@ -8,5 +8,5 @@ import dagger.android.ContributesAndroidInjector;
 @Module
 public abstract class ActivityModule {
     @ContributesAndroidInjector
-    abstract MediaPlayerActivity contributeMainActivity();
+    abstract MediaPlayerActivity contributeMediaPlayerActivity();
 }

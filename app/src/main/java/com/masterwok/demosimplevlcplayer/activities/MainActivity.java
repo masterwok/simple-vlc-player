@@ -29,6 +29,18 @@ public class MainActivity extends AppCompatActivity {
 
         bindViewComponents();
         subscribeToViewComponents();
+
+
+        // VlcOptionsProvider can be used to provide LibVlc initialization options.
+        VlcOptionsProvider
+                .getInstance()
+                .setOptions(
+                        // The VlcOptionsProvider.Builder can be used to override only a
+                        // few options rather than rebuilding them yourself.
+                        new VlcOptionsProvider.Builder(this)
+                                .setVerbose(true)
+                                .build()
+                );
     }
 
     /**
@@ -93,17 +105,6 @@ public class MainActivity extends AppCompatActivity {
     @SuppressWarnings("SameParameterValue")
     private void startMediaPlayerActivity(Uri videoUri, Uri subtitleUri) {
         Intent intent = new Intent(this, MediaPlayerActivity.class);
-
-        // For dev only..
-//        subtitleUri = Uri.parse("file:///storage/emulated/0/Download/Pi%20(1998)/Pi.1998.720p.BluRay.x264.YIFY.srt");
-
-        // Override default options used to initialize LibVLC.
-        VlcOptionsProvider
-                .getInstance()
-                .setOptions(new VlcOptionsProvider.Builder()
-                        .setVerbose(true)
-                        .build()
-                );
 
         intent.putExtra(MediaPlayerActivity.MediaUri, videoUri);
         intent.putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri);

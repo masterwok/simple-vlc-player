@@ -31,7 +31,9 @@ public class VlcModule {
                 .getOptions();
 
         return options == null || options.size() == 0
-                ? new LibVLC(appContext)
+                // No options provided, build defaults.
+                ? new LibVLC(appContext, new VlcOptionsProvider.Builder(context).build())
+                // Use provided options.
                 : new LibVLC(appContext, options);
     }
 

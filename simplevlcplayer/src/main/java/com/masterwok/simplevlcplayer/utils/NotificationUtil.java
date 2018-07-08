@@ -19,7 +19,11 @@ public class NotificationUtil {
      * @return The notification manager system service.
      */
     public static NotificationManager getNotificationManager(Context context) {
-        return context.getSystemService(NotificationManager.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return context.getSystemService(NotificationManager.class);
+        }
+
+        return (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     /**

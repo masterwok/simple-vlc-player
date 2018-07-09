@@ -35,6 +35,9 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.android.support:design:27.1.1'
 
+    // LibVLC
+    implementation 'com.github.masterwok:libvlc-android-sdk:v3.0.0'
+
     // Dagger
     implementation 'com.google.dagger:dagger:2.16'
     implementation 'com.google.dagger:dagger-android:2.16'

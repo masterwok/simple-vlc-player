@@ -223,12 +223,14 @@ public abstract class BasePlayerFragment
         );
 
         progressBar.setVisibility(View.GONE);
-        progressBar.setIndeterminateTintList(
-                ColorStateList.valueOf(
-                        ResourceUtil.getColor(
-                                getContext(),
-                                R.color.player_spinner
-                        )));
+
+        // TODO: Get tint working on API 21
+//        progressBar.setIndeterminateTintList(
+//                ColorStateList.valueOf(
+//                        ResourceUtil.getColor(
+//                                getContext(),
+//                                R.color.player_spinner
+//                        )));
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 ResourceUtil.getDimenDp(getContext(), R.dimen.player_spinner_width),

@@ -2,8 +2,14 @@ package com.masterwok.simplevlcplayer.utils;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.ColorRes;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 
 /**
  * This class provides static convenience methods for Android resources.
@@ -59,6 +65,50 @@ public class ResourceUtil {
         return context
                 .getResources()
                 .getDimension(id);
+    }
+
+    /**
+     * Get a drawable by resource identifier.
+     *
+     * @param context The context to resolve the drawable from.
+     * @param id      The id of the drawable.
+     * @return The drawable resource.
+     */
+    public static Drawable getDrawable(
+            Context context,
+            int id
+    ) {
+        return ContextCompat.getDrawable(context, id);
+    }
+
+    /**
+     * Get a tinted drawable resource.
+     *
+     * @param context    The context used to resolve the drawable.
+     * @param drawableId The id of the drawable.
+     * @param colorId    The id of the tint color.
+     * @return If successful, the tinted drawable. Else, false.
+     */
+    @RequiresApi(api = Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
+    public static Drawable getTintedDrawable(
+            @NonNull final Context context,
+            @DrawableRes int drawableId,
+            @ColorRes int colorId
+    ) {
+        Drawable drawable = ContextCompat.getDrawable(context, drawableId);
+
+        if (drawable == null) {
+            return null;
+        }
+
+        drawable = DrawableCompat.wrap(drawable);
+
+        DrawableCompat.setTint(
+                drawable.mutate(),
+                ContextCompat.getColor(context, colorId)
+        );
+
+        return drawable;
     }
 
     /**

@@ -50,7 +50,8 @@ public class PlayerControlComponent
     }
 
     public PlayerControlComponent(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+        super(context, attrs, defStyleAttr);
+
         readStyleAttributes(context, attrs);
         inflate(context);
     }

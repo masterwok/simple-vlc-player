@@ -1,1 +1,1 @@
-include ':app', ':simplevlcplayer'
+include ':sample', ':simplevlcplayer'

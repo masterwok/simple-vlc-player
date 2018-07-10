@@ -5,7 +5,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -28,6 +27,7 @@ import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
 import com.masterwok.simplevlcplayer.utils.ResourceUtil;
 import com.masterwok.simplevlcplayer.utils.ThreadUtil;
+import com.masterwok.simplevlcplayer.utils.ViewUtil;
 
 
 public abstract class BasePlayerFragment
@@ -216,25 +216,25 @@ public abstract class BasePlayerFragment
 
     @SuppressWarnings("ConstantConditions")
     private void initProgressBar() {
+        final Context context = getContext();
+
         progressBar = new ProgressBar(
-                getContext(),
+                context,
                 null,
                 android.R.attr.progressBarStyleLarge
         );
 
         progressBar.setVisibility(View.GONE);
 
-        // TODO: Get tint working on API 21
-//        progressBar.setIndeterminateTintList(
-//                ColorStateList.valueOf(
-//                        ResourceUtil.getColor(
-//                                getContext(),
-//                                R.color.player_spinner
-//                        )));
+        ViewUtil.setProgressBarColor(
+                context,
+                progressBar,
+                R.color.player_spinner
+        );
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                ResourceUtil.getDimenDp(getContext(), R.dimen.player_spinner_width),
-                ResourceUtil.getDimenDp(getContext(), R.dimen.player_spinner_height)
+                ResourceUtil.getDimenDp(context, R.dimen.player_spinner_width),
+                ResourceUtil.getDimenDp(context, R.dimen.player_spinner_height)
         );
 
         params.gravity = Gravity.CENTER;

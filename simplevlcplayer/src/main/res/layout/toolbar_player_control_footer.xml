@@ -41,7 +41,7 @@
             android:layout_below="@id/seekbar_position"
             android:layout_centerHorizontal="true"
             android:background="@android:color/transparent"
-            android:src="@drawable/ic_play_arrow_white_36dp"
+            app:srcCompat="@drawable/ic_play_arrow_white_36dp"
             tools:ignore="ContentDescription,MissingPrefix"/>
 
         <android.support.v7.widget.AppCompatTextView

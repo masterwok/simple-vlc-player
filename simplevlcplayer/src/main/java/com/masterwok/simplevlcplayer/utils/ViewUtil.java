@@ -1,9 +1,11 @@
 package com.masterwok.simplevlcplayer.utils;
 
+import android.content.Context;
 import android.view.View;
 import android.view.Window;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ProgressBar;
 
 /**
  * This class provides static convenience methods for views.
@@ -54,5 +56,26 @@ public class ViewUtil {
         }
 
         window.setDimAmount(amount);
+    }
+
+    /**
+     * Set the color of the the provided progress bar to the provided
+     * color resource.
+     *
+     * @param context     The context used to resolve the color resource.
+     * @param progressBar The progress bar to set the color of.
+     * @param colorId     The color resource id.
+     */
+    public static void setProgressBarColor(
+            Context context,
+            ProgressBar progressBar,
+            int colorId
+    ) {
+        progressBar
+                .getIndeterminateDrawable()
+                .setColorFilter(
+                        context.getResources().getColor(colorId),
+                        android.graphics.PorterDuff.Mode.SRC_IN
+                );
     }
 }

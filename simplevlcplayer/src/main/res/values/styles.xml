@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light"/>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar"/>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -21,9 +21,9 @@
         <item name="android:textColorSecondary">@color/player_dialog_text</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="AppTheme.PlayerComponentToolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="actionBarItemBackground">@drawable/background_action_bar_item</item>
+    </style>
 
     <style name="AppTheme.PlayerSeekBar" parent="@style/Widget.AppCompat.SeekBar">
         <item name="colorAccent">@color/player_seekbar</item>

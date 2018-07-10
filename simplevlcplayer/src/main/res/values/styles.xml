@@ -24,4 +24,8 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="AppTheme.PlayerSeekBar" parent="@style/Widget.AppCompat.SeekBar">
+        <item name="colorAccent">@color/player_seekbar</item>
+    </style>
 </resources>

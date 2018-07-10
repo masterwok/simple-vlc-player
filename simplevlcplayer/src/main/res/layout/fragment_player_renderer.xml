@@ -2,6 +2,7 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
@@ -12,7 +13,8 @@
         android:layout_width="@dimen/player_renderer_image_width"
         android:layout_height="@dimen/player_renderer_image_height"
         android:layout_gravity="center"
-        app:srcCompat="@drawable/ic_cast_connected_white_24dp"/>
+        app:srcCompat="@drawable/ic_cast_connected_white_24dp"
+        tools:ignore="VectorDrawableCompat"/>
 
     <com.masterwok.simplevlcplayer.components.PlayerControlComponent
         android:id="@+id/component_player"

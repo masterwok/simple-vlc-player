@@ -31,8 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginBottom="10dp"
-            android:progressTint="@color/player_seekbar"
-            android:thumbTint="@color/player_seekbar"/>
+            android:theme="@style/AppTheme.PlayerSeekBar"/>
 
         <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/imagebutton_play_pause"
@@ -42,7 +41,7 @@
             android:layout_centerHorizontal="true"
             android:background="@android:color/transparent"
             app:srcCompat="@drawable/ic_play_arrow_white_36dp"
-            tools:ignore="ContentDescription,MissingPrefix"/>
+            tools:ignore="ContentDescription,MissingPrefix,VectorDrawableCompat"/>
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/textview_position"

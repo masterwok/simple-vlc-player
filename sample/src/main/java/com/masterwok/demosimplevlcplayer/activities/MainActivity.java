@@ -77,11 +77,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("*/*");
 
-//        startActivityForResult(intent, OpenDocumentRequestCode);
-        startMediaPlayerActivity(
-                null,
-                null
-        );
+        startActivityForResult(intent, OpenDocumentRequestCode);
     }
 
     @Override
@@ -110,13 +106,13 @@ public class MainActivity extends AppCompatActivity {
     private void startMediaPlayerActivity(Uri videoUri, Uri subtitleUri) {
         Intent intent = new Intent(this, MediaPlayerActivity.class);
 
-//        intent.putExtra(MediaPlayerActivity.MediaUri, videoUri);
+        intent.putExtra(MediaPlayerActivity.MediaUri, videoUri);
         intent.putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri);
 
-        intent.putExtra(MediaPlayerActivity.MediaUri, Uri.parse(
-                "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4"
-//                "http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_stereo.avi"
-        ));
+//        intent.putExtra(MediaPlayerActivity.MediaUri, Uri.parse(
+//                "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4"
+////                "http://download.blender.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_stereo.avi"
+//        ));
 
         // TODO: Seek partial files setTime fails when seeking past downloaded portion of file.
 

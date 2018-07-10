@@ -61,13 +61,12 @@ public class SelectionListAdapter<T> extends BaseAdapter {
             int tintColorId
     ) {
         this.selectionItems = selectionItems;
-        selectedDrawable = context.getDrawable(selectedDrawableId);
 
-        if (selectedDrawable == null) {
-            return;
-        }
-
-        selectedDrawable.setTint(ResourceUtil.getColor(context, tintColorId));
+        selectedDrawable = ResourceUtil.getTintedDrawable(
+                context,
+                selectedDrawableId,
+                tintColorId
+        );
     }
 
 

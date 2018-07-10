@@ -28,6 +28,7 @@ import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
 import com.masterwok.simplevlcplayer.utils.BitmapUtil;
 import com.masterwok.simplevlcplayer.utils.NotificationUtil;
+import com.masterwok.simplevlcplayer.utils.ResourceUtil;
 
 import org.videolan.libvlc.Dialog;
 import org.videolan.libvlc.LibVLC;
@@ -104,7 +105,11 @@ public final class MediaPlayerService
 
         Dialog.setCallbacks(libVlc, this);
 
-        defaultBitmap = BitmapUtil.drawableToBitmap(getResources().getDrawable(R.drawable.ic_stream_cover, null));
+        defaultBitmap = BitmapUtil.drawableToBitmap(ResourceUtil.getDrawable(
+                getApplicationContext(),
+                R.drawable.ic_stream_cover
+        ));
+
         binder = new MediaPlayerServiceBinder(this);
 
         notificationManager = NotificationUtil.getNotificationManager(

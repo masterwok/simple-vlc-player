@@ -2,8 +2,13 @@ package com.masterwok.simplevlcplayer.fragments;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -58,6 +63,46 @@ public class LocalPlayerFragment
     private SurfaceView surfaceMedia;
 
     private FrameLayout surfaceFrame;
+
+    private BroadcastReceiver becomingNoisyReceiver;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        becomingNoisyReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                    if (serviceBinder == null) {
+                        return;
+                    }
+
+                    // Pause playback whenever the user pulls out ( ͡° ͜ʖ ͡°)
+                    serviceBinder.pause();
+                }
+            }
+        };
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        //noinspection ConstantConditions
+        getContext().registerReceiver(
+                becomingNoisyReceiver,
+                new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        );
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        //noinspection ConstantConditions
+        getContext().unregisterReceiver(becomingNoisyReceiver);
+    }
 
     @Override
     protected void configure(
@@ -214,7 +259,6 @@ public class LocalPlayerFragment
         detachSurfaces();
     }
 
-
     @Override
     public void onPlayerSeekStateChange(boolean canSeek) {
         super.onPlayerSeekStateChange(canSeek);
@@ -276,7 +320,6 @@ public class LocalPlayerFragment
 
         surfaceMedia = null;
     }
-
 
     private void changeMediaPlayerLayout(int displayW, int displayH) {
         /* Change the video placement using the MediaPlayer API */

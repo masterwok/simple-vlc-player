@@ -2,6 +2,7 @@ package com.masterwok.simplevlcplayer.services.binders;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.view.SurfaceView;
@@ -11,6 +12,7 @@ import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
 import com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
+import com.masterwok.simplevlcplayer.utils.AudioUtil;
 import com.masterwok.simplevlcplayer.utils.FileUtil;
 
 import org.videolan.libvlc.IVLCVout;
@@ -26,12 +28,39 @@ import java.lang.ref.WeakReference;
  * class to avoid an implicit reference to the service. The service is referenced
  * through a weak reference to prevent memory leaks.
  */
+@SuppressWarnings("WeakerAccess")
 public final class MediaPlayerServiceBinder extends android.os.Binder {
 
     private final WeakReference<MediaPlayerService> serviceWeakReference;
+    private final WeakReference<AudioManager.OnAudioFocusChangeListener> audioFocusChangeListener;
+
+    private final AudioManager audioManager;
 
     public MediaPlayerServiceBinder(MediaPlayerService service) {
         serviceWeakReference = new WeakReference<>(service);
+        audioFocusChangeListener = new WeakReference<>(createAudioFocusListener());
+
+        audioManager = AudioUtil.getAudioManager(service.getApplicationContext());
+    }
+
+    private AudioManager.OnAudioFocusChangeListener createAudioFocusListener() {
+        return focusChange -> {
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    setVolume(100);
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    pause();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                    pause();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    // Lower volume, continue playing.
+                    setVolume(50);
+                    break;
+            }
+        };
     }
 
     public RendererItemObservable getRendererItemObservable() {
@@ -42,6 +71,11 @@ public final class MediaPlayerServiceBinder extends android.os.Binder {
 
     public void setSelectedRendererItem(RendererItem rendererItem) {
         final VlcMediaPlayer player = getPlayer();
+
+        // No need for local audio focus, abandon it.
+        if (rendererItem != null) {
+            abandonAudioFocus();
+        }
 
         player.detachSurfaces();
         player.setRendererItem(rendererItem);
@@ -94,11 +128,31 @@ public final class MediaPlayerServiceBinder extends android.os.Binder {
     }
 
     public void play() {
+        gainAudioFocus();
+
         getPlayer().play();
     }
 
     public void stop() {
+        abandonAudioFocus();
+
         getPlayer().stop();
+    }
+
+    private void gainAudioFocus() {
+        // Only gain audio focus when playing locally.
+        if (getPlayer().getSelectedRendererItem() != null) {
+            return;
+        }
+
+        AudioUtil.requestAudioFocus(
+                audioManager,
+                audioFocusChangeListener.get()
+        );
+    }
+
+    private void abandonAudioFocus() {
+        audioManager.abandonAudioFocus(audioFocusChangeListener.get());
     }
 
     public void setCallback(MediaPlayer.Callback callback) {
@@ -130,14 +184,12 @@ public final class MediaPlayerServiceBinder extends android.os.Binder {
     }
 
     public void togglePlayback() {
-        final VlcMediaPlayer player = getPlayer();
-
-        if (player.isPlaying()) {
-            player.pause();
+        if (getPlayer().isPlaying()) {
+            pause();
             return;
         }
 
-        player.play();
+        play();
     }
 
     public void pause() {
@@ -181,4 +233,7 @@ public final class MediaPlayerServiceBinder extends android.os.Binder {
                 .isPlaying();
     }
 
+    public void setVolume(int volume) {
+        getPlayer().setVolume(volume);
+    }
 }

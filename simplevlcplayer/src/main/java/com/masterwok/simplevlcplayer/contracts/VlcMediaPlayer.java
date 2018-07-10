@@ -25,6 +25,8 @@ public interface VlcMediaPlayer
 
     void setRendererItem(RendererItem rendererItem);
 
+    void setVolume(int volume);
+
     RendererItem getSelectedRendererItem();
 
     void setAspectRatio(String aspectRatio);

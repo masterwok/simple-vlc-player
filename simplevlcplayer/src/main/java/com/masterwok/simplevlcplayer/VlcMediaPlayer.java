@@ -212,6 +212,11 @@ public class VlcMediaPlayer
     }
 
     @Override
+    public void setVolume(int volume) {
+        player.setVolume(volume);
+    }
+
+    @Override
     public RendererItem getSelectedRendererItem() {
         return selectedRendererItem;
     }

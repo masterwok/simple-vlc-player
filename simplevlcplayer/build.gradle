@@ -33,7 +33,7 @@ dependencies {
     implementation 'com.android.support:design:27.1.1'
 
     // LibVLC
-    implementation 'com.github.masterwok:libvlc-android-sdk:v3.0.0'
+    implementation 'com.github.masterwok:libvlc-android-sdk:3.0.11'
 
     // Dagger
     implementation 'com.google.dagger:dagger:2.16'

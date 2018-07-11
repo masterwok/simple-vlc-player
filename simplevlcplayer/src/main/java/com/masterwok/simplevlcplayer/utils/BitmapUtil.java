@@ -78,7 +78,7 @@ public class BitmapUtil {
                     new Point(width, height),
                     cancellationSignal
             );
-        } catch (FileNotFoundException e) {
+        } catch (Exception ignored) {
             return null;
         }
     }

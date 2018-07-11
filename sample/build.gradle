@@ -20,25 +20,11 @@ android {
         targetCompatibility = '1.8'
     }
 
-
     splits {
-
-        // Configures multiple APKs based on ABI.
         abi {
-
-            // Enables building multiple APKs per ABI.
             enable true
-
-            // By default all ABIs are included, so use reset() and include to specify that we only
-            // want APKs for x86 and x86_64.
-
-            // Resets the list of ABIs that Gradle should create APKs for to none.
             reset()
-
-            // Specifies a list of ABIs that Gradle should create APKs for.
             include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
-
-            // Specifies that we do not want to also generate a universal APK that includes all ABIs.
             universalApk false
         }
     }
@@ -55,13 +41,6 @@ dependencies {
 }
 
 // Map for the version code that gives each ABI a value.
-// If your build includes a universal APK, you should assign it a versionCode that's
-// lower than that of any of your other APKs. Because Google Play Store installs the
-// version of your app that is both compatible with the target device and has the
-// highest versionCode, assigning a lower versionCode to the universal APK ensures
-// that Google Play Store tries to install one of your APKs before falling back to
-// the universal APK. The sample code below handles this by not overriding a universal
-// APK's default versionCode.
 ext.abiCodes = [
         'armeabi-v7a': 1,
         'arm64-v8a'  : 2,

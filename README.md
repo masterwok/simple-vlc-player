@@ -82,6 +82,10 @@ android.applicationVariants.all { variant ->
 }
 ```
 
+## Licensing
+
+Please refer to the [VLC FAQ](https://wiki.videolan.org/Frequently_Asked_Questions/#May_I_redistribute_libVLC_in_my_application.3F).
+
 ## Screenshots
 
 ![Local Playback](/sample/screenshots/localPlayback.jpg?raw=true "Local Playback")

@@ -81,3 +81,10 @@ android.applicationVariants.all { variant ->
     }
 }
 ```
+
+## Screenshots
+
+![Local Playback](/sample/screenshots/localPlayback.jpg?raw=true "Local Playback")
+![Renderer Item Selection](/sample/screenshots/rendererItemSelection.jpg?raw=true "Renderer Item Selection")
+![Casting](/sample/screenshots/casting.jpg?raw=true "Casting")
+

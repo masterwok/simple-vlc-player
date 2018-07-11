@@ -2,9 +2,11 @@ package com.masterwok.simplevlcplayer.services;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.AudioManager;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
@@ -18,6 +20,7 @@ import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
+import android.view.SurfaceView;
 import android.widget.Toast;
 
 import com.masterwok.simplevlcplayer.R;
@@ -26,14 +29,19 @@ import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
 import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
 import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
+import com.masterwok.simplevlcplayer.utils.AudioUtil;
 import com.masterwok.simplevlcplayer.utils.BitmapUtil;
+import com.masterwok.simplevlcplayer.utils.FileUtil;
 import com.masterwok.simplevlcplayer.utils.NotificationUtil;
 import com.masterwok.simplevlcplayer.utils.ResourceUtil;
 
 import org.videolan.libvlc.Dialog;
+import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.RendererItem;
+
+import java.lang.ref.WeakReference;
 
 import javax.inject.Inject;
 
@@ -50,6 +58,7 @@ public final class MediaPlayerService
     private static final String SimpleVlcSessionTag = "tag.simplevlcsession";
     private static final int MediaPlayerServiceNotificationId = 32106;
 
+
     @Inject
     public LibVLC libVlc;
 
@@ -60,6 +69,8 @@ public final class MediaPlayerService
     public MediaSessionCompat mediaSession;
     public MediaPlayer.Callback callback;
 
+    private WeakReference<AudioManager.OnAudioFocusChangeListener> audioFocusChangeListener;
+    private AudioManager audioManager;
     private NotificationManager notificationManager;
     private PlaybackStateCompat.Builder stateBuilder;
     private MediaPlayerServiceBinder binder;
@@ -102,6 +113,9 @@ public final class MediaPlayerService
     @Override
     public void onCreate() {
         super.onCreate();
+
+        audioFocusChangeListener = new WeakReference<>(createAudioFocusListener());
+        audioManager = AudioUtil.getAudioManager(getApplicationContext());
 
         Dialog.setCallbacks(libVlc, this);
 
@@ -329,6 +343,26 @@ public final class MediaPlayerService
 
     }
 
+    private AudioManager.OnAudioFocusChangeListener createAudioFocusListener() {
+        return focusChange -> {
+            switch (focusChange) {
+                case AudioManager.AUDIOFOCUS_GAIN:
+                    setVolume(100);
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    pause();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                    pause();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    // Lower volume, continue playing.
+                    setVolume(50);
+                    break;
+            }
+        };
+    }
+
     private void enterForeground() {
         mediaSession.setMetadata(
                 getMediaMetadata(getMediaBitmap())
@@ -437,7 +471,6 @@ public final class MediaPlayerService
         );
     }
 
-
     @Override
     public void onProgressUpdate(Dialog.ProgressDialog progressDialog) {
 
@@ -520,4 +553,149 @@ public final class MediaPlayerService
         return builder.build();
     }
 
+    //
+    // DERP
+    //
+
+    public RendererItemObservable getRendererItemObservable() {
+        return rendererItemObservable;
+    }
+
+    public void setSelectedRendererItem(RendererItem rendererItem) {
+        // No need for local audio focus, abandon it.
+        if (rendererItem != null) {
+            abandonAudioFocus();
+        }
+
+        player.detachSurfaces();
+        player.setRendererItem(rendererItem);
+
+        sendRendererSelectedBroadcast(rendererItem);
+    }
+
+    public IVLCVout getVout() {
+        return player.getVout();
+    }
+
+    public void setMedia(Context context, Uri mediaUri) {
+        if (context == null || mediaUri == null) {
+            return;
+        }
+
+        final String schema = mediaUri.getScheme();
+
+        // Use file descriptor when dealing with content schemas.
+        if (schema != null && schema.equals(ContentResolver.SCHEME_CONTENT)) {
+            player.setMedia(FileUtil.getUriFileDescriptor(
+                    context.getApplicationContext(),
+                    mediaUri,
+                    "r"
+            ));
+
+            return;
+        }
+
+        player.setMedia(mediaUri);
+    }
+
+    public void setSubtitle(Uri subtitleUri) {
+        if (subtitleUri == null) {
+            return;
+        }
+
+        player.setSubtitle(subtitleUri);
+    }
+
+    public void play() {
+        gainAudioFocus();
+
+        player.play();
+    }
+
+    public void stop() {
+        abandonAudioFocus();
+
+        player.stop();
+    }
+
+    private void gainAudioFocus() {
+        // Only gain audio focus when playing locally.
+        if (player.getSelectedRendererItem() != null) {
+            return;
+        }
+
+        AudioUtil.requestAudioFocus(
+                audioManager,
+                audioFocusChangeListener.get()
+        );
+    }
+
+    private void abandonAudioFocus() {
+        audioManager.abandonAudioFocus(audioFocusChangeListener.get());
+    }
+
+    public MediaSessionCompat getMediaSession() {
+        return mediaSession;
+    }
+
+    public void setTime(long time) {
+        player.setTime(time);
+    }
+
+    public void setProgress(int progress) {
+        player.setTime((long) ((float) progress / 100 * player.getLength()));
+    }
+
+    public void togglePlayback() {
+        if (player.isPlaying()) {
+            pause();
+            return;
+        }
+
+        play();
+    }
+
+    public void pause() {
+        player.pause();
+    }
+
+    public void setAspectRatio(String aspectRatio) {
+        player.setAspectRatio(aspectRatio);
+    }
+
+    public void setScale(float scale) {
+        player.setScale(scale);
+    }
+
+    public Media.VideoTrack getCurrentVideoTrack() {
+        return player.getCurrentVideoTrack();
+    }
+
+    public void attachSurfaces(
+            SurfaceView surfaceMedia,
+            SurfaceView surfaceSubtitle,
+            IVLCVout.OnNewVideoLayoutListener listener
+    ) {
+        player.attachSurfaces(
+                surfaceMedia,
+                surfaceSubtitle,
+                listener
+        );
+    }
+
+    public void detachSurfaces() {
+        player.detachSurfaces();
+    }
+
+    public RendererItem getSelectedRendererItem() {
+        return player.getSelectedRendererItem();
+    }
+
+    public boolean isPlaying() {
+        return player.isPlaying();
+    }
+
+    public void setVolume(int volume) {
+        player.setVolume(volume);
+    }
 }

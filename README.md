@@ -3,6 +3,32 @@ An Android media player library powered by [LibVLC](https://wiki.videolan.org/Li
 
 ## Usage
 
+Options can be provided for the initialization of LibVLC by using the ```VlcOptionsProvider``` singleton. This optional configuration should only be provided once during app initialization, or at some point before starting the ```MediaPlayerActivity```. If no options are provided, then a default configuration is provided when initializing LibVLC. To make life easier, the ```VlcOptionsProvider.Builder``` class is available to help build a list of common options. If an option is not provided to the builder, then the default value for that option is used. For example, the following enables LibVLC verbose logging and sets the subtitle background opactiy:
+
+```java
+VlcOptionsProvider
+        .getInstance()
+        .setOptions(
+                new VlcOptionsProvider.Builder(this)
+                        .withSubtitleBackgroundOpacity(255)
+                        .setVerbose(true)
+                        .build()
+        );
+```
+
+The ```MediaPlayerActivity``` can be started by providing a required media URI and an optional subtitle URI. The subtitle URI must be a local file.
+
+```java
+Intent intent = new Intent(this, MediaPlayerActivity.class);
+
+intent.putExtra(MediaPlayerActivity.MediaUri, videoUri);
+intent.putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri);
+
+startActivity(intent);
+```
+
+## Configuration
+
 Add this in your root build.gradle at the end of repositories:
 ```gradle
 allprojects {

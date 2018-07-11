@@ -7,11 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -74,7 +72,7 @@ public final class MediaPlayerService
     private NotificationManager notificationManager;
     private PlaybackStateCompat.Builder stateBuilder;
     private MediaPlayerServiceBinder binder;
-    private Bitmap mediaBitmap; // cached value..access via getMediaBitmap()
+    private Bitmap mediaBitmap;
     private Bitmap defaultBitmap;
 
     private long lastUpdateTime = 0L;
@@ -365,41 +363,13 @@ public final class MediaPlayerService
 
     private void enterForeground() {
         mediaSession.setMetadata(
-                getMediaMetadata(getMediaBitmap())
+                getMediaMetadata(mediaBitmap)
         );
 
         startForeground(
                 MediaPlayerServiceNotificationId,
                 buildPlaybackNotification()
         );
-    }
-
-    private Bitmap getMediaBitmap() {
-        final Media media = player.getMedia();
-
-        if (mediaBitmap != null || media == null) {
-            return mediaBitmap;
-        }
-
-        final Uri mediaUri = media.getUri();
-        final String schema = mediaUri.getScheme();
-
-        if (schema == null || !schema.equals("file")) {
-            mediaBitmap = defaultBitmap;
-            return mediaBitmap;
-        }
-
-        mediaBitmap = ThumbnailUtils.createVideoThumbnail(
-                mediaUri.getPath(),
-                MediaStore.Images.Thumbnails.MINI_KIND
-        );
-
-        mediaBitmap = mediaBitmap == null
-                // Fallback to default bitmap.
-                ? defaultBitmap
-                : mediaBitmap;
-
-        return mediaBitmap;
     }
 
     private void createNotificationChannel() {
@@ -530,7 +500,7 @@ public final class MediaPlayerService
         builder.setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setSmallIcon(R.drawable.ic_play_arrow_black_36dp)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setLargeIcon(getMediaBitmap())
+                .setLargeIcon(mediaBitmap)
                 .setContentTitle(title)
                 .setContentText(null)
                 .setTicker(title)
@@ -553,10 +523,6 @@ public final class MediaPlayerService
         return builder.build();
     }
 
-    //
-    // DERP
-    //
-
     public RendererItemObservable getRendererItemObservable() {
         return rendererItemObservable;
     }
@@ -577,12 +543,34 @@ public final class MediaPlayerService
         return player.getVout();
     }
 
-    public void setMedia(Context context, Uri mediaUri) {
+    private Bitmap setMediaBitmap(Uri mediaUri) {
+        if (mediaBitmap != null) {
+            return mediaBitmap;
+        }
+
+        mediaBitmap = BitmapUtil.getBitmap(
+                getApplicationContext(),
+                mediaUri
+        );
+
+        return mediaBitmap = mediaBitmap == null
+                // Unable to get bitmap, use fallback bitmap.
+                ? defaultBitmap
+                : mediaBitmap;
+    }
+
+
+    public void setMedia(
+            Context context,
+            Uri mediaUri
+    ) {
         if (context == null || mediaUri == null) {
             return;
         }
 
         final String schema = mediaUri.getScheme();
+
+        setMediaBitmap(mediaUri);
 
         // Use file descriptor when dealing with content schemas.
         if (schema != null && schema.equals(ContentResolver.SCHEME_CONTENT)) {

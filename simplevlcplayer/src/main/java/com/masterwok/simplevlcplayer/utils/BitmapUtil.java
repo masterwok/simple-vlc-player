@@ -6,14 +6,17 @@ import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 
 import java.io.FileNotFoundException;
 
 /**
  * This class provides static convenience methods for bitmaps.
  */
+@SuppressWarnings("WeakerAccess")
 public class BitmapUtil {
 
     /**
@@ -64,7 +67,7 @@ public class BitmapUtil {
             int height,
             android.os.CancellationSignal cancellationSignal
     ) {
-        if(width < 0 || height < 0) {
+        if (width < 0 || height < 0) {
             return null;
         }
 
@@ -80,4 +83,47 @@ public class BitmapUtil {
         }
     }
 
+    /**
+     * Get a bitmap for a file resource.
+     *
+     * @param uri The URI of the file.
+     * @return If successful, the bitmap. Else, null;
+     */
+    public static Bitmap getFileBitmap(Uri uri) {
+        return ThumbnailUtils.createVideoThumbnail(
+                uri.getPath(),
+                MediaStore.Images.Thumbnails.MINI_KIND
+        );
+    }
+
+    /**
+     * Attempt to get a bitmap for the provided URI.
+     *
+     * @param context The context to resolve the bitmap in.
+     * @param uri     The URI of the media.
+     * @return If successful, the bitmap. Else, null. If the URI schema is not
+     * file or content, then null is returned.
+     */
+    public static Bitmap getBitmap(
+            Context context,
+            Uri uri
+    ) {
+        final String schema = uri.getScheme();
+
+        if ("file".equals(schema)) {
+            return BitmapUtil.getFileBitmap(uri);
+        }
+
+        if ("content".equals(schema)) {
+            return BitmapUtil.getDocumentBitmap(
+                    context,
+                    uri,
+                    500,
+                    500,
+                    null
+            );
+        }
+
+        return null;
+    }
 }

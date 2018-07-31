@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DemoSimpleVlcPlayer</string>
+    <string name="app_name">Demo Simple VLC Player</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="play_demo_media">Play Demo Media</string>
 </resources>

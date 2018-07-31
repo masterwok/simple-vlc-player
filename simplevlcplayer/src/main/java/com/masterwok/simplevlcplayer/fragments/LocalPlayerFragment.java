@@ -317,8 +317,6 @@ public class LocalPlayerFragment
         }
 
         serviceBinder.detachSurfaces();
-
-        surfaceMedia = null;
     }
 
     private void changeMediaPlayerLayout(int displayW, int displayH) {

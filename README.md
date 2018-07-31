@@ -86,9 +86,6 @@ android.applicationVariants.all { variant ->
 
 Please refer to the [VLC FAQ](https://wiki.videolan.org/Frequently_Asked_Questions/#May_I_redistribute_libVLC_in_my_application.3F).
 
-## Screenshots
+## Demo Screenshots
 
-![Local Playback](/sample/screenshots/localPlayback.jpg?raw=true "Local Playback")
-![Renderer Item Selection](/sample/screenshots/rendererItemSelection.jpg?raw=true "Renderer Item Selection")
-![Casting](/sample/screenshots/casting.jpg?raw=true "Casting")
-<img src="/sample/screenshots/lockScreenAndNotification.jpg?raw=true" height="600" title="Lock Screen and Notification">
+<img src="/app/screenshots/example.jpg?raw=true" height="600" title="Demo Screenshot">

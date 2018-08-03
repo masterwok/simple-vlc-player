@@ -310,14 +310,14 @@ public final class MediaPlayerService
             return;
         }
 
-        switch (dialogTitle) {
-            case "Broken or missing Index":
+        switch (dialogTitle.toLowerCase()) {
+            case "broken or missing index":
                 onBrokenOrMissingIndexDialog(questionDialog);
                 break;
-            case "Insecure site":
+            case "insecure site":
                 onInsecureSiteDialog(questionDialog);
                 break;
-            case "Performance warning":
+            case "performance warning":
                 onPerformanceWarningDialog(questionDialog);
                 break;
             default:
@@ -340,9 +340,9 @@ public final class MediaPlayerService
     }
 
     private void onInsecureSiteDialog(Dialog.QuestionDialog questionDialog) {
-        if (questionDialog.getAction1Text().equals("View certificate")) {
+        if (questionDialog.getAction1Text().toLowerCase().equals("view certificate")) {
             questionDialog.postAction(1);
-        } else if (questionDialog.getAction2Text().equals("Accept permanently")) {
+        } else if (questionDialog.getAction2Text().toLowerCase().equals("accept permanently")) {
             questionDialog.postAction(2);
         }
 

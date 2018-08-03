@@ -7,4 +7,5 @@
     <string name="dialog_title_renderer">Select device</string>
     <string name="dialog_button_renderer_negative">Cancel</string>
     <string name="toast_casting_performance_warning">Casting this video requires conversion. This conversion can use all the available power and could quickly drain your battery.</string>
+    <string name="toast_missing_index_warning">File index broken or missing, seeking will not work correctly.</string>
 </resources>

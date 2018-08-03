@@ -17,6 +17,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.SurfaceView;
 import android.widget.Toast;
@@ -47,6 +48,8 @@ public final class MediaPlayerService
         extends InjectableService
         implements MediaPlayer.Callback
         , Dialog.Callbacks {
+
+    private static final String Tag = "MediaPlayerService";
 
     public static final String RendererClearedAction = "action.rendererclearedaction";
     public static final String RendererSelectionAction = "action.rendererselectionaction";
@@ -303,22 +306,27 @@ public final class MediaPlayerService
     public void onDisplay(Dialog.QuestionDialog questionDialog) {
         final String dialogTitle = questionDialog.getTitle();
 
-        if (dialogTitle.equals("Insecure site")) {
-            if (questionDialog.getAction1Text().equals("View certificate")) {
-                questionDialog.postAction(1);
-            } else if (questionDialog.getAction2Text().equals("Accept permanently")) {
-                questionDialog.postAction(2);
-            }
-
-            questionDialog.dismiss();
+        if (dialogTitle == null) {
             return;
         }
 
-        // Ignore non-performance warning dialogs.
-        if (!questionDialog.getTitle().equals("Performance warning")) {
-            return;
+        switch (dialogTitle) {
+            case "Broken or missing Index":
+                onBrokenOrMissingIndexDialog(questionDialog);
+                break;
+            case "Insecure site":
+                onInsecureSiteDialog(questionDialog);
+                break;
+            case "Performance warning":
+                onPerformanceWarningDialog(questionDialog);
+                break;
+            default:
+                Log.w(Tag, "Unhandled dialog: " + dialogTitle);
+                break;
         }
+    }
 
+    private void onPerformanceWarningDialog(Dialog.QuestionDialog questionDialog) {
         // Let the user know casting will eat their battery.
         Toast.makeText(
                 getApplicationContext(),
@@ -328,6 +336,28 @@ public final class MediaPlayerService
 
         // Accept and dismiss performance warning dialog.
         questionDialog.postAction(1);
+        questionDialog.dismiss();
+    }
+
+    private void onInsecureSiteDialog(Dialog.QuestionDialog questionDialog) {
+        if (questionDialog.getAction1Text().equals("View certificate")) {
+            questionDialog.postAction(1);
+        } else if (questionDialog.getAction2Text().equals("Accept permanently")) {
+            questionDialog.postAction(2);
+        }
+
+        questionDialog.dismiss();
+    }
+
+    private void onBrokenOrMissingIndexDialog(Dialog.QuestionDialog questionDialog) {
+        // Let the user know seeking will not work properly.
+        Toast.makeText(
+                getApplicationContext(),
+                R.string.toast_missing_index_warning,
+                Toast.LENGTH_LONG
+        ).show();
+
+        questionDialog.postAction(2);
         questionDialog.dismiss();
     }
 

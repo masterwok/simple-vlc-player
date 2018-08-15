@@ -55,7 +55,10 @@ class RendererItemObservable(private val libVlc: LibVLC) : Observable(), Rendere
         rendererItems.clear()
     }
 
-    @Suppress("ProtectedInFinal")
+    /**
+     * See: https://stackoverflow.com/questions/43784161/how-to-implement-finalize-in-kotlin
+     */
+    @Suppress("ProtectedInFinal", "unused")
     protected fun finalize() {
         // Stop the discoverers and release the renderer items.
         stop()

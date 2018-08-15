@@ -82,6 +82,9 @@ android.applicationVariants.all { variant ->
 }
 ```
 
+## Projects using simple-vlc-player
+- [Bit Cast](https://play.google.com/store/apps/details?id=com.masterwok.bitcast)
+
 ## Licensing
 
 Please refer to the [VLC FAQ](https://wiki.videolan.org/Frequently_Asked_Questions/#May_I_redistribute_libVLC_in_my_application.3F).

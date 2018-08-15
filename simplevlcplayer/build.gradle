@@ -26,6 +26,10 @@ android {
 
 }
 
+ext {
+    version_dagger = '2.16'
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
 
@@ -40,11 +44,11 @@ dependencies {
     implementation 'com.github.masterwok:libvlc-android-sdk:3.0.11'
 
     // Dagger
-    implementation 'com.google.dagger:dagger:2.16'
-    implementation 'com.google.dagger:dagger-android:2.16'
-    implementation 'com.google.dagger:dagger-android-support:2.16'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
-    annotationProcessor 'com.google.dagger:dagger-android-processor:2.16'
+    kapt "com.google.dagger:dagger-android-processor:$version_dagger"
+    kapt "com.google.dagger:dagger-compiler:$version_dagger"
+    implementation "com.google.dagger:dagger:$version_dagger"
+    implementation "com.google.dagger:dagger-android:$version_dagger"
+    implementation "com.google.dagger:dagger-android-support:$version_dagger"
 
 }
 repositories {

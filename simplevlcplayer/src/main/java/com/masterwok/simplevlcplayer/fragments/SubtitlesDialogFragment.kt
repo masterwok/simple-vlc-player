@@ -1,7 +1,6 @@
 package com.masterwok.simplevlcplayer.fragments
 
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.view.View
@@ -32,10 +31,6 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
         subscribeToViewComponents()
 
         return createDialog(view)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
     }
 
     private fun subscribeToViewComponents() {

@@ -6,5 +6,10 @@
         android:id="@+id/menu_item_cast"
         android:icon="@drawable/ic_menu_cast"
         android:title="@string/cast_connect"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/menu_item_subtitles"
+        android:icon="@drawable/ic_menu_subtitles"
+        android:title="@string/cast_connect"
+        app:showAsAction="ifRoom"/>
 </menu>

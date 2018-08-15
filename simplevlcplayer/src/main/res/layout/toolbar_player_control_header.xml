@@ -16,4 +16,3 @@
     app:contentInsetLeft="0dp"
     app:contentInsetRight="0dp"
     app:contentInsetStart="0dp"/>
-    <!--android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"-->

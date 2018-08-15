@@ -1,6 +1,6 @@
-package com.masterwok.simplevlcplayer.constants;
+package com.masterwok.simplevlcplayer.constants
 
-public enum SizePolicy {
+enum class SizePolicy {
     SURFACE_BEST_FIT,
     SURFACE_FIT_SCREEN,
     SURFACE_FILL,

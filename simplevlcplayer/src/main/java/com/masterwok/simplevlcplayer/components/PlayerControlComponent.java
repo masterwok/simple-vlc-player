@@ -68,6 +68,8 @@ public class PlayerControlComponent
         void onProgressChanged(int progress);
 
         void onProgressChangeStarted();
+
+        void onSubtitlesButtonClicked();
     }
 
     public void registerCallback(Callback callback) {
@@ -127,7 +129,14 @@ public class PlayerControlComponent
         imageButtonPlayPause.setOnClickListener(view -> callback.onPlayPauseButtonClicked());
 
         toolbarHeader.setOnMenuItemClickListener(item -> {
-            callback.onCastButtonClicked();
+            int itemId = item.getItemId();
+
+            if(itemId == R.id.menu_item_cast) {
+                callback.onCastButtonClicked();
+            } else if(itemId == R.id.menu_item_subtitles) {
+                callback.onSubtitlesButtonClicked();
+            }
+
             return true;
         });
 

@@ -196,6 +196,20 @@ public abstract class BasePlayerFragment
     }
 
     @Override
+    public void onSubtitlesButtonClicked() {
+        FragmentManager fragmentManager = getFragmentManager();
+
+        if (fragmentManager == null) {
+            return;
+        }
+
+        new SubtitlesDialogFragment().show(
+                fragmentManager,
+                SubtitlesDialogFragment.Tag
+        );
+    }
+
+    @Override
     public void onProgressChangeStarted() {
         if (serviceBinder == null) {
             return;

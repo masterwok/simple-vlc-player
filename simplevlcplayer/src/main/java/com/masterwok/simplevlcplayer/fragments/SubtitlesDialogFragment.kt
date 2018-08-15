@@ -1,24 +1,31 @@
 package com.masterwok.simplevlcplayer.fragments
 
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatDialogFragment
 import android.view.View
 import com.masterwok.simplevlcplayer.R
+import com.masterwok.simplevlcplayer.dagger.injectors.InjectableAppCompatDialogFragment
+import com.masterwok.simplevlcplayer.viewmodels.SubtitlesDialogFragmentViewModel
+import javax.inject.Inject
 
-class SubtitlesDialogFragment : AppCompatDialogFragment() {
+class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
     companion object {
         const val Tag = "tag.subtitlesdialogfragment"
 
         private const val DimAmount = 0.6F
     }
 
+    @Inject
+    lateinit var viewModel: SubtitlesDialogFragmentViewModel
+
     private fun inflateView(): View = requireActivity()
             .layoutInflater
             .inflate(R.layout.dialog_subtitles, null)
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        super.onCreateDialog(savedInstanceState)
         val view = inflateView()
 
         bindViewComponents(view)
@@ -27,11 +34,14 @@ class SubtitlesDialogFragment : AppCompatDialogFragment() {
         return createDialog(view)
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+    }
+
     private fun subscribeToViewComponents() {
     }
 
     private fun bindViewComponents(view: View) {
-
     }
 
     private fun createDialog(view: View): Dialog =

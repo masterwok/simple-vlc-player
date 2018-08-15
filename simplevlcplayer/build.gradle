@@ -1,10 +1,10 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 27
-
-
 
     defaultConfig {
         minSdkVersion 16
@@ -26,28 +26,41 @@ android {
 
 }
 
+ext {
+    version_libvlc = '3.0.11'
+    version_open_subtitles = '0.0.1'
+    version_dagger = '2.16'
+    version_support = '27.1.1'
+    version_constraint = '1.1.2'
+    version_lifecycle = '1.1.1'
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
 
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    implementation 'com.android.support:design:27.1.1'
+    // Support Libraries
+    implementation "com.android.support:appcompat-v7:$version_support"
+    implementation "com.android.support:design:$version_support"
+    implementation "com.android.support.constraint:constraint-layout:$version_constraint"
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     // LibVLC
-    implementation 'com.github.masterwok:libvlc-android-sdk:3.0.11'
+    implementation "com.github.masterwok:libvlc-android-sdk:$version_libvlc"
 
     // Open Subtitles Android
-    implementation 'com.github.masterwok:open-subtitles-android:0.0.1'
+    implementation "com.github.masterwok:open-subtitles-android:$version_open_subtitles"
+
+    // View Model and LiveData
+    implementation "android.arch.lifecycle:extensions:$version_lifecycle"
 
     // Dagger
-    implementation 'com.google.dagger:dagger:2.16'
-    implementation 'com.google.dagger:dagger-android:2.16'
-    implementation 'com.google.dagger:dagger-android-support:2.16'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
-    annotationProcessor 'com.google.dagger:dagger-android-processor:2.16'
+    implementation "com.google.dagger:dagger:$version_dagger"
+    implementation "com.google.dagger:dagger-android:$version_dagger"
+    implementation "com.google.dagger:dagger-android-support:$version_dagger"
+    kapt "com.google.dagger:dagger-compiler:$version_dagger"
+    kapt "com.google.dagger:dagger-android-processor:$version_dagger"
 
 }
 repositories {

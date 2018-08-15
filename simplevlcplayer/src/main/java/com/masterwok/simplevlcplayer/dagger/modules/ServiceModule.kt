@@ -1,12 +1,15 @@
 package com.masterwok.simplevlcplayer.dagger.modules
 
+import com.masterwok.opensubtitlesandroid.services.contracts.OpenSubtitlesService
 import dagger.Module
+import dagger.Provides
+import javax.inject.Singleton
 
 @Module
 class ServiceModule {
 
-//    @Singleton
-//    @Provides
-//    fun provideAnalyticsService(firebaseService: FirebaseService): AnalyticsService =
-//            com.masterwok.bitcast.services.AnalyticsService(firebaseService)
+    @Singleton
+    @Provides
+    fun providesOpenSubtitlesService(): OpenSubtitlesService =
+            com.masterwok.opensubtitlesandroid.services.OpenSubtitlesService()
 }

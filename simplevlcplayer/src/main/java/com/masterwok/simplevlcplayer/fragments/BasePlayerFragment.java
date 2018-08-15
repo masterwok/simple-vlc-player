@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v4.provider.DocumentFile;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -203,10 +204,16 @@ public abstract class BasePlayerFragment
             return;
         }
 
-        new SubtitlesDialogFragment().show(
-                fragmentManager,
-                SubtitlesDialogFragment.Tag
-        );
+        String mediaName = DocumentFile
+                .fromSingleUri(getContext(), mediaUri)
+                .getName();
+
+        SubtitlesDialogFragment
+                .createInstance(mediaName)
+                .show(
+                        fragmentManager,
+                        SubtitlesDialogFragment.Tag
+                );
     }
 
     @Override

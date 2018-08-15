@@ -1,6 +1,7 @@
 package com.masterwok.simplevlcplayer.fragments
 
 import android.app.Dialog
+import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.view.View
@@ -12,12 +13,23 @@ import javax.inject.Inject
 class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
     companion object {
         const val Tag = "tag.subtitlesdialogfragment"
+        const val MediaNameKey = "key.medianame"
 
         private const val DimAmount = 0.6F
+
+        @JvmStatic
+        fun createInstance(mediaName: String): SubtitlesDialogFragment =
+                SubtitlesDialogFragment().apply {
+                    arguments = Bundle().apply {
+                        putString(MediaNameKey, mediaName)
+                    }
+                }
     }
 
     @Inject
     lateinit var viewModel: SubtitlesDialogFragmentViewModel
+
+    private lateinit var mediaName: String
 
     private fun inflateView(): View = requireActivity()
             .layoutInflater
@@ -29,6 +41,14 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
 
         bindViewComponents(view)
         subscribeToViewComponents()
+
+        mediaName = arguments!!.getString(MediaNameKey)
+
+        // TODO: Populate recycler view.
+        AsyncTask.execute {
+            val result = viewModel.querySubtitles(mediaName)
+            val qwer = 1
+        }
 
         return createDialog(view)
     }

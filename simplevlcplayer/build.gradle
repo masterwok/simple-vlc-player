@@ -33,6 +33,7 @@ ext {
     version_support = '27.1.1'
     version_constraint = '1.1.2'
     version_lifecycle = '1.1.1'
+    version_dagger = '2.16'
 }
 
 dependencies {
@@ -56,11 +57,19 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$version_lifecycle"
 
     // Dagger
+<<<<<<< HEAD
     implementation "com.google.dagger:dagger:$version_dagger"
     implementation "com.google.dagger:dagger-android:$version_dagger"
     implementation "com.google.dagger:dagger-android-support:$version_dagger"
     kapt "com.google.dagger:dagger-compiler:$version_dagger"
     kapt "com.google.dagger:dagger-android-processor:$version_dagger"
+=======
+    kapt "com.google.dagger:dagger-android-processor:$version_dagger"
+    kapt "com.google.dagger:dagger-compiler:$version_dagger"
+    implementation "com.google.dagger:dagger:$version_dagger"
+    implementation "com.google.dagger:dagger-android-support:$version_dagger"
+    implementation "com.google.dagger:dagger-android:$version_dagger"
+>>>>>>> master
 
 }
 repositories {

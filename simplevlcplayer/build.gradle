@@ -1,10 +1,10 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 27
-
-
 
     defaultConfig {
         minSdkVersion 16
@@ -47,8 +47,8 @@ dependencies {
     kapt "com.google.dagger:dagger-android-processor:$version_dagger"
     kapt "com.google.dagger:dagger-compiler:$version_dagger"
     implementation "com.google.dagger:dagger:$version_dagger"
-    implementation "com.google.dagger:dagger-android:$version_dagger"
     implementation "com.google.dagger:dagger-android-support:$version_dagger"
+    implementation "com.google.dagger:dagger-android:$version_dagger"
 
 }
 repositories {

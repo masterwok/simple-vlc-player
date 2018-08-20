@@ -1,4 +1,4 @@
-package com.masterwok.simplevlcplayer.utils;
+package com.masterwok.simplevlcplayer.common.utils;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;

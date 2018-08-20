@@ -1,4 +1,4 @@
-package com.masterwok.simplevlcplayer.utils;
+package com.masterwok.simplevlcplayer.common.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,8 +10,6 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-
-import java.io.FileNotFoundException;
 
 /**
  * This class provides static convenience methods for bitmaps.

@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.models.SelectionItem;
-import com.masterwok.simplevlcplayer.utils.ResourceUtil;
+import com.masterwok.simplevlcplayer.common.utils.ResourceUtil;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -26,9 +26,9 @@ import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableFragment;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
-import com.masterwok.simplevlcplayer.utils.ResourceUtil;
-import com.masterwok.simplevlcplayer.utils.ThreadUtil;
-import com.masterwok.simplevlcplayer.utils.ViewUtil;
+import com.masterwok.simplevlcplayer.common.utils.ResourceUtil;
+import com.masterwok.simplevlcplayer.common.utils.ThreadUtil;
+import com.masterwok.simplevlcplayer.common.utils.ViewUtil;
 
 
 public abstract class BasePlayerFragment

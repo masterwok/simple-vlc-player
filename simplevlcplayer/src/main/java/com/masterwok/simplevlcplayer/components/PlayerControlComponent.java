@@ -11,9 +11,9 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import com.masterwok.simplevlcplayer.R;
-import com.masterwok.simplevlcplayer.utils.ThreadUtil;
-import com.masterwok.simplevlcplayer.utils.TimeUtil;
-import com.masterwok.simplevlcplayer.utils.ViewUtil;
+import com.masterwok.simplevlcplayer.common.utils.ThreadUtil;
+import com.masterwok.simplevlcplayer.common.utils.TimeUtil;
+import com.masterwok.simplevlcplayer.common.utils.ViewUtil;
 
 public class PlayerControlComponent
         extends RelativeLayout

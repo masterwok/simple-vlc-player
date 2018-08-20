@@ -1,4 +1,4 @@
-package com.masterwok.simplevlcplayer
+package com.masterwok.simplevlcplayer.common
 
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver

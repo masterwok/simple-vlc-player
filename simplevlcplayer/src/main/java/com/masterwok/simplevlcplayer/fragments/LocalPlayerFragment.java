@@ -25,7 +25,7 @@ import android.widget.FrameLayout;
 import com.masterwok.simplevlcplayer.R;
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
 import com.masterwok.simplevlcplayer.constants.SizePolicy;
-import com.masterwok.simplevlcplayer.utils.ResourceUtil;
+import com.masterwok.simplevlcplayer.common.utils.ResourceUtil;
 
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.Media;

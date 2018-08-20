@@ -1,4 +1,4 @@
-package com.masterwok.simplevlcplayer.utils;
+package com.masterwok.simplevlcplayer.common.utils;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;

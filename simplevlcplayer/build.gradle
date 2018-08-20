@@ -23,7 +23,6 @@ android {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
-
 }
 
 ext {
@@ -34,6 +33,7 @@ ext {
     version_constraint = '1.1.2'
     version_lifecycle = '1.1.1'
     version_dagger = '2.16'
+    version_coroutines = '0.24.0'
 }
 
 dependencies {
@@ -46,6 +46,10 @@ dependencies {
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // Kotlin Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version_coroutines"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version_coroutines"
 
     // LibVLC
     implementation "com.github.masterwok:libvlc-android-sdk:$version_libvlc"

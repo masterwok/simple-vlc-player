@@ -1,11 +1,13 @@
 package com.masterwok.simplevlcplayer.fragments
 
 import android.app.Dialog
+import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import com.masterwok.opensubtitlesandroid.models.OpenSubtitleItem
 import com.masterwok.simplevlcplayer.R
 import com.masterwok.simplevlcplayer.adapters.SelectionListAdapter
@@ -48,9 +50,6 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
             .layoutInflater
             .inflate(R.layout.dialog_subtitles, null)
 
-    private fun subscribeToViewComponents() {
-    }
-
     private fun createDialog(view: View): Dialog =
             AlertDialog.Builder(
                     requireActivity()
@@ -69,9 +68,17 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
 
         dialogView = inflateView()
 
-        subscribeToViewComponents()
-
         return createDialog(dialogView)
+    }
+
+    private fun subscribeToViewComponents() {
+        listViewSubtitles.onItemClickListener = AdapterView
+                .OnItemClickListener { parent: AdapterView<*>
+                                       , itemView: View
+                                       , position: Int
+                                       , id: Long ->
+                    onSubtitleSelected(position)
+                }
     }
 
     private fun setLoadingViewState() {
@@ -88,6 +95,7 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         configureListViewAndAdapter()
+        subscribeToViewComponents()
 
         progressBarSubtitles.setColor(R.color.progress_bar_spinner)
 
@@ -124,6 +132,19 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
         })
 
         setLoadedViewState()
+    }
+
+    private fun onSubtitleSelected(position: Int) = launch(UI, parent = rootJob) {
+        val subtitleItem = adapterSubtitles.getItem(position)
+        val context = context!!
+
+        viewModel.downloadSubtitleItem(
+                context
+                , subtitleItem.value
+                , Uri.fromFile(context.cacheDir)
+        )
+
+        dismiss()
     }
 
 }

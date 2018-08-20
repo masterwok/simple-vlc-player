@@ -74,6 +74,16 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
         return createDialog(dialogView)
     }
 
+    private fun setLoadingViewState() {
+        progressBarSubtitles.visibility = View.VISIBLE
+        listViewSubtitles.visibility = View.GONE
+    }
+
+    private fun setLoadedViewState() {
+        progressBarSubtitles.visibility = View.GONE
+        listViewSubtitles.visibility = View.VISIBLE
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -102,6 +112,8 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
 
 
     private fun querySubtitles(mediaName: String) = launch(UI, parent = rootJob) {
+        setLoadingViewState()
+
         val subtitles = viewModel.querySubtitles(mediaName)
 
         adapterSubtitles.configure(subtitles.map {
@@ -110,6 +122,8 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
                     , it
             )
         })
+
+        setLoadedViewState()
     }
 
 }

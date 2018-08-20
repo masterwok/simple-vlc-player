@@ -7,9 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.masterwok.opensubtitlesandroid.models.OpenSubtitleItem
-import com.masterwok.simplevlcplayer.common.AndroidJob
 import com.masterwok.simplevlcplayer.R
 import com.masterwok.simplevlcplayer.adapters.SelectionListAdapter
+import com.masterwok.simplevlcplayer.common.AndroidJob
+import com.masterwok.simplevlcplayer.common.extensions.setColor
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableAppCompatDialogFragment
 import com.masterwok.simplevlcplayer.models.SelectionItem
 import com.masterwok.simplevlcplayer.viewmodels.SubtitlesDialogFragmentViewModel
@@ -38,10 +39,10 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
     @Inject
     lateinit var viewModel: SubtitlesDialogFragmentViewModel
 
-    private val rootJob: AndroidJob = AndroidJob(lifecycle)
-
     private lateinit var adapterSubtitles: SelectionListAdapter<OpenSubtitleItem>
     private lateinit var dialogView: View
+
+    private val rootJob: AndroidJob = AndroidJob(lifecycle)
 
     private fun inflateView(): View = requireActivity()
             .layoutInflater
@@ -63,16 +64,12 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
                 window.setDimAmount(DimAmount)
             }
 
-    override fun onCreateView(
-            inflater: LayoutInflater
-            , container: ViewGroup?
-            , savedInstanceState: Bundle?
-    ): View? = dialogView
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
 
         dialogView = inflateView()
+
+        subscribeToViewComponents()
 
         return createDialog(dialogView)
     }
@@ -80,6 +77,14 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        configureListViewAndAdapter()
+
+        progressBarSubtitles.setColor(R.color.progress_bar_spinner)
+
+        querySubtitles(arguments!!.getString(MediaNameKey))
+    }
+
+    private fun configureListViewAndAdapter() {
         adapterSubtitles = SelectionListAdapter(
                 context
                 , R.drawable.ic_check_black
@@ -87,9 +92,14 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
         )
 
         listViewSubtitles.adapter = adapterSubtitles
-
-        querySubtitles(arguments!!.getString(MediaNameKey))
     }
+
+    override fun onCreateView(
+            inflater: LayoutInflater
+            , container: ViewGroup?
+            , savedInstanceState: Bundle?
+    ): View? = dialogView
+
 
     private fun querySubtitles(mediaName: String) = launch(UI, parent = rootJob) {
         val subtitles = viewModel.querySubtitles(mediaName)

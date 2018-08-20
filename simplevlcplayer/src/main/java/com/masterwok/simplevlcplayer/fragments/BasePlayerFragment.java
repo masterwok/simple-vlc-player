@@ -250,7 +250,7 @@ public abstract class BasePlayerFragment
         ViewUtil.setProgressBarColor(
                 context,
                 progressBar,
-                R.color.player_spinner
+                R.color.progress_bar_spinner
         );
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(

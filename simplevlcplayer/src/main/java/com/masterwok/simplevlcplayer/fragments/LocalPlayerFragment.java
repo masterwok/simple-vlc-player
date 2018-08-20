@@ -23,9 +23,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.masterwok.simplevlcplayer.R;
+import com.masterwok.simplevlcplayer.common.utils.ResourceUtil;
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
 import com.masterwok.simplevlcplayer.constants.SizePolicy;
-import com.masterwok.simplevlcplayer.common.utils.ResourceUtil;
 
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.Media;
@@ -390,7 +390,7 @@ public class LocalPlayerFragment
             return;
         }
 
-        serviceBinder.getVout().setWindowSize(sw, sh);
+        serviceBinder.getVOut().setWindowSize(sw, sh);
 
         ViewGroup.LayoutParams lp = surfaceMedia.getLayoutParams();
 

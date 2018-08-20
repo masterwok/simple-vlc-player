@@ -13,7 +13,7 @@ import org.videolan.libvlc.Media
 import org.videolan.libvlc.RendererItem
 import java.lang.ref.WeakReference
 
-class DerpBinder constructor(
+class MediaPlayerServiceBinder constructor(
         mediaPlayerService: MediaPlayerService
 ) : Binder() {
 
@@ -43,7 +43,7 @@ class DerpBinder constructor(
             .get()
             ?.setMedia(context, mediaUri)
 
-    fun setSubtitle(subtitleUri: Uri) = serviceWeakReference
+    fun setSubtitle(subtitleUri: Uri?) = serviceWeakReference
             .get()
             ?.setSubtitle(subtitleUri)
 
@@ -86,7 +86,7 @@ class DerpBinder constructor(
             .get()
             ?.pause()
 
-    fun setAspectRatio(aspectRatio: String) = serviceWeakReference
+    fun setAspectRatio(aspectRatio: String?) = serviceWeakReference
             .get()
             ?.setAspectRatio(aspectRatio)
 
@@ -120,9 +120,5 @@ class DerpBinder constructor(
                 .get()
                 ?.isPlaying
                 ?: false
-
-    fun setVolume(volumne: Int) = serviceWeakReference
-            .get()
-            ?.setVolume(volumne)
 
 }

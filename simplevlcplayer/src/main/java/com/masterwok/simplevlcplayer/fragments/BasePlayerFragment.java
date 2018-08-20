@@ -21,14 +21,14 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
 import com.masterwok.simplevlcplayer.R;
+import com.masterwok.simplevlcplayer.common.utils.ResourceUtil;
+import com.masterwok.simplevlcplayer.common.utils.ThreadUtil;
+import com.masterwok.simplevlcplayer.common.utils.ViewUtil;
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent;
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableFragment;
 import com.masterwok.simplevlcplayer.services.MediaPlayerService;
 import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
-import com.masterwok.simplevlcplayer.common.utils.ResourceUtil;
-import com.masterwok.simplevlcplayer.common.utils.ThreadUtil;
-import com.masterwok.simplevlcplayer.common.utils.ViewUtil;
 
 
 public abstract class BasePlayerFragment
@@ -38,8 +38,10 @@ public abstract class BasePlayerFragment
 
     public static final String MediaUri = "extra.mediauri";
     public static final String SubtitleUri = "extra.subtitleuri";
+    public static final String SubtitleDestinationUri = "extra.subtitledestinationuri";
 
     protected MediaPlayerServiceBinder serviceBinder;
+    private Uri subtitleDestinationUri;
     protected Uri subtitleUri;
     protected Uri mediaUri;
 
@@ -117,6 +119,7 @@ public abstract class BasePlayerFragment
 
         mediaUri = intent.getParcelableExtra(MediaUri);
         subtitleUri = intent.getParcelableExtra(SubtitleUri);
+        subtitleDestinationUri = intent.getParcelableExtra(SubtitleDestinationUri);
     }
 
     @Override
@@ -209,11 +212,8 @@ public abstract class BasePlayerFragment
                 .getName();
 
         SubtitlesDialogFragment
-                .createInstance(mediaName)
-                .show(
-                        fragmentManager,
-                        SubtitlesDialogFragment.Tag
-                );
+                .createInstance(mediaName, subtitleDestinationUri)
+                .show(fragmentManager, SubtitlesDialogFragment.Tag);
     }
 
     @Override

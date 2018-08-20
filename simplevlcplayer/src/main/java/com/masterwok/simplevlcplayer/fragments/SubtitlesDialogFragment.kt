@@ -26,14 +26,19 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
     companion object {
         const val Tag = "tag.subtitlesdialogfragment"
         const val MediaNameKey = "key.medianame"
+        const val DestinationUriKey = "key.destinationuri"
 
         private const val DimAmount = 0.6F
 
         @JvmStatic
-        fun createInstance(mediaName: String): SubtitlesDialogFragment =
+        fun createInstance(
+                mediaName: String
+                , subtitleDestinationUri: Uri?
+        ): SubtitlesDialogFragment =
                 SubtitlesDialogFragment().apply {
                     arguments = Bundle().apply {
                         putString(MediaNameKey, mediaName)
+                        putParcelable(DestinationUriKey, subtitleDestinationUri)
                     }
                 }
     }
@@ -135,13 +140,13 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
     }
 
     private fun onSubtitleSelected(position: Int) = launch(UI, parent = rootJob) {
-        val subtitleItem = adapterSubtitles.getItem(position)
+        val selectedItem = adapterSubtitles.getItem(position)
         val context = context!!
 
         viewModel.downloadSubtitleItem(
                 context
-                , subtitleItem.value
-                , Uri.fromFile(context.cacheDir)
+                , selectedItem.value
+                , arguments?.getParcelable(DestinationUriKey)
         )
 
         dismiss()

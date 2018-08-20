@@ -29,10 +29,11 @@ class SubtitlesDialogFragmentViewModel @Inject constructor(
     suspend fun downloadSubtitleItem(
             context: Context
             , openSubtitleItem: OpenSubtitleItem
-            , destinationUri: Uri
+            , destinationUri: Uri?
     ) = withContext(CommonPool) {
+        // Default to cache directory if destination Uri was not provided.
         val outputFile = Uri.fromFile(File(
-                destinationUri.path
+                (destinationUri ?: Uri.fromFile(context.cacheDir)).path
                 , openSubtitleItem.SubFileName
         ))
 

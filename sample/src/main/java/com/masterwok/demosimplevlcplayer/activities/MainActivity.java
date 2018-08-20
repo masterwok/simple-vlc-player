@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
         intent.putExtra(MediaPlayerActivity.MediaUri, videoUri);
         intent.putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri);
+        intent.putExtra(MediaPlayerActivity.SubtitleDestinationUri, Uri.fromFile(getCacheDir()));
 
         startActivity(intent);
     }

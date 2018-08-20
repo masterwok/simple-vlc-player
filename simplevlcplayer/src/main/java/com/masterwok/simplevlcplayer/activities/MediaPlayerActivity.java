@@ -20,6 +20,7 @@ public class MediaPlayerActivity
 
     public static final String MediaUri = BasePlayerFragment.MediaUri;
     public static final String SubtitleUri = BasePlayerFragment.SubtitleUri;
+    public static final String SubtitleDestinationUri = BasePlayerFragment.SubtitleDestinationUri;
 
     public LocalPlayerFragment localPlayerFragment;
     public RendererPlayerFragment rendererPlayerFragment;

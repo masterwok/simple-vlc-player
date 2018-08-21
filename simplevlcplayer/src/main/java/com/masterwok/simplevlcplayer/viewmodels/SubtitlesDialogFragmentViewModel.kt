@@ -31,24 +31,33 @@ class SubtitlesDialogFragmentViewModel @Inject constructor(
                 .filter { it.SubFormat.toLowerCase() == "srt" }
     }
 
+    fun getSubtitleItemDownloadUri(
+            context: Context
+            , openSubtitleItem: OpenSubtitleItem
+            , destinationUri: Uri?
+    ): Uri = Uri.fromFile(File(
+            (destinationUri ?: Uri.fromFile(context.cacheDir)).path
+            , openSubtitleItem.IDSubtitle
+    ))
+
     suspend fun downloadSubtitleItem(
             context: Context
             , openSubtitleItem: OpenSubtitleItem
             , destinationUri: Uri?
     ): Uri = withContext(CommonPool) {
-        // Default to cache directory if destination Uri was not provided.
-        val outputFile = Uri.fromFile(File(
-                (destinationUri ?: Uri.fromFile(context.cacheDir)).path
-                , openSubtitleItem.SubFileName
-        ))
+        val downloadedSubtitleFileUri = getSubtitleItemDownloadUri(
+                context
+                , openSubtitleItem
+                , destinationUri
+        )
 
         openSubtitlesService.downloadSubtitle(
                 context
                 , openSubtitleItem
-                , outputFile
+                , downloadedSubtitleFileUri
         )
 
-        outputFile
+        downloadedSubtitleFileUri
     }
 
 }

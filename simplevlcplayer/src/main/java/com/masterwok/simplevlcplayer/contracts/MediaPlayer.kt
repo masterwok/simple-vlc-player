@@ -25,7 +25,7 @@ interface MediaPlayer {
 
     fun setMedia(uri: Uri?)
 
-    fun setSubtitle(uri: Uri?)
+    fun setSubtitleUri(uri: Uri?)
 
     interface Callback {
         fun onPlayerOpening()

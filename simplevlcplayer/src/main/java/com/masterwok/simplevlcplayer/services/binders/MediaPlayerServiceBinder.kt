@@ -34,6 +34,16 @@ class MediaPlayerServiceBinder constructor(
                     ?.selectedRendererItem = value
         }
 
+    var selectedSubtitleUri: Uri?
+        get() = serviceWeakReference
+                .get()
+                ?.selectedSubtitleUri
+        set(value) {
+            serviceWeakReference
+                    .get()
+                    ?.selectedSubtitleUri = value
+        }
+
     var vOut: IVLCVout? = null
         get() = serviceWeakReference
                 .get()

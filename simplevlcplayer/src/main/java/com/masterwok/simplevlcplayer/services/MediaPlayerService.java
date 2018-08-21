@@ -294,7 +294,7 @@ public final class MediaPlayerService
 
     @Override
     public void onSubtitlesCleared() {
-        if(callback != null) {
+        if (callback != null) {
             callback.onSubtitlesCleared();
         }
     }
@@ -576,6 +576,10 @@ public final class MediaPlayerService
         sendRendererSelectedBroadcast(rendererItem);
     }
 
+    public void setSelectedSubtitleUri(Uri subtitleUri) {
+        player.setSubtitleUri(subtitleUri);
+    }
+
     public IVLCVout getVout() {
         return player.getVOut();
     }
@@ -624,7 +628,7 @@ public final class MediaPlayerService
     }
 
     public void setSubtitle(Uri subtitleUri) {
-        player.setSubtitle(subtitleUri);
+        player.setSubtitleUri(subtitleUri);
     }
 
     public void play() {
@@ -706,6 +710,10 @@ public final class MediaPlayerService
 
     public RendererItem getSelectedRendererItem() {
         return player.getSelectedRendererItem();
+    }
+
+    public Uri getSelectedSubtitleUri() {
+        return player.getSelectedSubtitleUri();
     }
 
     public boolean isPlaying() {

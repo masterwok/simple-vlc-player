@@ -23,6 +23,8 @@ class VlcMediaPlayer constructor(
 
     override var selectedRendererItem: RendererItem? = null
 
+    override var selectedSubtitleUri: Uri? = null
+
     override val media: Media?
         get() = player.media
 
@@ -95,7 +97,9 @@ class VlcMediaPlayer constructor(
         player.media = Media(libVlc, uri)
     }
 
-    override fun setSubtitle(uri: Uri?) {
+    override fun setSubtitleUri(uri: Uri?) {
+        selectedSubtitleUri = uri
+
         if (uri == null) {
             if (hasSlaves()) {
                 callback?.onSubtitlesCleared()

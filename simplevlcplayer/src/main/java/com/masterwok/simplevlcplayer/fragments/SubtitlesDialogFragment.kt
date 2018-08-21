@@ -198,13 +198,20 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
     private fun createSubtitleSelectionItemList(
             subtitles: List<OpenSubtitleItem>
     ): ArrayList<SelectionItem<OpenSubtitleItem>> = ArrayList(subtitles.map {
-        SelectionItem(false
+        val downloadUri = viewModel.getSubtitleItemDownloadUri(
+                requireContext()
+                , it
+                , arguments?.getParcelable(DestinationUriKey)
+        )
+
+        SelectionItem(
+                serviceBinder?.selectedSubtitleUri == downloadUri
                 , it.SubFileName
                 , it
         )
     }).apply {
         add(0, SelectionItem(
-                false
+                serviceBinder?.selectedSubtitleUri == null || this.size == 0
                 , "None"
                 , null
         ))

@@ -1,5 +1,6 @@
 package com.masterwok.simplevlcplayer.contracts
 
+import android.net.Uri
 import android.view.SurfaceView
 
 import org.videolan.libvlc.IVLCVout
@@ -13,6 +14,8 @@ interface VlcMediaPlayer : MediaPlayer {
     val vOut: IVLCVout
 
     val selectedRendererItem: RendererItem?
+
+    val selectedSubtitleUri: Uri?
 
     val currentVideoTrack: Media.VideoTrack?
 

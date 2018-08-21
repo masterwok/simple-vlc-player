@@ -3,24 +3,46 @@ package com.masterwok.simplevlcplayer
 import android.net.Uri
 import android.view.SurfaceView
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer.Callback
+import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer
 import org.videolan.libvlc.*
 import org.videolan.libvlc.Media.Slave.Type.Subtitle
 import org.videolan.libvlc.MediaPlayer.Event.*
 import java.io.FileDescriptor
 
-class DerpPlayer constructor(
-        val libVlc: LibVLC
-) : com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer
+class VlcMediaPlayer constructor(
+        private val libVlc: LibVLC
+) : VlcMediaPlayer
         , MediaPlayer.EventListener
         , IVLCVout.Callback {
 
-    private var selectedRendererItem: RendererItem? = null
-
     private var player: MediaPlayer = MediaPlayer(libVlc).apply {
-        setEventListener(this@DerpPlayer)
+        setEventListener(this@VlcMediaPlayer)
     }
 
-    private var callback: Callback? = null
+    override var callback: Callback? = null
+
+    override var selectedRendererItem: RendererItem? = null
+
+    override val media: Media?
+        get() = player.media
+
+    override val vout: IVLCVout
+        get() = player.vlcVout
+
+    override var time: Long
+        get() = player.time
+        set(value) {
+            player.time = value
+        }
+
+    override val length: Long
+        get() = player.length
+
+    override val isPlaying: Boolean
+        get() = player.isPlaying
+
+    override val currentVideoTrack: Media.VideoTrack?
+        get() = player.currentVideoTrack
 
     override fun onEvent(event: MediaPlayer.Event?) {
         when (event?.type) {
@@ -43,11 +65,7 @@ class DerpPlayer constructor(
 
     private fun hasSlaves() = player.media?.slaves?.size ?: 0 > 0
 
-    override fun getMedia(): Media? = player.media
-
     override fun play() = player.play()
-
-    override fun getVout(): IVLCVout = player.vlcVout
 
     override fun detachSurfaces() = vout.detachViews()
 
@@ -57,26 +75,12 @@ class DerpPlayer constructor(
 
     override fun stop() = player.stop()
 
-    override fun getTime(): Long = player.time
-
-    override fun getLength(): Long = player.length
-
-    override fun isPlaying(): Boolean = player.isPlaying
-
-    override fun getSelectedRendererItem(): RendererItem? = selectedRendererItem
-
-    override fun getCurrentVideoTrack(): Media.VideoTrack = player.currentVideoTrack
-
     override fun setVolume(volume: Int) {
         player.volume = volume
     }
 
     override fun setScale(scale: Float) {
         player.scale = scale
-    }
-
-    override fun setTime(time: Long) {
-        player.time = time
     }
 
     override fun onSurfacesCreated(p0: IVLCVout?) {
@@ -115,14 +119,11 @@ class DerpPlayer constructor(
         media.release()
     }
 
-    override fun setCallback(callback: Callback?) {
-        this.callback = callback
-    }
 
     override fun attachSurfaces(
-            surfaceMedia: SurfaceView?
-            , surfaceSubtitles: SurfaceView?
-            , layoutListener: IVLCVout.OnNewVideoLayoutListener?
+            surfaceMedia: SurfaceView
+            , surfaceSubtitles: SurfaceView
+            , layoutListener: IVLCVout.OnNewVideoLayoutListener
     ) {
         selectedRendererItem = null
 

@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import com.masterwok.simplevlcplayer.R
 import com.masterwok.simplevlcplayer.adapters.SelectionListAdapter
 import com.masterwok.simplevlcplayer.common.AndroidJob
-import com.masterwok.simplevlcplayer.common.utils.ResourceUtil
 import com.masterwok.simplevlcplayer.models.SelectionItem
 import kotlinx.android.synthetic.main.dialog_renderer_item.*
 import kotlinx.coroutines.experimental.android.UI
@@ -52,7 +51,7 @@ class RendererItemDialogFragment : MediaPlayerServiceDialogFragment() {
 
         selectionItems.add(0, SelectionItem<RendererItem>(
                 rendererItems?.isEmpty() == true || selectedRendererItem == null
-                , ResourceUtil.getString(requireContext(), R.string.dialog_none)
+                , context!!.getString(R.string.dialog_none)
                 , null
         ))
 

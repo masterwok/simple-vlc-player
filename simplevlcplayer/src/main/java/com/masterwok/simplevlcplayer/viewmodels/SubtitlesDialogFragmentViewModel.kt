@@ -30,7 +30,7 @@ class SubtitlesDialogFragmentViewModel @Inject constructor(
             context: Context
             , openSubtitleItem: OpenSubtitleItem
             , destinationUri: Uri?
-    ) = withContext(CommonPool) {
+    ): Uri = withContext(CommonPool) {
         // Default to cache directory if destination Uri was not provided.
         val outputFile = Uri.fromFile(File(
                 (destinationUri ?: Uri.fromFile(context.cacheDir)).path
@@ -42,6 +42,8 @@ class SubtitlesDialogFragmentViewModel @Inject constructor(
                 , openSubtitleItem
                 , outputFile
         )
+
+        outputFile
     }
 
 }

@@ -13,7 +13,6 @@ import com.masterwok.simplevlcplayer.R
 import com.masterwok.simplevlcplayer.adapters.SelectionListAdapter
 import com.masterwok.simplevlcplayer.common.AndroidJob
 import com.masterwok.simplevlcplayer.common.extensions.setColor
-import com.masterwok.simplevlcplayer.dagger.injectors.InjectableAppCompatDialogFragment
 import com.masterwok.simplevlcplayer.models.SelectionItem
 import com.masterwok.simplevlcplayer.viewmodels.SubtitlesDialogFragmentViewModel
 import kotlinx.android.synthetic.main.dialog_subtitles.*
@@ -21,7 +20,7 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import javax.inject.Inject
 
-class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
+class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
     companion object {
         const val Tag = "tag.subtitlesdialogfragment"
@@ -50,6 +49,10 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
     private lateinit var dialogView: View
 
     private val rootJob: AndroidJob = AndroidJob(lifecycle)
+
+    override fun onServiceConnected() {
+        // Intentionally left blank..
+    }
 
     private fun inflateView(): View = requireActivity()
             .layoutInflater
@@ -143,13 +146,15 @@ class SubtitlesDialogFragment : InjectableAppCompatDialogFragment() {
         val selectedItem = adapterSubtitles.getItem(position)
         val context = context!!
 
-        viewModel.downloadSubtitleItem(
+        val subtitleUri = viewModel.downloadSubtitleItem(
                 context
                 , selectedItem.value
                 , arguments?.getParcelable(DestinationUriKey)
         )
 
         dismiss()
+
+        serviceBinder?.setSubtitle(subtitleUri)
     }
 
 }

@@ -6,10 +6,11 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.support.v7.app.AppCompatDialogFragment
+import com.masterwok.simplevlcplayer.dagger.injectors.InjectableAppCompatDialogFragment
 import com.masterwok.simplevlcplayer.services.MediaPlayerService
 import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder
 
-abstract class MediaPlayerServiceDialogFragment : AppCompatDialogFragment() {
+abstract class MediaPlayerServiceDialogFragment : InjectableAppCompatDialogFragment() {
 
     protected var serviceBinder: MediaPlayerServiceBinder? = null
 

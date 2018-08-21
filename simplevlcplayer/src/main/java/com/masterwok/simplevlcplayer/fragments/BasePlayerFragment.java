@@ -319,4 +319,9 @@ public abstract class BasePlayerFragment
     @Override
     public void onPlayerPositionChanged(float positionChanged) {
     }
+
+    @Override
+    public void onSubtitlesCleared() {
+    }
+
 }

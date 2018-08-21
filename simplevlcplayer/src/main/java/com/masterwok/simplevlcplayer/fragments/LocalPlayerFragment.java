@@ -266,8 +266,7 @@ public class LocalPlayerFragment
     public void onPlayerSeekStateChange(boolean canSeek) {
         super.onPlayerSeekStateChange(canSeek);
 
-        if (!canSeek
-                || serviceBinder == null) {
+        if (!canSeek || serviceBinder == null) {
             return;
         }
 
@@ -276,7 +275,6 @@ public class LocalPlayerFragment
 
     @Override
     public void onSubtitlesCleared() {
-        stopPlayback();
         startPlayback(false);
     }
 
@@ -309,7 +307,10 @@ public class LocalPlayerFragment
     }
 
     private void attachSurfaces() {
-        if (serviceBinder == null) {
+        IVLCVout vOut = serviceBinder.getVOut();
+
+        if (serviceBinder == null
+                || (vOut != null && vOut.areViewsAttached())) {
             return;
         }
 

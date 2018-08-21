@@ -85,8 +85,4 @@ public class RendererPlayerFragment
         serviceBinder.play();
     }
 
-    @Override
-    public void onSubtitlesCleared() {
-        // Intentionally left blank..
-    }
 }

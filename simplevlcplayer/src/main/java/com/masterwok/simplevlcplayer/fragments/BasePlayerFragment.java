@@ -38,12 +38,14 @@ public abstract class BasePlayerFragment
 
     public static final String MediaUri = "extra.mediauri";
     public static final String SubtitleUri = "extra.subtitleuri";
+    public static final String OpenSubtitlesUserAgent = "extra.useragent";
     public static final String SubtitleDestinationUri = "extra.subtitledestinationuri";
 
     protected MediaPlayerServiceBinder serviceBinder;
     private Uri subtitleDestinationUri;
     protected Uri subtitleUri;
     protected Uri mediaUri;
+    private String openSubtitlesUserAgent;
 
     private MediaControllerCompat mediaController;
     private ProgressBar progressBar;
@@ -117,6 +119,7 @@ public abstract class BasePlayerFragment
     private void readIntent() {
         Intent intent = getActivity().getIntent();
 
+        openSubtitlesUserAgent = intent.getStringExtra(OpenSubtitlesUserAgent);
         mediaUri = intent.getParcelableExtra(MediaUri);
         subtitleUri = intent.getParcelableExtra(SubtitleUri);
         subtitleDestinationUri = intent.getParcelableExtra(SubtitleDestinationUri);
@@ -156,7 +159,6 @@ public abstract class BasePlayerFragment
                 getActivity(),
                 MediaPlayerService.class
         );
-
     }
 
     private void registerMediaController(MediaPlayerServiceBinder serviceBinder) {
@@ -212,8 +214,11 @@ public abstract class BasePlayerFragment
                 .getName();
 
         SubtitlesDialogFragment
-                .createInstance(mediaName, subtitleDestinationUri)
-                .show(fragmentManager, SubtitlesDialogFragment.Tag);
+                .createInstance(
+                        openSubtitlesUserAgent
+                        , mediaName
+                        , subtitleDestinationUri
+                ).show(fragmentManager, SubtitlesDialogFragment.Tag);
     }
 
     @Override

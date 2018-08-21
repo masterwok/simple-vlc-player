@@ -27,6 +27,7 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
     companion object {
         const val Tag = "tag.subtitlesdialogfragment"
+        const val OpenSubtitlesUserAgentKey = "key.opensubtitlesuseragentkey"
         const val MediaNameKey = "key.medianame"
         const val DestinationUriKey = "key.destinationuri"
 
@@ -34,11 +35,13 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
         @JvmStatic
         fun createInstance(
-                mediaName: String
+                openSubtitlesUserAgent: String?
+                , mediaName: String
                 , subtitleDestinationUri: Uri?
         ): SubtitlesDialogFragment =
                 SubtitlesDialogFragment().apply {
                     arguments = Bundle().apply {
+                        putString(OpenSubtitlesUserAgentKey, openSubtitlesUserAgent)
                         putString(MediaNameKey, mediaName)
                         putParcelable(DestinationUriKey, subtitleDestinationUri)
                     }
@@ -51,6 +54,8 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
     private lateinit var adapterSubtitles: SelectionListAdapter<OpenSubtitleItem>
     private lateinit var dialogView: View
     private lateinit var mediaName: String
+
+    private var openSubtitlesUserAgent: String? = null
 
     private val rootJob: AndroidJob = AndroidJob(lifecycle)
 
@@ -113,9 +118,10 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
         progressBarSubtitles.setColor(R.color.progress_bar_spinner)
 
+        openSubtitlesUserAgent = arguments!!.getString(OpenSubtitlesUserAgentKey)
         mediaName = arguments!!.getString(MediaNameKey)
 
-        querySubtitles(mediaName)
+        querySubtitles(openSubtitlesUserAgent, mediaName)
     }
 
     private fun configureListViewAndAdapter() {
@@ -134,12 +140,14 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
             , savedInstanceState: Bundle?
     ): View? = dialogView
 
-
-    private fun querySubtitles(mediaName: String): Job = launch(UI, parent = rootJob) {
+    private fun querySubtitles(
+            openSubtitlesUserAgent: String?
+            , mediaName: String
+    ): Job = launch(UI, parent = rootJob) {
         setLoadingViewState()
 
         try {
-            val subtitles = viewModel.querySubtitles(mediaName)
+            val subtitles = viewModel.querySubtitles(openSubtitlesUserAgent, mediaName)
 
             adapterSubtitles.configure(
                     createSubtitleSelectionItemList(subtitles)
@@ -149,7 +157,7 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
         } catch (ex: Exception) {
             setErrorViewState(R.string.dialog_subtitle_error_querying, View.OnClickListener {
                 hideRetryButton()
-                querySubtitles(mediaName)
+                querySubtitles(openSubtitlesUserAgent, mediaName)
             })
         }
     }
@@ -229,7 +237,7 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
         } catch (ex: Exception) {
             setErrorViewState(R.string.dialog_subtitle_error_downloading, View.OnClickListener {
                 hideRetryButton()
-                querySubtitles(mediaName)
+                querySubtitles(openSubtitlesUserAgent, mediaName)
             })
         }
     }

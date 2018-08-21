@@ -15,15 +15,20 @@ class SubtitlesDialogFragmentViewModel @Inject constructor(
         private val openSubtitlesService: OpenSubtitlesService
 ) : ViewModel() {
 
-    suspend fun querySubtitles(mediaName: String): List<OpenSubtitleItem> = withContext(CommonPool) {
+    suspend fun querySubtitles(
+            openSubtitlesUserAgent: String?
+            , mediaName: String
+    ): List<OpenSubtitleItem> = withContext(CommonPool) {
         val url = OpenSubtitlesUrlBuilder()
                 .query(mediaName)
                 .build()
 
-        openSubtitlesService.search(
-                com.masterwok.opensubtitlesandroid.services.OpenSubtitlesService.TemporaryUserAgent
-                , url
-        ).filter { it.SubFormat.toLowerCase() == "srt" }
+        val tmpUserAgent = openSubtitlesUserAgent
+                ?: com.masterwok.opensubtitlesandroid.services.OpenSubtitlesService.TemporaryUserAgent
+
+        openSubtitlesService
+                .search(tmpUserAgent, url)
+                .filter { it.SubFormat.toLowerCase() == "srt" }
     }
 
     suspend fun downloadSubtitleItem(

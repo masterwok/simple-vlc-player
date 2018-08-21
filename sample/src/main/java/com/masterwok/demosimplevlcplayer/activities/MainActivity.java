@@ -131,6 +131,9 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri);
         intent.putExtra(MediaPlayerActivity.SubtitleDestinationUri, Uri.fromFile(getCacheDir()));
 
+        // This should be the User-Agent you registered with opensubtitles.org
+        intent.putExtra(MediaPlayerActivity.OpenSubtitlesUserAgent, "TemporaryUserAgent");
+
         startActivity(intent);
     }
 

@@ -51,7 +51,7 @@ class RendererItemDialogFragment : MediaPlayerServiceDialogFragment() {
 
         selectionItems.add(0, SelectionItem<RendererItem>(
                 rendererItems?.isEmpty() == true || selectedRendererItem == null
-                , context!!.getString(R.string.dialog_none)
+                , getString(R.string.dialog_none)
                 , null
         ))
 

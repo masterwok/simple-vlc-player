@@ -14,4 +14,7 @@
     <color name="player_dialog_accent">@android:color/white</color>
 
     <color name="player_dialog_check">#94E495</color>
+
+    <color name="dialog_subtitle_error_netural_button">#5D5179</color>
+    <color name="dialog_subtitle_error">#FFFFFF</color>
 </resources>

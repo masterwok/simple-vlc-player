@@ -14,6 +14,26 @@
         android:layout_marginTop="40dp"
         android:layout_marginBottom="20dp"/>
 
+    <LinearLayout
+        android:id="@+id/linearLayoutSubtitleError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@+id/textViewSubtitlesError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/dialog_subtitle_error"
+            android:textSize="14sp"
+            android:textStyle="normal"/>
+    </LinearLayout>
+
     <ListView
         android:id="@+id/listViewSubtitles"
         android:layout_width="match_parent"

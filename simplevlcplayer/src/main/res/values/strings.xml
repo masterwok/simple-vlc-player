@@ -10,4 +10,6 @@
     <string name="toast_missing_index_warning">File index broken or missing, seeking will not work correctly.</string>
     <string name="dialog_select_subtitles">Select Subtitles</string>
     <string name="dialog_button_subtitles_negative">CANCEL</string>
+    <string name="dialog_subtitle_error_querying">An error occurred while querying for subtitles.</string>
+    <string name="dialog_subtitle_error_retry">RETRY</string>
 </resources>

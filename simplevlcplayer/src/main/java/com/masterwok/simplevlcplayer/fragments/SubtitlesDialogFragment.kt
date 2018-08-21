@@ -12,6 +12,7 @@ import com.masterwok.opensubtitlesandroid.models.OpenSubtitleItem
 import com.masterwok.simplevlcplayer.R
 import com.masterwok.simplevlcplayer.adapters.SelectionListAdapter
 import com.masterwok.simplevlcplayer.common.AndroidJob
+import com.masterwok.simplevlcplayer.common.extensions.getCompatColor
 import com.masterwok.simplevlcplayer.common.extensions.setColor
 import com.masterwok.simplevlcplayer.models.SelectionItem
 import com.masterwok.simplevlcplayer.viewmodels.SubtitlesDialogFragmentViewModel
@@ -47,6 +48,7 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
     private lateinit var adapterSubtitles: SelectionListAdapter<OpenSubtitleItem>
     private lateinit var dialogView: View
+    private lateinit var mediaName: String
 
     private val rootJob: AndroidJob = AndroidJob(lifecycle)
 
@@ -92,11 +94,13 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
     private fun setLoadingViewState() {
         progressBarSubtitles.visibility = View.VISIBLE
         listViewSubtitles.visibility = View.GONE
+        linearLayoutSubtitleError.visibility = View.GONE
     }
 
     private fun setLoadedViewState() {
-        progressBarSubtitles.visibility = View.GONE
         listViewSubtitles.visibility = View.VISIBLE
+        progressBarSubtitles.visibility = View.GONE
+        linearLayoutSubtitleError.visibility = View.GONE
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -107,7 +111,9 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
         progressBarSubtitles.setColor(R.color.progress_bar_spinner)
 
-        querySubtitles(arguments!!.getString(MediaNameKey))
+        mediaName = arguments!!.getString(MediaNameKey)
+
+        querySubtitles(mediaName)
     }
 
     private fun configureListViewAndAdapter() {
@@ -130,24 +136,66 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
     private fun querySubtitles(mediaName: String) = launch(UI, parent = rootJob) {
         setLoadingViewState()
 
-        val subtitles = viewModel.querySubtitles(mediaName)
+        try {
+            val subtitles = viewModel.querySubtitles(mediaName)
 
-        adapterSubtitles.configure(
-                ArrayList(subtitles.map {
-                    SelectionItem(false
-                            , it.SubFileName
-                            , it
-                    )
-                }).apply {
-                    add(0, SelectionItem(
-                            false
-                            , "None"
-                            , null
-                    ))
-                }
+            adapterSubtitles.configure(
+                    createSubtitleSelectionItemList(subtitles)
+            )
+
+            setLoadedViewState()
+        } catch (ex: Exception) {
+            setErrorViewState()
+        }
+    }
+
+    private fun showErrorContainer() {
+        progressBarSubtitles.visibility = View.GONE
+        listViewSubtitles.visibility = View.GONE
+        linearLayoutSubtitleError.visibility = View.VISIBLE
+    }
+
+    private fun setErrorViewState() {
+        showErrorContainer()
+
+        textViewSubtitlesError.text = getString(R.string.dialog_subtitle_error_querying)
+
+        showRetryButton(View.OnClickListener {
+            hideRetryButton()
+            querySubtitles(mediaName)
+        })
+    }
+
+    private fun hideRetryButton() {
+        (dialog as AlertDialog)
+                .getButton(AlertDialog.BUTTON_NEUTRAL)
+                .visibility = View.GONE
+    }
+
+    private fun showRetryButton(
+            listener: View.OnClickListener?
+    ) = (dialog as AlertDialog).getButton(AlertDialog.BUTTON_NEUTRAL).apply {
+        text = context.getString(R.string.dialog_subtitle_error_retry)
+        setTextColor(context.getCompatColor(R.color.dialog_subtitle_error))
+        visibility = View.VISIBLE
+
+        setOnClickListener(listener)
+    }
+
+
+    private fun createSubtitleSelectionItemList(
+            subtitles: List<OpenSubtitleItem>
+    ): ArrayList<SelectionItem<OpenSubtitleItem>> = ArrayList(subtitles.map {
+        SelectionItem(false
+                , it.SubFileName
+                , it
         )
-
-        setLoadedViewState()
+    }).apply {
+        add(0, SelectionItem(
+                false
+                , "None"
+                , null
+        ))
     }
 
     private fun onSubtitleSelected(position: Int) = launch(UI, parent = rootJob) {

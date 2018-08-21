@@ -10,7 +10,7 @@ import java.io.FileDescriptor
 
 interface VlcMediaPlayer : MediaPlayer {
 
-    val vout: IVLCVout
+    val vOut: IVLCVout
 
     val selectedRendererItem: RendererItem?
 

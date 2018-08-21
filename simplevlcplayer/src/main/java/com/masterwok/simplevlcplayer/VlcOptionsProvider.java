@@ -237,9 +237,9 @@ public final class VlcOptionsProvider {
             }
 
             if (openGl == 1) {
-                options.add("--vout=gles2,none");
+                options.add("--vOut=gles2,none");
             } else if (openGl == 0) {
-                options.add("--vout=android_display,none");
+                options.add("--vOut=android_display,none");
             }
 
             options.add("--avcodec-skiploopfilter");

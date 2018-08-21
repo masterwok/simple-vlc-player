@@ -26,7 +26,7 @@ class VlcMediaPlayer constructor(
     override val media: Media?
         get() = player.media
 
-    override val vout: IVLCVout
+    override val vOut: IVLCVout
         get() = player.vlcVout
 
     override var time: Long
@@ -67,7 +67,7 @@ class VlcMediaPlayer constructor(
 
     override fun play() = player.play()
 
-    override fun detachSurfaces() = vout.detachViews()
+    override fun detachSurfaces() = vOut.detachViews()
 
     override fun release() = player.release()
 
@@ -127,9 +127,9 @@ class VlcMediaPlayer constructor(
     ) {
         selectedRendererItem = null
 
-        vout.setVideoView(surfaceMedia)
-        vout.setSubtitlesView(surfaceSubtitles)
-        vout.attachViews(layoutListener)
+        vOut.setVideoView(surfaceMedia)
+        vOut.setSubtitlesView(surfaceSubtitles)
+        vOut.attachViews(layoutListener)
     }
 
 

@@ -577,7 +577,7 @@ public final class MediaPlayerService
     }
 
     public IVLCVout getVout() {
-        return player.getVout();
+        return player.getVOut();
     }
 
     private Bitmap setMediaBitmap(Uri mediaUri) {

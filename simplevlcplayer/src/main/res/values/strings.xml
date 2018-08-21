@@ -12,4 +12,5 @@
     <string name="dialog_button_subtitles_negative">CANCEL</string>
     <string name="dialog_subtitle_error_querying">An error occurred while querying for subtitles.</string>
     <string name="dialog_subtitle_error_retry">RETRY</string>
+    <string name="dialog_subtitle_error_downloading">An error occurred while downloading subtitles.</string>
 </resources>

@@ -3,6 +3,7 @@ package com.masterwok.simplevlcplayer.fragments
 import android.app.Dialog
 import android.net.Uri
 import android.os.Bundle
+import android.support.annotation.StringRes
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import com.masterwok.simplevlcplayer.common.extensions.setColor
 import com.masterwok.simplevlcplayer.models.SelectionItem
 import com.masterwok.simplevlcplayer.viewmodels.SubtitlesDialogFragmentViewModel
 import kotlinx.android.synthetic.main.dialog_subtitles.*
+import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import javax.inject.Inject
@@ -133,7 +135,7 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
     ): View? = dialogView
 
 
-    private fun querySubtitles(mediaName: String) = launch(UI, parent = rootJob) {
+    private fun querySubtitles(mediaName: String): Job = launch(UI, parent = rootJob) {
         setLoadingViewState()
 
         try {
@@ -145,7 +147,10 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
             setLoadedViewState()
         } catch (ex: Exception) {
-            setErrorViewState()
+            setErrorViewState(R.string.dialog_subtitle_error_querying, View.OnClickListener {
+                hideRetryButton()
+                querySubtitles(mediaName)
+            })
         }
     }
 
@@ -155,15 +160,15 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
         linearLayoutSubtitleError.visibility = View.VISIBLE
     }
 
-    private fun setErrorViewState() {
+    private fun setErrorViewState(
+            @StringRes errorId: Int
+            , listener: View.OnClickListener?
+    ) {
         showErrorContainer()
 
-        textViewSubtitlesError.text = getString(R.string.dialog_subtitle_error_querying)
+        textViewSubtitlesError.text = getString(errorId)
 
-        showRetryButton(View.OnClickListener {
-            hideRetryButton()
-            querySubtitles(mediaName)
-        })
+        showRetryButton(listener)
     }
 
     private fun hideRetryButton() {
@@ -181,7 +186,6 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
         setOnClickListener(listener)
     }
-
 
     private fun createSubtitleSelectionItemList(
             subtitles: List<OpenSubtitleItem>
@@ -202,19 +206,32 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
         val selectedItem = adapterSubtitles.getItem(position)
         val context = context!!
         val openSubtitleItem = selectedItem?.value
-        var subtitleUri: Uri? = null
 
-        if (openSubtitleItem != null) {
-            subtitleUri = viewModel.downloadSubtitleItem(
+        setLoadingViewState()
+
+        if (openSubtitleItem == null) {
+            serviceBinder?.setSubtitle(null)
+            dismiss()
+            return@launch
+        }
+
+        try {
+            val subtitleUri = viewModel.downloadSubtitleItem(
                     context
                     , openSubtitleItem
                     , arguments?.getParcelable(DestinationUriKey)
             )
+
+            dismiss()
+
+            serviceBinder?.setSubtitle(subtitleUri)
+
+        } catch (ex: Exception) {
+            setErrorViewState(R.string.dialog_subtitle_error_downloading, View.OnClickListener {
+                hideRetryButton()
+                querySubtitles(mediaName)
+            })
         }
-
-        dismiss()
-
-        serviceBinder?.setSubtitle(subtitleUri)
     }
 
 }

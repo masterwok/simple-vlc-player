@@ -293,6 +293,13 @@ public final class MediaPlayerService
     }
 
     @Override
+    public void onSubtitlesCleared() {
+        if(callback != null) {
+            callback.onSubtitlesCleared();
+        }
+    }
+
+    @Override
     public void onDisplay(Dialog.ErrorMessage errorMessage) {
 
     }

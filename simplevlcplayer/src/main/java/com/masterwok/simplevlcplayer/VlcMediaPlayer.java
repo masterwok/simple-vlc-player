@@ -100,7 +100,12 @@ public class VlcMediaPlayer
     @Override
     public void setSubtitle(Uri uri) {
         if (uri == null) {
-            // TODO: Clear media slaves.
+            Media.Slave[] slaves = player.getMedia().getSlaves();
+
+            if (slaves != null && slaves.length > 0) {
+                callback.onSubtitlesCleared();
+            }
+
             return;
         }
 

@@ -51,5 +51,7 @@ public interface MediaPlayer {
         void onBuffering(float buffering);
 
         void onPlayerPositionChanged(float positionChanged);
+
+        void onSubtitlesCleared();
     }
 }

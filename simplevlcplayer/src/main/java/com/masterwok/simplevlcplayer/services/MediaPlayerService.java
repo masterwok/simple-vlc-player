@@ -617,10 +617,6 @@ public final class MediaPlayerService
     }
 
     public void setSubtitle(Uri subtitleUri) {
-        if (subtitleUri == null) {
-            return;
-        }
-
         player.setSubtitle(subtitleUri);
     }
 

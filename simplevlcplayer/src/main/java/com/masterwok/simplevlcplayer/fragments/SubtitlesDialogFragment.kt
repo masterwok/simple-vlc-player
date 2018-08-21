@@ -132,12 +132,20 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
         val subtitles = viewModel.querySubtitles(mediaName)
 
-        adapterSubtitles.configure(subtitles.map {
-            SelectionItem(false
-                    , it.SubFileName
-                    , it
-            )
-        })
+        adapterSubtitles.configure(
+                ArrayList(subtitles.map {
+                    SelectionItem(false
+                            , it.SubFileName
+                            , it
+                    )
+                }).apply {
+                    add(0, SelectionItem(
+                            false
+                            , "None"
+                            , null
+                    ))
+                }
+        )
 
         setLoadedViewState()
     }
@@ -145,12 +153,16 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
     private fun onSubtitleSelected(position: Int) = launch(UI, parent = rootJob) {
         val selectedItem = adapterSubtitles.getItem(position)
         val context = context!!
+        val openSubtitleItem = selectedItem?.value
+        var subtitleUri: Uri? = null
 
-        val subtitleUri = viewModel.downloadSubtitleItem(
-                context
-                , selectedItem.value
-                , arguments?.getParcelable(DestinationUriKey)
-        )
+        if (openSubtitleItem != null) {
+            subtitleUri = viewModel.downloadSubtitleItem(
+                    context
+                    , openSubtitleItem
+                    , arguments?.getParcelable(DestinationUriKey)
+            )
+        }
 
         dismiss()
 

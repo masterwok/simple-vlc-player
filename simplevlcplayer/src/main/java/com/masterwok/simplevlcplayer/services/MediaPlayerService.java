@@ -23,16 +23,16 @@ import android.view.SurfaceView;
 import android.widget.Toast;
 
 import com.masterwok.simplevlcplayer.R;
-import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
-import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
-import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
-import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
-import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
 import com.masterwok.simplevlcplayer.common.utils.AudioUtil;
 import com.masterwok.simplevlcplayer.common.utils.BitmapUtil;
 import com.masterwok.simplevlcplayer.common.utils.FileUtil;
 import com.masterwok.simplevlcplayer.common.utils.NotificationUtil;
 import com.masterwok.simplevlcplayer.common.utils.ResourceUtil;
+import com.masterwok.simplevlcplayer.contracts.MediaPlayer;
+import com.masterwok.simplevlcplayer.contracts.VlcMediaPlayer;
+import com.masterwok.simplevlcplayer.dagger.injectors.InjectableService;
+import com.masterwok.simplevlcplayer.observables.RendererItemObservable;
+import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder;
 
 import org.videolan.libvlc.Dialog;
 import org.videolan.libvlc.IVLCVout;
@@ -646,10 +646,6 @@ public final class MediaPlayerService
 
     private void abandonAudioFocus() {
         audioManager.abandonAudioFocus(audioFocusChangeListener.get());
-    }
-
-    public MediaSessionCompat getMediaSession() {
-        return mediaSession;
     }
 
     public void setTime(long time) {

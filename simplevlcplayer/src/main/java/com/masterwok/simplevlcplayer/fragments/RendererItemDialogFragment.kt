@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.masterwok.simplevlcplayer.R
 import com.masterwok.simplevlcplayer.adapters.SelectionListAdapter
+import com.masterwok.simplevlcplayer.common.AndroidJob
 import com.masterwok.simplevlcplayer.common.utils.ResourceUtil
 import com.masterwok.simplevlcplayer.models.SelectionItem
 import kotlinx.android.synthetic.main.dialog_renderer_item.*
@@ -23,6 +24,8 @@ class RendererItemDialogFragment : MediaPlayerServiceDialogFragment() {
 
         private const val DimAmount = 0.6F
     }
+
+    private val rootJob: AndroidJob = AndroidJob(lifecycle)
 
     private lateinit var dialogView: View
     private lateinit var rendererItemAdapter: SelectionListAdapter<RendererItem>
@@ -53,7 +56,7 @@ class RendererItemDialogFragment : MediaPlayerServiceDialogFragment() {
                 , null
         ))
 
-        launch(UI) { rendererItemAdapter.configure(selectionItems) }
+        launch(UI, parent = rootJob) { rendererItemAdapter.configure(selectionItems) }
     }
 
     override fun onServiceConnected() {

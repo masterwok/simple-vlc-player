@@ -212,7 +212,7 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
     }).apply {
         add(0, SelectionItem(
                 serviceBinder?.selectedSubtitleUri == null || this.size == 0
-                , "None"
+                , getString(R.string.dialog_none)
                 , null
         ))
     }

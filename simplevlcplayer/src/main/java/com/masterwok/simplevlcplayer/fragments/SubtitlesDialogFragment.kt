@@ -266,6 +266,7 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
             }
 
             dismiss()
+
             return@launch
         }
 

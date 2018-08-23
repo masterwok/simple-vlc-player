@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,6 +38,7 @@ public class LocalPlayerFragment
         extends BasePlayerFragment
         implements IVLCVout.OnNewVideoLayoutListener {
 
+    private static final String SetProvidedSubtitle = "bundle.setprovidedsubtitleonnextplayback";
     private static final String IsPlayingKey = "bundle.isplaying";
     private static final String LengthKey = "bundle.length";
     private static final String TimeKey = "bundle.time";
@@ -52,6 +54,7 @@ public class LocalPlayerFragment
     private int mVideoSarNum = 0;
     private int mVideoSarDen = 0;
 
+    private boolean setProvidedSubtitle = true;
     private boolean resumeIsPlaying = true;
     private long resumeLength = 0;
     private long resumeTime = 0;
@@ -243,7 +246,11 @@ public class LocalPlayerFragment
         serviceBinder.setMedia(getContext(), mediaUri);
 
         if (setSubtitles) {
-            serviceBinder.setSubtitle(subtitleUri);
+            if(setProvidedSubtitle) {
+                serviceBinder.setSubtitle(subtitleUri);
+            } else {
+                serviceBinder.setSubtitle(serviceBinder.getSelectedSubtitleUri());
+            }
         }
 
         if (resumeIsPlaying) {
@@ -286,6 +293,7 @@ public class LocalPlayerFragment
             return;
         }
 
+        setProvidedSubtitle = savedInstanceState.getBoolean(SetProvidedSubtitle);
         resumeIsPlaying = savedInstanceState.getBoolean(IsPlayingKey, true);
         resumeTime = savedInstanceState.getLong(TimeKey, 0);
         resumeLength = savedInstanceState.getLong(LengthKey, 0);
@@ -299,6 +307,9 @@ public class LocalPlayerFragment
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
+        Uri selectedSubtitleUri = serviceBinder.getSelectedSubtitleUri();
+
+        outState.putBoolean(SetProvidedSubtitle, selectedSubtitleUri == subtitleUri);
         outState.putBoolean(IsPlayingKey, resumeIsPlaying);
         outState.putLong(TimeKey, resumeTime);
         outState.putLong(LengthKey, resumeLength);

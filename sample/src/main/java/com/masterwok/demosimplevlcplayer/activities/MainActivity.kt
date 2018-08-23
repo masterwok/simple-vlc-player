@@ -18,7 +18,6 @@ import com.masterwok.simplevlcplayer.VlcOptionsProvider
 import com.masterwok.simplevlcplayer.activities.MediaPlayerActivity
 import com.nononsenseapps.filepicker.FilePickerActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.File
 
 class MainActivity : AppCompatActivity() {
     companion object {

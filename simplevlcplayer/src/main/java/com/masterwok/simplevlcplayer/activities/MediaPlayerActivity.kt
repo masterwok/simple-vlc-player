@@ -24,8 +24,8 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
         const val SubtitleLanguageCode = BasePlayerFragment.SubtitleLanguageCode
     }
 
-    var localPlayerFragment: LocalPlayerFragment? = null
-    var rendererPlayerFragment: RendererPlayerFragment? = null
+    private var localPlayerFragment: LocalPlayerFragment? = null
+    private var rendererPlayerFragment: RendererPlayerFragment? = null
 
     private val broadCastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {

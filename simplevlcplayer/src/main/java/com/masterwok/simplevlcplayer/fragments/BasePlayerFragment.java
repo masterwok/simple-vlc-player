@@ -219,6 +219,7 @@ public abstract class BasePlayerFragment
         SubtitlesDialogFragment
                 .createInstance(
                         mediaName
+                        , subtitleUri
                         , openSubtitlesUserAgent
                         , subtitleLanguageCode
                         , subtitleDestinationUri

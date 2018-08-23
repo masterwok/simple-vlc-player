@@ -30,13 +30,17 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
         const val OpenSubtitlesUserAgentKey = "key.opensubtitlesuseragent"
         const val SubtitleLanguageCodeKey = "key.subtitlelanguagecode"
         const val MediaNameKey = "key.medianame"
+        const val SubtitleUriKey = "key.subtitleuri"
         const val DestinationUriKey = "key.destinationuri"
+        const val NoneSubtitleIndex = 0
+        const val ProvidedSubtitleIndex = 1
 
         private const val DimAmount = 0.6F
 
         @JvmStatic
         fun createInstance(
                 mediaName: String
+                , subtitleUri: Uri?
                 , openSubtitlesUserAgent: String?
                 , subtitleLanguageCode: String?
                 , subtitleDestinationUri: Uri?
@@ -44,6 +48,7 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
                 SubtitlesDialogFragment().apply {
                     arguments = Bundle().apply {
                         putString(MediaNameKey, mediaName)
+                        putParcelable(SubtitleUriKey, subtitleUri)
                         putString(OpenSubtitlesUserAgentKey, openSubtitlesUserAgent)
                         putString(SubtitleLanguageCodeKey, subtitleLanguageCode)
                         putParcelable(DestinationUriKey, subtitleDestinationUri)
@@ -60,6 +65,7 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
     private var openSubtitlesUserAgent: String? = null
     private var subtitleLanguageCode: String? = null
+    private var subtitleUri: Uri? = null
 
     private val rootJob: AndroidJob = AndroidJob(lifecycle)
 
@@ -114,7 +120,6 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
         linearLayoutSubtitleError.visibility = View.GONE
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -124,6 +129,7 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
         progressBarSubtitles.setColor(R.color.progress_bar_spinner)
 
         mediaName = arguments!!.getString(MediaNameKey)
+        subtitleUri = arguments!!.getParcelable(SubtitleUriKey)
         openSubtitlesUserAgent = arguments!!.getString(OpenSubtitlesUserAgentKey)
         subtitleLanguageCode = arguments!!.getString(SubtitleLanguageCodeKey)
 
@@ -229,9 +235,19 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
                 , it
         )
     }).apply {
-        add(0, SelectionItem(
+        add(NoneSubtitleIndex, SelectionItem(
                 serviceBinder?.selectedSubtitleUri == null || this.size == 0
                 , getString(R.string.dialog_none)
+                , null
+        ))
+
+        if (subtitleUri == null) {
+            return@apply
+        }
+
+        add(ProvidedSubtitleIndex, SelectionItem(
+                serviceBinder?.selectedSubtitleUri == subtitleUri
+                , subtitleUri?.lastPathSegment
                 , null
         ))
     }
@@ -244,7 +260,11 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
         setLoadingViewState()
 
         if (openSubtitleItem == null) {
-            serviceBinder?.setSubtitle(null)
+            when (position) {
+                NoneSubtitleIndex -> serviceBinder?.setSubtitle(null)
+                ProvidedSubtitleIndex -> serviceBinder?.setSubtitle(subtitleUri)
+            }
+
             dismiss()
             return@launch
         }

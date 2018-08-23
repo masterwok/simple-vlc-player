@@ -31,7 +31,7 @@ class SubtitlesDialogFragmentViewModel @Inject constructor(
 
         openSubtitlesService
                 .search(tmpUserAgent, url)
-                .filter { it.SubFormat.toLowerCase() == "srt" }
+                .toList()
     }
 
     suspend fun downloadSubtitleItem(

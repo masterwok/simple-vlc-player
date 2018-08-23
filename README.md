@@ -18,7 +18,7 @@ VlcOptionsProvider
         );
 ```
 
-The ```MediaPlayerActivity``` can be started by providing a required media URI and an optional subtitle Uri. The subtitle Uri must be a local file. Consumers of this library should also supply an [opensubtitles.org User-Agent](http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst) and preferred subtitle language via the intent. As stated in the Open Subtitles documentation, the temporary user agent should only be used during development and testing as it periodically changes.
+The ```MediaPlayerActivity``` can be started by providing a required media Uri and an optional subtitle Uri. The subtitle Uri must be a local file. Consumers of this library should also supply an [opensubtitles.org User-Agent](http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst) and preferred subtitle language via the intent. As stated in the Open Subtitles documentation, the temporary user agent should only be used during development and testing as it periodically changes.
 
 ```java
 Intent intent = new Intent(this, MediaPlayerActivity.class);

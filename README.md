@@ -26,6 +26,11 @@ Intent intent = new Intent(this, MediaPlayerActivity.class);
 intent.putExtra(MediaPlayerActivity.MediaUri, videoUri);
 intent.putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri);
 
+// This should be the User-Agent you registered with opensubtitles.org
+// See: http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst
+intent.putExtra(MediaPlayerActivity.OpenSubtitlesUserAgent, OpenSubtitlesService.TemporaryUserAgent)
+intent.putExtra(MediaPlayerActivity.SubtitleLanguageCode, SubtitleLanguage.English)
+
 startActivity(intent);
 ```
 
@@ -43,7 +48,7 @@ and add the following in the dependent module:
 
 ```gradle
 dependencies {
-    implementation 'com.github.masterwok:simple-vlc-player:1.0.4'
+    implementation 'com.github.masterwok:simple-vlc-player:1.1.0'
 }
 ```
 

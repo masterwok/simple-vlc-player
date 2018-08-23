@@ -266,7 +266,7 @@ public final class MediaPlayerService
         final long time = player.getTime() / 1000L;
 
         // At least one second has elapsed, update playback state.
-        if (time >= lastUpdateTime + 1) {
+        if (time >= lastUpdateTime + 1 || time <= lastUpdateTime) {
             updatePlaybackState();
             lastUpdateTime = time;
         }

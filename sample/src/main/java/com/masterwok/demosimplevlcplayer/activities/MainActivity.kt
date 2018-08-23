@@ -1,19 +1,24 @@
 package com.masterwok.demosimplevlcplayer.activities
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.support.v7.app.AppCompatActivity
 import com.masterwok.demosimplevlcplayer.R
+import com.masterwok.demosimplevlcplayer.extensions.appCompatRequestPermissions
+import com.masterwok.demosimplevlcplayer.extensions.isPermissionGranted
 import com.masterwok.opensubtitlesandroid.SubtitleLanguage
 import com.masterwok.opensubtitlesandroid.services.OpenSubtitlesService
 import com.masterwok.simplevlcplayer.VlcOptionsProvider
 import com.masterwok.simplevlcplayer.activities.MediaPlayerActivity
 import com.nononsenseapps.filepicker.FilePickerActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -25,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        requestWriteExternalStoragePermission()
         bindViewComponents()
         subscribeToViewComponents()
 
@@ -34,6 +40,30 @@ class MainActivity : AppCompatActivity() {
                 .getInstance().options = VlcOptionsProvider.Builder(this)
                 .setVerbose(true)
                 .build()
+    }
+
+    private fun requestWriteExternalStoragePermission() {
+        if (isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            return
+        }
+
+        appCompatRequestPermissions(
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+                , 0
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+            requestCode: Int
+            , permissions: Array<out String>
+            , grantResults: IntArray
+    ) {
+        val permissionWasDenied = grantResults.any { it != PackageManager.PERMISSION_GRANTED }
+
+        if (permissionWasDenied) {
+            // Required to read local subtitles in external storage.
+            throw Exception("READ_EXTERNAL_STORAGE permission must be granted to run demo.")
+        }
     }
 
     /**
@@ -108,8 +138,15 @@ class MainActivity : AppCompatActivity() {
     private fun startMediaPlayerActivity(videoUri: Uri?, subtitleUri: Uri?) =
             startActivity(Intent(this, MediaPlayerActivity::class.java).apply {
 
+                val file = File("/storage/emulated/0/Download/derp.srt")
+
+                val isFile = file.isFile
+
+                val tmp = Uri.fromFile(file)
+                putExtra(MediaPlayerActivity.SubtitleUri, tmp)
+
                 putExtra(MediaPlayerActivity.MediaUri, videoUri)
-                putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri)
+//                putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri)
                 putExtra(MediaPlayerActivity.SubtitleDestinationUri, Uri.fromFile(cacheDir))
 
                 // This should be the User-Agent you registered with opensubtitles.org

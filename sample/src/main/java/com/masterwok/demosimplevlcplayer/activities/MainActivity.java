@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 
 import com.masterwok.demosimplevlcplayer.R;
+import com.masterwok.opensubtitlesandroid.SubtitleLanguage;
+import com.masterwok.opensubtitlesandroid.services.OpenSubtitlesService;
 import com.masterwok.simplevlcplayer.VlcOptionsProvider;
 import com.masterwok.simplevlcplayer.activities.MediaPlayerActivity;
 import com.nononsenseapps.filepicker.FilePickerActivity;
@@ -133,7 +135,8 @@ public class MainActivity extends AppCompatActivity {
 
         // This should be the User-Agent you registered with opensubtitles.org
         // See: http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst
-        intent.putExtra(MediaPlayerActivity.OpenSubtitlesUserAgent, "TemporaryUserAgent");
+        intent.putExtra(MediaPlayerActivity.OpenSubtitlesUserAgent, OpenSubtitlesService.TemporaryUserAgent);
+        intent.putExtra(MediaPlayerActivity.SubtitleLanguageCode, SubtitleLanguage.Finnish);
 
         startActivity(intent);
     }

@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModel
 import android.content.Context
 import android.net.Uri
 import com.masterwok.opensubtitlesandroid.OpenSubtitlesUrlBuilder
+import com.masterwok.opensubtitlesandroid.SubtitleLanguage
 import com.masterwok.opensubtitlesandroid.models.OpenSubtitleItem
 import com.masterwok.opensubtitlesandroid.services.contracts.OpenSubtitlesService
 import kotlinx.coroutines.experimental.CommonPool
@@ -16,11 +17,13 @@ class SubtitlesDialogFragmentViewModel @Inject constructor(
 ) : ViewModel() {
 
     suspend fun querySubtitles(
-            openSubtitlesUserAgent: String?
-            , mediaName: String
+            mediaName: String
+            , openSubtitlesUserAgent: String?
+            , subtitleLanguageCode: String?
     ): List<OpenSubtitleItem> = withContext(CommonPool) {
         val url = OpenSubtitlesUrlBuilder()
                 .query(mediaName)
+                .subLanguageId(subtitleLanguageCode ?: SubtitleLanguage.English)
                 .build()
 
         val tmpUserAgent = openSubtitlesUserAgent
@@ -30,15 +33,6 @@ class SubtitlesDialogFragmentViewModel @Inject constructor(
                 .search(tmpUserAgent, url)
                 .filter { it.SubFormat.toLowerCase() == "srt" }
     }
-
-    fun getSubtitleItemDownloadUri(
-            context: Context
-            , openSubtitleItem: OpenSubtitleItem
-            , destinationUri: Uri?
-    ): Uri = Uri.fromFile(File(
-            (destinationUri ?: Uri.fromFile(context.cacheDir)).path
-            , openSubtitleItem.IDSubtitle
-    ))
 
     suspend fun downloadSubtitleItem(
             context: Context
@@ -59,5 +53,22 @@ class SubtitlesDialogFragmentViewModel @Inject constructor(
 
         downloadedSubtitleFileUri
     }
+
+    fun getSubtitleItemDownloadUri(
+            context: Context
+            , openSubtitleItem: OpenSubtitleItem
+            , destinationUri: Uri?
+    ): Uri = Uri.fromFile(File(
+            (destinationUri ?: Uri.fromFile(context.cacheDir)).path
+            , openSubtitleItem.getUniqueName()
+    ))
+
+    private fun OpenSubtitleItem.getUniqueName() =
+            "${IDMovieImdb}_" +
+                    "${IDMovie}_" +
+                    "${IDSubMovieFile}_" +
+                    "${IDSubtitle}_" +
+                    "${IDSubtitleFile}_" +
+                    SubFileName
 
 }

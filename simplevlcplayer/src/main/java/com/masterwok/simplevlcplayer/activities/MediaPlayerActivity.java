@@ -22,6 +22,7 @@ public class MediaPlayerActivity
     public static final String SubtitleUri = BasePlayerFragment.SubtitleUri;
     public static final String SubtitleDestinationUri = BasePlayerFragment.SubtitleDestinationUri;
     public static final String OpenSubtitlesUserAgent = BasePlayerFragment.OpenSubtitlesUserAgent;
+    public static final String SubtitleLanguageCode = BasePlayerFragment.SubtitleLanguageCode;
 
     public LocalPlayerFragment localPlayerFragment;
     public RendererPlayerFragment rendererPlayerFragment;

@@ -27,7 +27,8 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
     companion object {
         const val Tag = "tag.subtitlesdialogfragment"
-        const val OpenSubtitlesUserAgentKey = "key.opensubtitlesuseragentkey"
+        const val OpenSubtitlesUserAgentKey = "key.opensubtitlesuseragent"
+        const val SubtitleLanguageCodeKey = "key.subtitlelanguagecode"
         const val MediaNameKey = "key.medianame"
         const val DestinationUriKey = "key.destinationuri"
 
@@ -35,14 +36,16 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
         @JvmStatic
         fun createInstance(
-                openSubtitlesUserAgent: String?
-                , mediaName: String
+                mediaName: String
+                , openSubtitlesUserAgent: String?
+                , subtitleLanguageCode: String?
                 , subtitleDestinationUri: Uri?
         ): SubtitlesDialogFragment =
                 SubtitlesDialogFragment().apply {
                     arguments = Bundle().apply {
-                        putString(OpenSubtitlesUserAgentKey, openSubtitlesUserAgent)
                         putString(MediaNameKey, mediaName)
+                        putString(OpenSubtitlesUserAgentKey, openSubtitlesUserAgent)
+                        putString(SubtitleLanguageCodeKey, subtitleLanguageCode)
                         putParcelable(DestinationUriKey, subtitleDestinationUri)
                     }
                 }
@@ -56,6 +59,7 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
     private lateinit var mediaName: String
 
     private var openSubtitlesUserAgent: String? = null
+    private var subtitleLanguageCode: String? = null
 
     private val rootJob: AndroidJob = AndroidJob(lifecycle)
 
@@ -110,6 +114,7 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
         linearLayoutSubtitleError.visibility = View.GONE
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -118,10 +123,15 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
         progressBarSubtitles.setColor(R.color.progress_bar_spinner)
 
-        openSubtitlesUserAgent = arguments!!.getString(OpenSubtitlesUserAgentKey)
         mediaName = arguments!!.getString(MediaNameKey)
+        openSubtitlesUserAgent = arguments!!.getString(OpenSubtitlesUserAgentKey)
+        subtitleLanguageCode = arguments!!.getString(SubtitleLanguageCodeKey)
 
-        querySubtitles(openSubtitlesUserAgent, mediaName)
+        querySubtitles(
+                mediaName
+                , openSubtitlesUserAgent
+                , subtitleLanguageCode
+        )
     }
 
     private fun configureListViewAndAdapter() {
@@ -141,13 +151,18 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
     ): View? = dialogView
 
     private fun querySubtitles(
-            openSubtitlesUserAgent: String?
-            , mediaName: String
+            mediaName: String
+            , openSubtitlesUserAgent: String?
+            , subtitleLanguageCode: String?
     ): Job = launch(UI, parent = rootJob) {
         setLoadingViewState()
 
         try {
-            val subtitles = viewModel.querySubtitles(openSubtitlesUserAgent, mediaName)
+            val subtitles = viewModel.querySubtitles(
+                    mediaName
+                    , openSubtitlesUserAgent
+                    , subtitleLanguageCode
+            )
 
             adapterSubtitles.configure(
                     createSubtitleSelectionItemList(subtitles)
@@ -157,7 +172,11 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
         } catch (ex: Exception) {
             setErrorViewState(R.string.dialog_subtitle_error_querying, View.OnClickListener {
                 hideRetryButton()
-                querySubtitles(openSubtitlesUserAgent, mediaName)
+                querySubtitles(
+                        mediaName
+                        , openSubtitlesUserAgent
+                        , subtitleLanguageCode
+                )
             })
         }
     }
@@ -244,7 +263,11 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
         } catch (ex: Exception) {
             setErrorViewState(R.string.dialog_subtitle_error_downloading, View.OnClickListener {
                 hideRetryButton()
-                querySubtitles(openSubtitlesUserAgent, mediaName)
+                querySubtitles(
+                        mediaName
+                        , openSubtitlesUserAgent
+                        , subtitleLanguageCode
+                )
             })
         }
     }

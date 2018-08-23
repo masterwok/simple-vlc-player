@@ -137,16 +137,8 @@ class MainActivity : AppCompatActivity() {
      */
     private fun startMediaPlayerActivity(videoUri: Uri?, subtitleUri: Uri?) =
             startActivity(Intent(this, MediaPlayerActivity::class.java).apply {
-
-                val file = File("/storage/emulated/0/Download/derp.srt")
-
-                val isFile = file.isFile
-
-                val tmp = Uri.fromFile(file)
-                putExtra(MediaPlayerActivity.SubtitleUri, tmp)
-
                 putExtra(MediaPlayerActivity.MediaUri, videoUri)
-//                putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri)
+                putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri)
                 putExtra(MediaPlayerActivity.SubtitleDestinationUri, Uri.fromFile(cacheDir))
 
                 // This should be the User-Agent you registered with opensubtitles.org

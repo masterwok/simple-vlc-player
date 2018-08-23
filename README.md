@@ -46,41 +46,6 @@ dependencies {
     implementation 'com.github.masterwok:simple-vlc-player:1.0.4'
 }
 ```
-unless you're a fan of large APKs, you'll probably want to add the following to the build.gradle of your app so an APK is generated per ABI:
-
-```gradle
-android {
-    ...
-    splits {
-        abi {
-            enable true
-            reset()
-            include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
-            universalApk false
-        }
-    }
-}
-
-// Map for the version code that gives each ABI a value.
-ext.abiCodes = [
-        'armeabi-v7a': 1,
-        'arm64-v8a'  : 2,
-        'x86'        : 3,
-        'x86_64'     : 4
-]
-
-import com.android.build.OutputFile
-
-android.applicationVariants.all { variant ->
-    variant.outputs.each { output ->
-        def baseAbiVersionCode = project.ext.abiCodes.get(output.getFilter(OutputFile.ABI))
-
-        if (baseAbiVersionCode != null) {
-            output.versionCodeOverride = baseAbiVersionCode * 10000000 + variant.versionCode
-        }
-    }
-}
-```
 
 ## Projects using simple-vlc-player
 - [Bit Cast](https://play.google.com/store/apps/details?id=com.masterwok.bitcast)

@@ -17,6 +17,7 @@ import android.support.v4.provider.DocumentFile;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
@@ -212,9 +213,11 @@ public abstract class BasePlayerFragment
             return;
         }
 
-        String mediaName = DocumentFile
+        String mediaName = URLUtil.isContentUrl(mediaUri.toString())
+                ? DocumentFile
                 .fromSingleUri(getContext(), mediaUri)
-                .getName();
+                .getName()
+                : mediaUri.getLastPathSegment();
 
         SubtitlesDialogFragment
                 .createInstance(

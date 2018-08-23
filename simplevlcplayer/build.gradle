@@ -33,7 +33,7 @@ ext {
     version_constraint = '1.1.2'
     version_lifecycle = '1.1.1'
     version_dagger = '2.16'
-    version_coroutines = '0.24.0'
+    version_coroutines = '0.25.0'
 }
 
 dependencies {

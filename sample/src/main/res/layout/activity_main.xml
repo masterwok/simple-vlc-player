@@ -7,7 +7,7 @@
     android:background="@drawable/shape_gradient_rasta">
 
     <android.support.v7.widget.AppCompatButton
-        android:id="@+id/button_play"
+        android:id="@+id/buttonPlay"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_gravity="center_vertical"

@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 27
@@ -41,6 +43,9 @@ ext {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
     implementation "com.android.support:appcompat-v7:$version_support"
     implementation "com.android.support:design:$version_support"
     implementation "com.android.support.constraint:constraint-layout:$version_constraint"
@@ -50,6 +55,7 @@ dependencies {
     implementation "com.nononsenseapps:filepicker:$version_filepicker"
 
     implementation project(path: ':simplevlcplayer')
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 }
 
 // Map for the version code that gives each ABI a value.
@@ -71,4 +77,3 @@ android.applicationVariants.all { variant ->
         }
     }
 }
-

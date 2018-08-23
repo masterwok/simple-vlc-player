@@ -18,7 +18,7 @@ VlcOptionsProvider
         );
 ```
 
-The ```MediaPlayerActivity``` can be started by providing a required media Uri and an optional subtitle Uri. The subtitle Uri must be a local file. Consumers of this library should also supply an [opensubtitles.org User-Agent](http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst) and preferred subtitle language via the intent. As stated in the Open Subtitles documentation, the temporary user agent should only be used during development and testing as it periodically changes.
+The ```MediaPlayerActivity``` can be started by providing a required media Uri and an optional subtitle Uri. The subtitle Uri must be a local file. Consumers of this library should also supply an [opensubtitles.org User-Agent](http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst) and preferred subtitle language via the intent. As stated in the Open Subtitles documentation, **the temporary User-Agent should only be used during development and testing** as it periodically changes.
 
 ```java
 Intent intent = new Intent(this, MediaPlayerActivity.class);
@@ -61,4 +61,6 @@ Please refer to the [VLC FAQ](https://wiki.videolan.org/Frequently_Asked_Questio
 ![Local Playback](/sample/screenshots/localPlayback.jpg?raw=true "Local Playback")
 ![Renderer Item Selection](/sample/screenshots/rendererItemSelection.jpg?raw=true "Renderer Item Selection")
 ![Casting](/sample/screenshots/casting.jpg?raw=true "Casting")
+![Subtitles](/sample/screenshots/subtitles.jpg?raw=true "Subtitles")
+<img src="/sample/screenshots/subtitleSelection.jpg?raw=true" height="600" title="Subtitle Selection Dialog">
 <img src="/sample/screenshots/lockScreenAndNotification.jpg?raw=true" height="600" title="Lock Screen and Notification">

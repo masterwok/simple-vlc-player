@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
         // This should be the User-Agent you registered with opensubtitles.org
         // See: http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst
         intent.putExtra(MediaPlayerActivity.OpenSubtitlesUserAgent, OpenSubtitlesService.TemporaryUserAgent);
-        intent.putExtra(MediaPlayerActivity.SubtitleLanguageCode, SubtitleLanguage.Finnish);
+        intent.putExtra(MediaPlayerActivity.SubtitleLanguageCode, SubtitleLanguage.English);
 
         startActivity(intent);
     }

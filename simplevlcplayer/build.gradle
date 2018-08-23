@@ -27,7 +27,7 @@ android {
 
 ext {
     version_libvlc = '3.0.11'
-    version_open_subtitles = '0.0.2'
+    version_open_subtitles = '0.0.4'
     version_dagger = '2.16'
     version_support = '27.1.1'
     version_constraint = '1.1.2'

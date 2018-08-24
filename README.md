@@ -45,7 +45,7 @@ and add the following in the dependent module:
 
 ```gradle
 dependencies {
-    implementation 'com.github.masterwok:simple-vlc-player:1.1.2'
+    implementation 'com.github.masterwok:simple-vlc-player:1.1.3'
 }
 ```
 

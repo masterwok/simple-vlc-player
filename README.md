@@ -13,6 +13,7 @@ VlcOptionsProvider
         .setOptions(
                 new VlcOptionsProvider.Builder(this)
                         .withSubtitleBackgroundOpacity(255)
+                        .withSubtitleEncoding(SubtitleEncoding.RussianKOI8R)
                         .setVerbose(true)
                         .build()
         );
@@ -25,8 +26,8 @@ Intent intent = new Intent(this, MediaPlayerActivity.class);
 
 intent.putExtra(MediaPlayerActivity.MediaUri, videoUri);
 intent.putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri);
-intent.putExtra(MediaPlayerActivity.OpenSubtitlesUserAgent, OpenSubtitlesService.TemporaryUserAgent)
-intent.putExtra(MediaPlayerActivity.SubtitleLanguageCode, SubtitleLanguage.English)
+intent.putExtra(MediaPlayerActivity.OpenSubtitlesUserAgent, "TemporaryUserAgent")
+intent.putExtra(MediaPlayerActivity.SubtitleLanguageCode, SubtitleLanguage.Russian)
 
 startActivity(intent);
 ```

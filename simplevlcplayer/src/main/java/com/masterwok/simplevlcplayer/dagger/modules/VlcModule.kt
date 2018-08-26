@@ -7,7 +7,6 @@ import com.masterwok.simplevlcplayer.VlcOptionsProvider
 import dagger.Module
 import dagger.Provides
 import org.videolan.libvlc.LibVLC
-import javax.inject.Singleton
 
 
 /**
@@ -16,7 +15,6 @@ import javax.inject.Singleton
 @Module
 class VlcModule {
 
-    @Singleton
     @Provides
     internal fun provideLibVlc(context: Context): LibVLC {
         val appContext = context.applicationContext

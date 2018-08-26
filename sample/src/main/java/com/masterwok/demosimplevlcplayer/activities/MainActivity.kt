@@ -41,12 +41,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestWriteExternalStoragePermission() {
-        if (isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+        if (isPermissionGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             return
         }
 
         appCompatRequestPermissions(
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 , 0
         )
     }
@@ -130,7 +130,8 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, MediaPlayerActivity::class.java).apply {
                 putExtra(MediaPlayerActivity.MediaUri, videoUri)
                 putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri)
-                putExtra(MediaPlayerActivity.SubtitleDestinationUri, Uri.fromFile(cacheDir))
+//                putExtra(MediaPlayerActivity.SubtitleDestinationUri, Uri.fromFile(cacheDir))
+                putExtra(MediaPlayerActivity.SubtitleDestinationUri, Uri.fromFile(Environment.getExternalStorageDirectory()))
 
                 // This should be the User-Agent you registered with opensubtitles.org
                 // See: http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst

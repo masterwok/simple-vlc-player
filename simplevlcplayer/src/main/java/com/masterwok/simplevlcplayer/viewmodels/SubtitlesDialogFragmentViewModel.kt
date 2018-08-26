@@ -63,12 +63,11 @@ class SubtitlesDialogFragmentViewModel @Inject constructor(
             , openSubtitleItem.getUniqueName()
     ))
 
-    private fun OpenSubtitleItem.getUniqueName() =
-            "${IDMovieImdb}_" +
-                    "${IDMovie}_" +
-                    "${IDSubMovieFile}_" +
-                    "${IDSubtitle}_" +
-                    "${IDSubtitleFile}_" +
-                    SubFileName
+    private fun OpenSubtitleItem.getUniqueName(): String = "${IDMovieImdb}_" +
+            "${IDMovie}_" +
+            "${IDSubMovieFile}_" +
+            "${IDSubtitle}_" +
+            "${IDSubtitleFile}_" +
+            "${SubFileName.substringBeforeLast(".")}.$SubLanguageID.$SubFormat"
 
 }

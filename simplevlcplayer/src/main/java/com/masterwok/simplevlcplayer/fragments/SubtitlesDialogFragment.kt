@@ -19,6 +19,7 @@ import com.masterwok.simplevlcplayer.models.SelectionItem
 import com.masterwok.simplevlcplayer.viewmodels.SubtitlesDialogFragmentViewModel
 import kotlinx.android.synthetic.main.dialog_subtitles.*
 import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.JobCancellationException
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import javax.inject.Inject
@@ -175,6 +176,8 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
             )
 
             setLoadedViewState()
+        } catch (ignored: JobCancellationException) {
+            // Nothing to do..
         } catch (ex: Exception) {
             setErrorViewState(R.string.dialog_subtitle_error_querying, View.OnClickListener {
                 hideRetryButton()
@@ -281,6 +284,8 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
 
             serviceBinder?.setSubtitle(subtitleUri)
 
+        } catch (ignored: JobCancellationException) {
+            // Nothing to do..
         } catch (ex: Exception) {
             setErrorViewState(R.string.dialog_subtitle_error_downloading, View.OnClickListener {
                 hideRetryButton()

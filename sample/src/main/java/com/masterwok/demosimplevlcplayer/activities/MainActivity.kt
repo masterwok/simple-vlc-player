@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
         if (permissionWasDenied) {
             // Required to read local subtitles in external storage.
-            throw Exception("READ_EXTERNAL_STORAGE permission must be granted to run demo.")
+            throw Exception("WRITE_EXTERNAL_STORAGE permission must be granted to run demo.")
         }
     }
 

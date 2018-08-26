@@ -122,7 +122,7 @@ public class LocalPlayerFragment
 
     @Override
     protected void onConnected() {
-        startPlayback(subtitleUri != null);
+        startPlayback();
     }
 
     @Override
@@ -234,7 +234,7 @@ public class LocalPlayerFragment
         surfaceMedia.addOnLayoutChangeListener(surfaceLayoutListener);
     }
 
-    private void startPlayback(boolean setSubtitles) {
+    private void startPlayback() {
         if (serviceBinder == null) {
             return;
         }
@@ -245,12 +245,10 @@ public class LocalPlayerFragment
 
         serviceBinder.setMedia(getContext(), mediaUri);
 
-        if (setSubtitles) {
-            if(setProvidedSubtitle) {
-                serviceBinder.setSubtitle(subtitleUri);
-            } else {
-                serviceBinder.setSubtitle(serviceBinder.getSelectedSubtitleUri());
-            }
+        if (setProvidedSubtitle) {
+            serviceBinder.setSubtitle(subtitleUri);
+        } else {
+            serviceBinder.setSubtitle(serviceBinder.getSelectedSubtitleUri());
         }
 
         if (resumeIsPlaying) {
@@ -282,7 +280,7 @@ public class LocalPlayerFragment
 
     @Override
     public void onSubtitlesCleared() {
-        startPlayback(false);
+        startPlayback();
     }
 
     @Override

@@ -12,10 +12,10 @@ import android.support.v7.app.AppCompatActivity
 import com.masterwok.demosimplevlcplayer.R
 import com.masterwok.demosimplevlcplayer.extensions.appCompatRequestPermissions
 import com.masterwok.demosimplevlcplayer.extensions.isPermissionGranted
-import com.masterwok.opensubtitlesandroid.SubtitleLanguage
-import com.masterwok.opensubtitlesandroid.services.OpenSubtitlesService
 import com.masterwok.simplevlcplayer.VlcOptionsProvider
 import com.masterwok.simplevlcplayer.activities.MediaPlayerActivity
+import com.masterwok.simplevlcplayer.constants.SubtitleEncoding
+import com.masterwok.simplevlcplayer.constants.SubtitleLanguage
 import com.nononsenseapps.filepicker.FilePickerActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -30,14 +30,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         requestWriteExternalStoragePermission()
-        bindViewComponents()
         subscribeToViewComponents()
 
-
         // VlcOptionsProvider can be used to provide LibVlc initialization options.
-        VlcOptionsProvider
-                .getInstance().options = VlcOptionsProvider.Builder(this)
+        VlcOptionsProvider.getInstance().options = VlcOptionsProvider
+                .Builder(this)
                 .setVerbose(true)
+                .withSubtitleEncoding(SubtitleEncoding.RussianKOI8R)
                 .build()
     }
 
@@ -63,13 +62,6 @@ class MainActivity : AppCompatActivity() {
             // Required to read local subtitles in external storage.
             throw Exception("READ_EXTERNAL_STORAGE permission must be granted to run demo.")
         }
-    }
-
-    /**
-     * Bind view components to private fields.
-     */
-    private fun bindViewComponents() {
-        //        buttonPlay = findViewById(R.id.button_play);
     }
 
     /**
@@ -142,7 +134,7 @@ class MainActivity : AppCompatActivity() {
 
                 // This should be the User-Agent you registered with opensubtitles.org
                 // See: http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst
-                putExtra(MediaPlayerActivity.OpenSubtitlesUserAgent, OpenSubtitlesService.TemporaryUserAgent)
-                putExtra(MediaPlayerActivity.SubtitleLanguageCode, SubtitleLanguage.English)
+                putExtra(MediaPlayerActivity.OpenSubtitlesUserAgent, "TemporaryUserAgent")
+                putExtra(MediaPlayerActivity.SubtitleLanguageCode, SubtitleLanguage.Russian)
             })
 }

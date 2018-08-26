@@ -55,7 +55,7 @@ dependencies {
     implementation "com.github.masterwok:libvlc-android-sdk:$version_libvlc"
 
     // Open Subtitles Android (exposed as API so consumers can use SubtitleLanguage class).
-    api "com.github.masterwok:open-subtitles-android:$version_open_subtitles"
+    implementation "com.github.masterwok:open-subtitles-android:$version_open_subtitles"
 
     // View Model and LiveData
     implementation "android.arch.lifecycle:extensions:$version_lifecycle"

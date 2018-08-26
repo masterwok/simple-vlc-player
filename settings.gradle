@@ -1,1 +1,4 @@
 include ':sample', ':simplevlcplayer'
+
+include ':opensubtitlesandroid'
+project(':opensubtitlesandroid').projectDir=new File('/home/masterwok/projects/open-subtitles-android/opensubtitlesandroid')

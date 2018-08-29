@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.StringRes
+import android.support.v4.app.FragmentManager
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
@@ -296,6 +297,12 @@ class SubtitlesDialogFragment : MediaPlayerServiceDialogFragment() {
                 )
             })
         }
+    }
+
+    override fun show(manager: FragmentManager?, tag: String?) {
+        val transaction = manager?.beginTransaction()
+        transaction?.add(this, tag)
+        transaction?.commitAllowingStateLoss()
     }
 
 }

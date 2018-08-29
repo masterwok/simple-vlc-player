@@ -41,8 +41,8 @@ abstract class BasePlayerFragment : InjectableFragment()
     }
 
     protected var serviceBinder: MediaPlayerServiceBinder? = null
-    protected var mediaController: MediaControllerCompat? = null
 
+    private var mediaController: MediaControllerCompat? = null
     private var subtitleDestinationUri: Uri? = null
     private var openSubtitlesUserAgent: String? = null
     private var subtitleLanguageCode: String? = null

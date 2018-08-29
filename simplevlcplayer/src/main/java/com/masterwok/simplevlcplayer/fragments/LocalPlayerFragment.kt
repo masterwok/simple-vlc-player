@@ -275,11 +275,11 @@ class LocalPlayerFragment : BasePlayerFragment()
                     val ar = videoW / videoH.toFloat()
                     val dar = displayW / displayH.toFloat()
 
-                    val scale: Float
-                    if (dar >= ar)
-                        scale = displayW / videoW.toFloat() /* horizontal */
+                    val scale: Float = if (dar >= ar)
+                        displayW / videoW.toFloat() /* horizontal */
                     else
-                        scale = displayH / videoH.toFloat() /* vertical */
+                        displayH / videoH.toFloat() /* vertical */
+
                     serviceBinder?.setScale(scale)
                     serviceBinder?.setAspectRatio(null)
                 } else {
@@ -401,9 +401,9 @@ class LocalPlayerFragment : BasePlayerFragment()
         // set display size
         lp.width = Math.ceil(dw * mVideoWidth / mVideoVisibleWidth).toInt()
         lp.height = Math.ceil(dh * mVideoHeight / mVideoVisibleHeight).toInt()
-        surfaceViewMedia.setLayoutParams(lp)
+        surfaceViewMedia.layoutParams = lp
         if (surfaceViewSubtitle != null)
-            surfaceViewSubtitle.setLayoutParams(lp)
+            surfaceViewSubtitle.layoutParams = lp
 
         // set frame size (crop if necessary)
         lp = frameLayoutVideoSurface.layoutParams

@@ -1,6 +1,7 @@
 package com.masterwok.simplevlcplayer.fragments;
 
 import android.app.Activity;
+import android.arch.lifecycle.Lifecycle;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -214,9 +215,7 @@ public abstract class BasePlayerFragment
         }
 
         String mediaName = URLUtil.isContentUrl(mediaUri.toString())
-                ? DocumentFile
-                .fromSingleUri(getContext(), mediaUri)
-                .getName()
+                ? DocumentFile.fromSingleUri(getContext(), mediaUri).getName()
                 : mediaUri.getLastPathSegment();
 
         SubtitlesDialogFragment

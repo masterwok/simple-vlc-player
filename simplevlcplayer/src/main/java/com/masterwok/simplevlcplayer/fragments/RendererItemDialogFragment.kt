@@ -2,6 +2,7 @@ package com.masterwok.simplevlcplayer.fragments
 
 import android.app.Dialog
 import android.os.Bundle
+import android.support.v4.app.FragmentManager
 import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
@@ -138,6 +139,12 @@ class RendererItemDialogFragment : MediaPlayerServiceDialogFragment() {
                 ?.deleteObserver(rendererItemObserver)
 
         super.onStop()
+    }
+
+    override fun show(manager: FragmentManager?, tag: String?) {
+        val transaction = manager?.beginTransaction()
+        transaction?.add(this, tag)
+        transaction?.commitAllowingStateLoss()
     }
 
 }

@@ -9,7 +9,7 @@
     android:keepScreenOn="true">
 
     <FrameLayout
-        android:id="@+id/video_surface_frame"
+        android:id="@+id/frameLayoutVideoSurface"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
@@ -17,19 +17,19 @@
         tools:ignore="true">
 
         <SurfaceView
-            android:id="@+id/surface_media"
+            android:id="@+id/surfaceViewMedia"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
         <SurfaceView
-            android:id="@+id/surface_subtitle"
+            android:id="@+id/surfaceViewSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
     </FrameLayout>
 
     <com.masterwok.simplevlcplayer.components.PlayerControlComponent
-        android:id="@+id/component_player"
+        android:id="@+id/componentPlayerControl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:hasSelectedRenderer="false"/>

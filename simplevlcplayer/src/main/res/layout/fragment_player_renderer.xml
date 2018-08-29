@@ -17,7 +17,7 @@
         tools:ignore="VectorDrawableCompat"/>
 
     <com.masterwok.simplevlcplayer.components.PlayerControlComponent
-        android:id="@+id/component_player"
+        android:id="@+id/componentPlayerControl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:hasSelectedRenderer="true"/>

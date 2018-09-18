@@ -47,7 +47,7 @@ class MediaPlayerServiceBinder constructor(
     var vOut: IVLCVout? = null
         get() = serviceWeakReference
                 .get()
-                ?.vout
+                ?.vOut
 
     fun setMedia(context: Context, mediaUri: Uri) = serviceWeakReference
             .get()

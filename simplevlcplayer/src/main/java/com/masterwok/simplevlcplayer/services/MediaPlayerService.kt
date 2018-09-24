@@ -166,7 +166,7 @@ class MediaPlayerService : InjectableService(), MediaPlayer.Callback, Dialog.Cal
         player?.callback = this
 
         rendererItemObservable = RendererItemObservable(libVlc)
-        rendererItemObservable!!.start()
+        rendererItemObservable?.start()
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
@@ -180,9 +180,9 @@ class MediaPlayerService : InjectableService(), MediaPlayer.Callback, Dialog.Cal
         stopForeground(true)
         Dialog.setCallbacks(libVlc, null)
         player?.release()
-        libVlc!!.release()
-        mediaSession!!.release()
-        rendererItemObservable!!.stop()
+        libVlc?.release()
+        mediaSession?.release()
+        rendererItemObservable?.stop()
         binder = null
         player = null
         libVlc = null
@@ -586,7 +586,7 @@ class MediaPlayerService : InjectableService(), MediaPlayer.Callback, Dialog.Cal
     }
 
     private fun abandonAudioFocus() {
-        audioManager!!.abandonAudioFocus(audioFocusChangeListener!!.get())
+        audioManager?.abandonAudioFocus(audioFocusChangeListener!!.get())
     }
 
     fun setTime(time: Long) {

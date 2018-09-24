@@ -38,13 +38,6 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
         }
     }
 
-    val mediaPlayerServiceIntent: Intent
-        get() = Intent(
-                applicationContext,
-                MediaPlayerService::class.java
-        )
-
-
     private fun showLocalPlayerFragment() {
         rendererPlayerFragment = null
         localPlayerFragment = LocalPlayerFragment()
@@ -74,12 +67,12 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
 
         registerRendererBroadcastReceiver()
 
-        startService(mediaPlayerServiceIntent)
+        startService(Intent(applicationContext, MediaPlayerService::class.java))
     }
 
     override fun onBackPressed() {
         // Always ensure that we stop the media player service when navigating back.
-        stopService(mediaPlayerServiceIntent)
+        stopService(Intent(applicationContext, MediaPlayerService::class.java))
 
         super.onBackPressed()
     }

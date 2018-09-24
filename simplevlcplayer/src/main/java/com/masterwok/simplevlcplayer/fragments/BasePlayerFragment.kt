@@ -114,6 +114,7 @@ abstract class BasePlayerFragment : InjectableFragment()
     override fun onStart() {
         super.onStart()
 
+        readIntent()
         bindMediaPlayerService()
     }
 
@@ -123,12 +124,6 @@ abstract class BasePlayerFragment : InjectableFragment()
         unbindMediaPlayerService()
 
         super.onStop()
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        readIntent()
     }
 
     private fun readIntent() {

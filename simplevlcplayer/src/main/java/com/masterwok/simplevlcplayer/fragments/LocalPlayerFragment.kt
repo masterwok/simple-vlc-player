@@ -169,7 +169,7 @@ class LocalPlayerFragment : BasePlayerFragment()
 
     private val handler = Handler()
 
-    val surfaceLayoutListener = object : View.OnLayoutChangeListener {
+    private val surfaceLayoutListener = object : View.OnLayoutChangeListener {
         private val mRunnable = { updateVideoSurfaces() }
 
         override fun onLayoutChange(

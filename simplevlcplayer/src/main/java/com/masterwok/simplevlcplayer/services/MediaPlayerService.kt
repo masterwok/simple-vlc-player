@@ -169,7 +169,11 @@ class MediaPlayerService : InjectableService(), MediaPlayer.Callback, Dialog.Cal
         rendererItemObservable?.start()
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+            intent: Intent?
+            , flags: Int
+            , startId: Int
+    ): Int {
         // Pass notification button intents to the media session callback.
         MediaButtonReceiver.handleIntent(mediaSession, intent)
 

@@ -1,9 +1,6 @@
 package com.masterwok.simplevlcplayer.dagger.modules
 
-import com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment
-import com.masterwok.simplevlcplayer.fragments.RendererItemDialogFragment
-import com.masterwok.simplevlcplayer.fragments.RendererPlayerFragment
-import com.masterwok.simplevlcplayer.fragments.SubtitlesDialogFragment
+import com.masterwok.simplevlcplayer.fragments.*
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -13,10 +10,10 @@ import dagger.android.ContributesAndroidInjector
 abstract class FragmentModule {
 
     @ContributesAndroidInjector
-    abstract fun contributesLocalPlayerFragment(): LocalPlayerFragment
+    internal abstract fun contributesLocalPlayerFragment(): LocalPlayerFragment
 
     @ContributesAndroidInjector
-    abstract fun contributesRendererPlayerFragment(): RendererPlayerFragment
+    internal abstract fun contributesRendererPlayerFragment(): CastPlayerFragment
 
     @ContributesAndroidInjector
     abstract fun contributesSubtitlesDialogFragment(): SubtitlesDialogFragment

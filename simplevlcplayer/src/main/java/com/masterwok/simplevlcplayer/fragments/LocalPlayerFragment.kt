@@ -1,7 +1,11 @@
 package com.masterwok.simplevlcplayer.fragments
 
+import android.annotation.TargetApi
+import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
 import android.support.v4.app.BundleCompat
 import android.support.v4.app.Fragment
@@ -9,21 +13,46 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.masterwok.simplevlcplayer.R
+import com.masterwok.simplevlcplayer.common.utils.ResourceUtil
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent
+import com.masterwok.simplevlcplayer.constants.SizePolicy
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer
 import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder
+import kotlinx.android.synthetic.main.fragment_player_local.*
+import org.videolan.libvlc.IVLCVout
+import org.videolan.libvlc.Media
 
 
 internal class LocalPlayerFragment : Fragment()
         , PlayerControlComponent.Callback
-        , MediaPlayer.Callback {
+        , MediaPlayer.Callback
+        , IVLCVout.OnNewVideoLayoutListener {
 
-    private val serviceBinder: IBinder? get() = BundleCompat.getBinder(arguments!!, MediaPlayerServiceBinder)
+    private val serviceBinder: MediaPlayerServiceBinder?
+        get() = BundleCompat.getBinder(
+                arguments!!
+                , MediaPlayerServiceBinder
+        ) as? MediaPlayerServiceBinder
+
     private val mediaUri: Uri get() = arguments!!.getParcelable(MediaUriKey)
     private val subtitleUri: Uri? get() = arguments!!.getParcelable(SubtitleUriKey)
     private val subtitleDestinationUri: Uri get() = arguments!!.getParcelable(SubtitleDestinationUriKey)
     private val subtitleLanguageCode: String get() = arguments!!.getString(SubtitleLanguageCodeKey)
     private val openSubtitlesUserAgent: String get() = arguments!!.getString(OpenSubtitlesUserAgentKey)
+
+    private var sizePolicy: SizePolicy = SizePolicy.SURFACE_BEST_FIT
+    private var mVideoHeight = 0
+    private var mVideoWidth = 0
+    private var mVideoVisibleHeight = 0
+    private var mVideoVisibleWidth = 0
+    private var mVideoSarNum = 0
+    private var mVideoSarDen = 0
+    private var setProvidedSubtitle = true
+    private var resumeIsPlaying = true
+    private var resumeLength: Long = 0
+    private var resumeTime: Long = 0
+
+    private val handler = Handler()
 
     companion object {
 
@@ -55,6 +84,30 @@ internal class LocalPlayerFragment : Fragment()
         }
     }
 
+    private val surfaceLayoutListener = object : View.OnLayoutChangeListener {
+        private val mRunnable = { updateVideoSurfaces() }
+
+        override fun onLayoutChange(
+                v: View,
+                left: Int,
+                top: Int,
+                right: Int,
+                bottom: Int,
+                oldLeft: Int,
+                oldTop: Int,
+                oldRight: Int,
+                oldBottom: Int
+        ) {
+            if (left != oldLeft
+                    || top != oldTop
+                    || right != oldRight
+                    || bottom != oldBottom) {
+                handler.removeCallbacks(mRunnable)
+                handler.post(mRunnable)
+            }
+        }
+    }
+
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -65,69 +118,287 @@ internal class LocalPlayerFragment : Fragment()
             false
     )
 
+    override fun onStart() {
+        super.onStart()
+
+        startPlayback()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        updateVideoSurfaces()
+    }
+
+    private fun attachSurfaces() {
+        if (serviceBinder?.vOut?.areViewsAttached() == true) {
+            return
+        }
+
+        serviceBinder?.attachSurfaces(
+                surfaceViewMedia
+                , surfaceViewSubtitle
+                , this
+        )
+    }
+
+    private fun startPlayback() {
+        surfaceViewMedia.addOnLayoutChangeListener(surfaceLayoutListener)
+
+        attachSurfaces()
+        updateVideoSurfaces()
+
+        serviceBinder?.setMedia(
+                requireContext()
+                , mediaUri
+        )
+
+        if (setProvidedSubtitle) {
+            serviceBinder?.setSubtitle(subtitleUri)
+        } else {
+            serviceBinder?.setSubtitle(serviceBinder?.selectedSubtitleUri)
+        }
+
+        if (resumeIsPlaying) {
+            serviceBinder?.play()
+        }
+    }
+
     override fun onPlayPauseButtonClicked() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onCastButtonClicked() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onProgressChanged(progress: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onProgressChangeStarted() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onSubtitlesButtonClicked() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onPlayerOpening() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onPlayerSeekStateChange(canSeek: Boolean) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onPlayerPlaying() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onPlayerPaused() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onPlayerStopped() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onPlayerEndReached() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onPlayerError() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onPlayerTimeChange(timeChanged: Long) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onBuffering(buffering: Float) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onPlayerPositionChanged(positionChanged: Float) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onSubtitlesCleared() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+    private fun changeMediaPlayerLayout(displayW: Int, displayH: Int) {
+        /* Change the video placement using the MediaPlayer API */
+        when (sizePolicy) {
+            SizePolicy.SURFACE_BEST_FIT -> {
+                serviceBinder?.setAspectRatio(null)
+                serviceBinder?.setScale(0f)
+            }
+            SizePolicy.SURFACE_FIT_SCREEN, SizePolicy.SURFACE_FILL -> {
+                val videoTrack = serviceBinder?.currentVideoTrack ?: return
+                val videoSwapped = videoTrack.orientation == Media.VideoTrack.Orientation.LeftBottom || videoTrack.orientation == Media.VideoTrack.Orientation.RightTop
+                if (sizePolicy == SizePolicy.SURFACE_FIT_SCREEN) {
+                    var videoW = videoTrack.width
+                    var videoH = videoTrack.height
+
+                    if (videoSwapped) {
+                        val swap = videoW
+                        videoW = videoH
+                        videoH = swap
+                    }
+                    if (videoTrack.sarNum != videoTrack.sarDen)
+                        videoW = videoW * videoTrack.sarNum / videoTrack.sarDen
+
+                    val ar = videoW / videoH.toFloat()
+                    val dar = displayW / displayH.toFloat()
+
+                    val scale: Float = if (dar >= ar)
+                        displayW / videoW.toFloat() /* horizontal */
+                    else
+                        displayH / videoH.toFloat() /* vertical */
+
+                    serviceBinder?.setScale(scale)
+                    serviceBinder?.setAspectRatio(null)
+                } else {
+                    serviceBinder?.setScale(0f)
+                    serviceBinder?.setAspectRatio(if (!videoSwapped)
+                        "$displayW:$displayH"
+                    else
+                        "$displayH:$displayW")
+                }
+            }
+            SizePolicy.SURFACE_16_9 -> {
+                serviceBinder?.setAspectRatio("16:9")
+                serviceBinder?.setScale(0f)
+            }
+            SizePolicy.SURFACE_4_3 -> {
+                serviceBinder?.setAspectRatio("4:3")
+                serviceBinder?.setScale(0f)
+            }
+            SizePolicy.SURFACE_ORIGINAL -> {
+                serviceBinder?.setAspectRatio(null)
+                serviceBinder?.setScale(1f)
+            }
+        }
+    }
+
+
+    private fun updateVideoSurfaces() {
+        if (serviceBinder == null) {
+            return
+        }
+
+        val activity = requireActivity()
+
+        val sw = activity.window.decorView.width
+        val sh = activity.window.decorView.height
+
+        // sanity check
+        if (sw * sh == 0) {
+            return
+        }
+
+        serviceBinder!!.vOut!!.setWindowSize(sw, sh)
+
+        var lp = surfaceViewMedia.layoutParams
+
+        if (mVideoWidth * mVideoHeight == 0) {
+            /* Case of OpenGL vouts: handles the placement of the video using MediaPlayer API */
+            lp.width = ViewGroup.LayoutParams.MATCH_PARENT
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT
+            surfaceViewMedia.layoutParams = lp
+            lp = frameLayoutVideoSurface.layoutParams
+            lp.width = ViewGroup.LayoutParams.MATCH_PARENT
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT
+            frameLayoutVideoSurface.layoutParams = lp
+            changeMediaPlayerLayout(sw, sh)
+            return
+        }
+
+        if (lp.width == lp.height && lp.width == ViewGroup.LayoutParams.MATCH_PARENT) {
+            /* We handle the placement of the video using Android View LayoutParams */
+            serviceBinder!!.setAspectRatio(null)
+            serviceBinder!!.setScale(0f)
+        }
+
+        var dw = sw.toDouble()
+        var dh = sh.toDouble()
+        val isPortrait = ResourceUtil.deviceIsPortraitOriented(context)
+
+        if (sw > sh && isPortrait || sw < sh && !isPortrait) {
+            dw = sh.toDouble()
+            dh = sw.toDouble()
+        }
+
+        // compute the aspect ratio
+        var ar: Double
+        val vw: Double
+        if (mVideoSarDen == mVideoSarNum) {
+            /* No indication about the density, assuming 1:1 */
+            vw = mVideoVisibleWidth.toDouble()
+            ar = mVideoVisibleWidth.toDouble() / mVideoVisibleHeight.toDouble()
+        } else {
+            /* Use the specified aspect ratio */
+            vw = mVideoVisibleWidth * mVideoSarNum.toDouble() / mVideoSarDen
+            ar = vw / mVideoVisibleHeight
+        }
+
+        // compute the display aspect ratio
+        val dar = dw / dh
+
+        when (sizePolicy) {
+            SizePolicy.SURFACE_BEST_FIT -> if (dar < ar)
+                dh = dw / ar
+            else
+                dw = dh * ar
+            SizePolicy.SURFACE_FIT_SCREEN -> if (dar >= ar)
+                dh = dw / ar /* horizontal */
+            else
+                dw = dh * ar /* vertical */
+            SizePolicy.SURFACE_FILL -> {
+            }
+            SizePolicy.SURFACE_16_9 -> {
+                ar = 16.0 / 9.0
+                if (dar < ar)
+                    dh = dw / ar
+                else
+                    dw = dh * ar
+            }
+            SizePolicy.SURFACE_4_3 -> {
+                ar = 4.0 / 3.0
+                if (dar < ar)
+                    dh = dw / ar
+                else
+                    dw = dh * ar
+            }
+            SizePolicy.SURFACE_ORIGINAL -> {
+                dh = mVideoVisibleHeight.toDouble()
+                dw = vw
+            }
+        }
+
+        // set display size
+        lp.width = Math.ceil(dw * mVideoWidth / mVideoVisibleWidth).toInt()
+        lp.height = Math.ceil(dh * mVideoHeight / mVideoVisibleHeight).toInt()
+        surfaceViewMedia.layoutParams = lp
+        if (surfaceViewSubtitle != null)
+            surfaceViewSubtitle.layoutParams = lp
+
+        // set frame size (crop if necessary)
+        lp = frameLayoutVideoSurface.layoutParams
+        lp.width = Math.floor(dw).toInt()
+        lp.height = Math.floor(dh).toInt()
+        frameLayoutVideoSurface.layoutParams = lp
+
+        surfaceViewMedia.invalidate()
+        if (surfaceViewSubtitle != null)
+            surfaceViewSubtitle.invalidate()
+    }
+
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    override fun onNewVideoLayout(
+            vOut: IVLCVout,
+            width: Int,
+            height: Int,
+            visibleWidth: Int,
+            visibleHeight: Int,
+            sarNum: Int,
+            sarDen: Int
+    ) {
+        mVideoWidth = width
+        mVideoHeight = height
+        mVideoVisibleWidth = visibleWidth
+        mVideoVisibleHeight = visibleHeight
+        mVideoSarNum = sarNum
+        mVideoSarDen = sarDen
+        updateVideoSurfaces()
+    }
+
 }
 
 

@@ -46,11 +46,37 @@ class LocalPlayerFragment : BasePlayerFragment()
     private var resumeLength: Long = 0
     private var resumeTime: Long = 0
 
+    private val handler = Handler()
+
     private val becomingNoisyReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY == intent.action) {
                 // Pause playback whenever the user pulls out ( ͡° ͜ʖ ͡°)
                 serviceBinder?.pause()
+            }
+        }
+    }
+
+    private val surfaceLayoutListener = object : View.OnLayoutChangeListener {
+        private val mRunnable = { updateVideoSurfaces() }
+
+        override fun onLayoutChange(
+                v: View,
+                left: Int,
+                top: Int,
+                right: Int,
+                bottom: Int,
+                oldLeft: Int,
+                oldTop: Int,
+                oldRight: Int,
+                oldBottom: Int
+        ) {
+            if (left != oldLeft
+                    || top != oldTop
+                    || right != oldRight
+                    || bottom != oldBottom) {
+                handler.removeCallbacks(mRunnable)
+                handler.post(mRunnable)
             }
         }
     }
@@ -69,7 +95,6 @@ class LocalPlayerFragment : BasePlayerFragment()
 
         context?.unregisterReceiver(becomingNoisyReceiver)
     }
-
 
     override fun configure(
             isPlaying: Boolean,
@@ -107,33 +132,6 @@ class LocalPlayerFragment : BasePlayerFragment()
         subscribeToViewComponents()
     }
 
-    override fun onPause() {
-        stopPlayback()
-
-        super.onPause()
-    }
-
-
-    private fun stopPlayback() {
-        surfaceViewSubtitle.removeOnLayoutChangeListener(surfaceLayoutListener)
-
-        updateResumeState()
-        serviceBinder?.stop()
-        detachSurfaces()
-    }
-
-    private fun updateResumeState() {
-        val activity = activity ?: return
-
-        val playbackState = MediaControllerCompat
-                .getMediaController(activity)
-                .playbackState
-
-        resumeIsPlaying = playbackState.state == PlaybackStateCompat.STATE_PLAYING
-        resumeTime = playbackState.position
-        resumeLength = playbackState.bufferedPosition
-    }
-
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         updateVideoSurfaces()
@@ -154,7 +152,10 @@ class LocalPlayerFragment : BasePlayerFragment()
         attachSurfaces()
         updateVideoSurfaces()
 
-        serviceBinder?.setMedia(context!!, mediaUri!!)
+        serviceBinder?.setMedia(
+                requireContext()
+                , mediaUri!!
+        )
 
         if (setProvidedSubtitle) {
             serviceBinder?.setSubtitle(subtitleUri)
@@ -164,32 +165,6 @@ class LocalPlayerFragment : BasePlayerFragment()
 
         if (resumeIsPlaying) {
             serviceBinder?.play()
-        }
-    }
-
-    private val handler = Handler()
-
-    private val surfaceLayoutListener = object : View.OnLayoutChangeListener {
-        private val mRunnable = { updateVideoSurfaces() }
-
-        override fun onLayoutChange(
-                v: View,
-                left: Int,
-                top: Int,
-                right: Int,
-                bottom: Int,
-                oldLeft: Int,
-                oldTop: Int,
-                oldRight: Int,
-                oldBottom: Int
-        ) {
-            if (left != oldLeft
-                    || top != oldTop
-                    || right != oldRight
-                    || bottom != oldBottom) {
-                handler.removeCallbacks(mRunnable)
-                handler.post(mRunnable)
-            }
         }
     }
 
@@ -221,6 +196,32 @@ class LocalPlayerFragment : BasePlayerFragment()
         outState.putLong(LengthKey, resumeLength)
 
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onPause() {
+        stopPlayback()
+
+        super.onPause()
+    }
+
+    private fun stopPlayback() {
+        surfaceViewSubtitle.removeOnLayoutChangeListener(surfaceLayoutListener)
+
+        updateResumeState()
+        serviceBinder?.stop()
+        detachSurfaces()
+    }
+
+    private fun updateResumeState() {
+        val activity = activity ?: return
+
+        val playbackState = MediaControllerCompat
+                .getMediaController(activity)
+                .playbackState
+
+        resumeIsPlaying = playbackState.state == PlaybackStateCompat.STATE_PLAYING
+        resumeTime = playbackState.position
+        resumeLength = playbackState.bufferedPosition
     }
 
 
@@ -311,8 +312,10 @@ class LocalPlayerFragment : BasePlayerFragment()
             return
         }
 
-        val sw = activity!!.window.decorView.width
-        val sh = activity!!.window.decorView.height
+        val activity = requireActivity()
+
+        val sw = activity.window.decorView.width
+        val sh = activity.window.decorView.height
 
         // sanity check
         if (sw * sh == 0) {
@@ -321,17 +324,17 @@ class LocalPlayerFragment : BasePlayerFragment()
 
         serviceBinder!!.vOut!!.setWindowSize(sw, sh)
 
-        var lp = surfaceViewMedia.getLayoutParams()
+        var lp = surfaceViewMedia.layoutParams
 
         if (mVideoWidth * mVideoHeight == 0) {
             /* Case of OpenGL vouts: handles the placement of the video using MediaPlayer API */
             lp.width = ViewGroup.LayoutParams.MATCH_PARENT
             lp.height = ViewGroup.LayoutParams.MATCH_PARENT
-            surfaceViewMedia.setLayoutParams(lp)
-            lp = frameLayoutVideoSurface.getLayoutParams()
+            surfaceViewMedia.layoutParams = lp
+            lp = frameLayoutVideoSurface.layoutParams
             lp.width = ViewGroup.LayoutParams.MATCH_PARENT
             lp.height = ViewGroup.LayoutParams.MATCH_PARENT
-            frameLayoutVideoSurface.setLayoutParams(lp)
+            frameLayoutVideoSurface.layoutParams = lp
             changeMediaPlayerLayout(sw, sh)
             return
         }

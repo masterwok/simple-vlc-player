@@ -18,6 +18,7 @@ import android.widget.FrameLayout
 import android.widget.ProgressBar
 import com.masterwok.simplevlcplayer.R
 import com.masterwok.simplevlcplayer.common.AndroidJob
+import com.masterwok.simplevlcplayer.common.extensions.getName
 import com.masterwok.simplevlcplayer.common.extensions.setColor
 import com.masterwok.simplevlcplayer.common.utils.ResourceUtil
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent
@@ -143,6 +144,8 @@ abstract class BasePlayerFragment : InjectableFragment()
     }
 
     private fun initProgressBar() {
+        val context = requireContext()
+
         progressBar = ProgressBar(
                 context
                 , null
@@ -153,8 +156,8 @@ abstract class BasePlayerFragment : InjectableFragment()
         }
 
         val params = FrameLayout.LayoutParams(
-                ResourceUtil.getDimenDp(context!!, R.dimen.player_spinner_width),
-                ResourceUtil.getDimenDp(context!!, R.dimen.player_spinner_height)
+                ResourceUtil.getDimenDp(context, R.dimen.player_spinner_width),
+                ResourceUtil.getDimenDp(context, R.dimen.player_spinner_height)
         ).apply {
             gravity = Gravity.CENTER
         }
@@ -194,18 +197,11 @@ abstract class BasePlayerFragment : InjectableFragment()
             RendererItemDialogFragment.Tag
     )
 
-
     override fun onSubtitlesButtonClicked() {
         val fragmentManager = fragmentManager ?: return
 
-        val mediaName = if (URLUtil.isContentUrl(mediaUri.toString()))
-            DocumentFile.fromSingleUri(context, mediaUri).name
-        else {
-            mediaUri?.lastPathSegment
-        }
-
         SubtitlesDialogFragment.createInstance(
-                mediaName!!
+                mediaUri.getName(requireContext())
                 , subtitleUri
                 , openSubtitlesUserAgent
                 , subtitleLanguageCode

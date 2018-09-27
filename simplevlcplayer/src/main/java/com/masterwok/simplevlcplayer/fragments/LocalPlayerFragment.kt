@@ -170,12 +170,11 @@ internal class LocalPlayerFragment : Fragment()
         resumeTime = savedInstanceState.getLong(TimeKey, 0)
         resumeLength = savedInstanceState.getLong(LengthKey, 0)
 
-        // TODO: Reconfigure LocalPlayerFragment UI on resume.
-//        configure(
-//                resumeIsPlaying,
-//                resumeTime,
-//                resumeLength
-//        )
+        configure(
+                resumeIsPlaying,
+                resumeTime,
+                resumeLength
+        )
     }
 
     private fun updateResumeState() {
@@ -233,6 +232,16 @@ internal class LocalPlayerFragment : Fragment()
             serviceBinder?.play()
         }
     }
+
+    fun configure(
+            isPlaying: Boolean,
+            time: Long,
+            length: Long
+    ) = componentPlayerControl.configure(
+            isPlaying,
+            time,
+            length
+    )
 
     override fun onPlayPauseButtonClicked() {
     }

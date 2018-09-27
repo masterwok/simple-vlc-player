@@ -96,8 +96,6 @@ abstract class BasePlayerFragment : InjectableFragment()
     }
 
     private fun registerMediaController(serviceBinder: MediaPlayerServiceBinder?) {
-        val activity = activity
-
         if (activity == null || serviceBinder == null) {
             return
         }
@@ -109,7 +107,7 @@ abstract class BasePlayerFragment : InjectableFragment()
             registerCallback(controllerCallback)
         }
 
-        MediaControllerCompat.setMediaController(activity, mediaController)
+        MediaControllerCompat.setMediaController(activity!!, mediaController)
     }
 
     override fun onStart() {

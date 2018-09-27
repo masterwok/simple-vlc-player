@@ -254,6 +254,12 @@ internal class LocalPlayerFragment : Fragment()
             length
     )
 
+    fun configure(state: PlaybackStateCompat) = configure(
+            state.state == PlaybackStateCompat.STATE_PLAYING,
+            state.position,
+            state.bufferedPosition
+    )
+
     override fun onPlayPauseButtonClicked() {
         serviceBinder?.togglePlayback()
     }

@@ -74,12 +74,8 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
 
     private val controllerCallback = object : MediaControllerCompat.Callback() {
         override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
-            // TODO: Update player fragment state.
-//            configure(
-//                    state.state == PlaybackStateCompat.STATE_PLAYING,
-//                    state.position,
-//                    state.bufferedPosition
-//            )
+            localPlayerFragment?.configure(state)
+            castPlayerFragment?.configure(state)
         }
     }
 

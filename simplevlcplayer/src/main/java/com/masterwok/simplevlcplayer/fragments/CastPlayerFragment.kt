@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.app.BundleCompat
 import android.support.v4.app.Fragment
+import android.support.v4.media.session.PlaybackStateCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -66,6 +67,10 @@ internal class CastPlayerFragment : Fragment()
             container,
             false
     )
+
+    fun configure(state: PlaybackStateCompat) {
+
+    }
 
     override fun onPlayPauseButtonClicked() {
     }

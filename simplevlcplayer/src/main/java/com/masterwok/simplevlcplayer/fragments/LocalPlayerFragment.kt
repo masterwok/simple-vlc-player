@@ -129,11 +129,15 @@ internal class LocalPlayerFragment : Fragment()
     override fun onStart() {
         super.onStart()
 
+        serviceBinder?.callback = this
+
         startPlayback()
     }
 
     override fun onPause() {
         stopPlayback()
+
+        serviceBinder?.callback = null
 
         super.onPause()
     }
@@ -249,6 +253,11 @@ internal class LocalPlayerFragment : Fragment()
     }
 
     override fun onPlayerSeekStateChange(canSeek: Boolean) {
+        if (!canSeek) {
+            return
+        }
+
+        serviceBinder?.setTime(resumeTime)
     }
 
     override fun onPlayerPlaying() {

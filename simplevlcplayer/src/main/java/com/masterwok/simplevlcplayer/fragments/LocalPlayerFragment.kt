@@ -16,17 +16,24 @@ import android.support.v4.app.BundleCompat
 import android.support.v4.app.Fragment
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ProgressBar
 import com.masterwok.simplevlcplayer.R
+import com.masterwok.simplevlcplayer.common.AndroidJob
 import com.masterwok.simplevlcplayer.common.extensions.getName
+import com.masterwok.simplevlcplayer.common.extensions.setColor
 import com.masterwok.simplevlcplayer.common.utils.ResourceUtil
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent
 import com.masterwok.simplevlcplayer.constants.SizePolicy
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer
 import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder
 import kotlinx.android.synthetic.main.fragment_player_local.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.videolan.libvlc.IVLCVout
 import org.videolan.libvlc.Media
 
@@ -60,7 +67,10 @@ internal class LocalPlayerFragment : Fragment()
     private var resumeLength: Long = 0
     private var resumeTime: Long = 0
 
+    private val rootJob: AndroidJob = AndroidJob(lifecycle)
     private val handler = Handler()
+
+    private lateinit var progressBar: ProgressBar
 
     companion object {
 
@@ -150,6 +160,7 @@ internal class LocalPlayerFragment : Fragment()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initProgressBar()
         subscribeToViewComponents()
         configureSubtitleSurface()
     }
@@ -319,6 +330,7 @@ internal class LocalPlayerFragment : Fragment()
     }
 
     override fun onPlayerOpening() {
+        // Intentionally left blank..
     }
 
     override fun onPlayerSeekStateChange(canSeek: Boolean) {
@@ -330,30 +342,72 @@ internal class LocalPlayerFragment : Fragment()
     }
 
     override fun onPlayerPlaying() {
+        // Intentionally left blank..
     }
 
     override fun onPlayerPaused() {
+        // Intentionally left blank..
     }
 
     override fun onPlayerStopped() {
+        // Intentionally left blank..
     }
 
     override fun onPlayerEndReached() {
+        activity?.finish()
     }
 
     override fun onPlayerError() {
+        // Intentionally left blank..
     }
 
     override fun onPlayerTimeChange(timeChanged: Long) {
+        // Intentionally left blank..
     }
 
     override fun onBuffering(buffering: Float) {
+        if (buffering == 100f) {
+            launch(UI, parent = rootJob) { progressBar.visibility = View.GONE }
+            return
+        }
+
+        if (progressBar.visibility == View.VISIBLE) {
+            return
+        }
+
+        launch(UI, parent = rootJob) { progressBar.visibility = View.VISIBLE }
     }
 
     override fun onPlayerPositionChanged(positionChanged: Float) {
+        // Intentionally left blank..
     }
 
     override fun onSubtitlesCleared() = startPlayback()
+
+    private fun initProgressBar() {
+        val context = requireContext()
+
+        progressBar = ProgressBar(
+                context
+                , null
+                , android.R.attr.progressBarStyleLarge
+        ).apply {
+            visibility = View.GONE
+            setColor(R.color.progress_bar_spinner)
+        }
+
+        val params = FrameLayout.LayoutParams(
+                ResourceUtil.getDimenDp(context, R.dimen.player_spinner_width),
+                ResourceUtil.getDimenDp(context, R.dimen.player_spinner_height)
+        ).apply {
+            gravity = Gravity.CENTER
+        }
+
+        (view as ViewGroup).addView(
+                progressBar
+                , params
+        )
+    }
 
     private fun changeMediaPlayerLayout(displayW: Int, displayH: Int) {
         /* Change the video placement using the MediaPlayer API */

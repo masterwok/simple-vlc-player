@@ -5,6 +5,10 @@ import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.app.BundleCompat
 import android.support.v4.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.masterwok.simplevlcplayer.R
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent
 import com.masterwok.simplevlcplayer.contracts.MediaPlayer
 import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder
@@ -32,24 +36,34 @@ internal class CastPlayerFragment : Fragment()
 
         @JvmStatic
         fun createInstance(
-                mediaUri: Uri
-                , mediaPlayerServiceBinder: MediaPlayerServiceBinder
+                mediaPlayerServiceBinder: MediaPlayerServiceBinder
+                , mediaUri: Uri
                 , subtitleUri: Uri?
                 , subtitleDestinationUri: Uri
-                , subtitlesLanguageCode: String
+                , subtitleLanguageCode: String
                 , openSubtitlesUserAgent: String
         ): CastPlayerFragment = CastPlayerFragment().apply {
             arguments = Bundle().apply {
                 putParcelable(MediaUriKey, mediaUri)
                 putParcelable(SubtitleUriKey, subtitleUri)
                 putParcelable(SubtitleDestinationUriKey, subtitleDestinationUri)
-                putString(SubtitleLanguageCodeKey, subtitlesLanguageCode)
+                putString(SubtitleLanguageCodeKey, subtitleLanguageCode)
                 putString(OpenSubtitlesUserAgentKey, openSubtitlesUserAgent)
 
                 BundleCompat.putBinder(this, MediaPlayerServiceBinder, mediaPlayerServiceBinder)
             }
         }
     }
+
+    override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View? = inflater.inflate(
+            R.layout.fragment_player_renderer,
+            container,
+            false
+    )
 
     override fun onPlayPauseButtonClicked() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -114,7 +128,6 @@ internal class CastPlayerFragment : Fragment()
     override fun onSubtitlesCleared() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
 
 }
 

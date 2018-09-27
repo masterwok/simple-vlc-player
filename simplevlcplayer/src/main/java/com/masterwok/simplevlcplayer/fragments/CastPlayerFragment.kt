@@ -27,6 +27,8 @@ internal class CastPlayerFragment : Fragment()
 
     companion object {
 
+        const val Tag = "tag.castplayerfragment"
+
         private const val MediaPlayerServiceBinder = "bundle.mediaplayerservicebinder"
         private const val MediaUriKey = "bundle.mediauri"
         private const val SubtitleUriKey = "bundle.subtitleuri"

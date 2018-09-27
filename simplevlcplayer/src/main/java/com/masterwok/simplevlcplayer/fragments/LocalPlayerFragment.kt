@@ -57,6 +57,8 @@ internal class LocalPlayerFragment : Fragment()
 
     companion object {
 
+        const val Tag = "tag.localplayerfragment"
+
         private const val MediaPlayerServiceBinder = "bundle.mediaplayerservicebinder"
         private const val MediaUriKey = "bundle.mediauri"
         private const val SubtitleUriKey = "bundle.subtitleuri"

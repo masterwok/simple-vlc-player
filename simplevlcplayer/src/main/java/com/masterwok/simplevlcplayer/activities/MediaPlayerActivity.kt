@@ -36,7 +36,7 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
 
             when (action) {
                 MediaPlayerService.RendererClearedAction -> showLocalPlayerFragment(mediaPlayerServiceBinder!!)
-                MediaPlayerService.RendererSelectionAction -> showRendererPlayerFragment(mediaPlayerServiceBinder!!)
+                MediaPlayerService.RendererSelectionAction -> showCastPlayerFragment(mediaPlayerServiceBinder!!)
             }
         }
     }
@@ -85,54 +85,56 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
 
     private fun createLocalPlayerFragment(
             serviceBinder: MediaPlayerServiceBinder
-    ): LocalPlayerFragment = LocalPlayerFragment.createInstance(
-            mediaPlayerServiceBinder = serviceBinder
-            , mediaUri = intent.getParcelableExtra(MediaUri)
-            , subtitleUri = intent.getParcelableExtra(SubtitleUri)
-            , subtitleDestinationUri = intent.getParcelableExtra(SubtitleDestinationUri)
-            , openSubtitlesUserAgent = intent.getStringExtra(OpenSubtitlesUserAgent)
-            , subtitleLanguageCode = intent.getStringExtra(SubtitleLanguageCode)
-    )
+    ): LocalPlayerFragment = supportFragmentManager
+            .findFragmentByTag(LocalPlayerFragment.Tag) as? LocalPlayerFragment
+            ?: LocalPlayerFragment.createInstance(
+                    mediaPlayerServiceBinder = serviceBinder
+                    , mediaUri = intent.getParcelableExtra(MediaUri)
+                    , subtitleUri = intent.getParcelableExtra(SubtitleUri)
+                    , subtitleDestinationUri = intent.getParcelableExtra(SubtitleDestinationUri)
+                    , openSubtitlesUserAgent = intent.getStringExtra(OpenSubtitlesUserAgent)
+                    , subtitleLanguageCode = intent.getStringExtra(SubtitleLanguageCode)
+            )
 
     private fun createCastPlayerFragment(
             serviceBinder: MediaPlayerServiceBinder
-    ): CastPlayerFragment = CastPlayerFragment.createInstance(
-            mediaPlayerServiceBinder = serviceBinder
-            , mediaUri = intent.getParcelableExtra(MediaUri)
-            , subtitleUri = intent.getParcelableExtra(SubtitleUri)
-            , subtitleDestinationUri = intent.getParcelableExtra(SubtitleDestinationUri)
-            , openSubtitlesUserAgent = intent.getStringExtra(OpenSubtitlesUserAgent)
-            , subtitleLanguageCode = intent.getStringExtra(SubtitleLanguageCode)
-    )
+    ): CastPlayerFragment = supportFragmentManager
+            .findFragmentByTag(CastPlayerFragment.Tag) as? CastPlayerFragment
+            ?: CastPlayerFragment.createInstance(
+                    mediaPlayerServiceBinder = serviceBinder
+                    , mediaUri = intent.getParcelableExtra(MediaUri)
+                    , subtitleUri = intent.getParcelableExtra(SubtitleUri)
+                    , subtitleDestinationUri = intent.getParcelableExtra(SubtitleDestinationUri)
+                    , openSubtitlesUserAgent = intent.getStringExtra(OpenSubtitlesUserAgent)
+                    , subtitleLanguageCode = intent.getStringExtra(SubtitleLanguageCode)
+            )
 
-    private fun showFragment(fragment: Fragment) {
-        supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.framelayout_fragment_container, fragment)
-                .commit()
-    }
+    private fun showFragment(
+            fragment: Fragment
+            , tag: String
+    ) = supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.framelayout_fragment_container, fragment, tag)
+            .commit()
 
     private fun showLocalPlayerFragment(mediaPlayerServiceBinder: MediaPlayerServiceBinder) {
         castPlayerFragment = null
         localPlayerFragment = createLocalPlayerFragment(mediaPlayerServiceBinder)
-        showFragment(localPlayerFragment!!)
+        showFragment(localPlayerFragment!!, LocalPlayerFragment.Tag)
     }
 
-    private fun showRendererPlayerFragment(mediaPlayerServiceBinder: MediaPlayerServiceBinder) {
+    private fun showCastPlayerFragment(mediaPlayerServiceBinder: MediaPlayerServiceBinder) {
         localPlayerFragment = null
         castPlayerFragment = createCastPlayerFragment(mediaPlayerServiceBinder)
-        showFragment(castPlayerFragment!!)
+        showFragment(castPlayerFragment!!, CastPlayerFragment.Tag)
     }
 
-    private fun registerRendererBroadcastReceiver() {
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(MediaPlayerService.RendererClearedAction)
-        intentFilter.addAction(MediaPlayerService.RendererSelectionAction)
-
-        LocalBroadcastManager
-                .getInstance(this)
-                .registerReceiver(broadCastReceiver, intentFilter)
-    }
+    private fun registerRendererBroadcastReceiver() = LocalBroadcastManager
+            .getInstance(this)
+            .registerReceiver(broadCastReceiver, IntentFilter().apply {
+                addAction(MediaPlayerService.RendererClearedAction)
+                addAction(MediaPlayerService.RendererSelectionAction)
+            })
 
     private fun bindMediaPlayerService() = bindService(
             Intent(applicationContext, MediaPlayerService::class.java)

@@ -6,9 +6,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.IBinder
 import android.support.v4.app.BundleCompat
 import android.support.v4.app.Fragment
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -62,6 +63,11 @@ internal class LocalPlayerFragment : Fragment()
         private const val SubtitleDestinationUriKey = "bundle.subtitledestinationuri"
         private const val SubtitleLanguageCodeKey = "bundle.subtitlelanguagecode"
         private const val OpenSubtitlesUserAgentKey = "bundle.useragent"
+
+        const val SetProvidedSubtitleKey = "bundle.setprovidedsubtitleonnextplayback"
+        const val IsPlayingKey = "bundle.isplaying"
+        const val LengthKey = "bundle.length"
+        const val TimeKey = "bundle.time"
 
         @JvmStatic
         fun createInstance(
@@ -124,9 +130,66 @@ internal class LocalPlayerFragment : Fragment()
         startPlayback()
     }
 
+    override fun onPause() {
+        stopPlayback()
+
+        super.onPause()
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         updateVideoSurfaces()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        val selectedSubtitleUri = serviceBinder?.selectedSubtitleUri
+
+        super.onSaveInstanceState(outState.apply {
+            putBoolean(SetProvidedSubtitleKey, selectedSubtitleUri === subtitleUri)
+            putBoolean(IsPlayingKey, resumeIsPlaying)
+            putLong(TimeKey, resumeTime)
+            putLong(LengthKey, resumeLength)
+        })
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+
+        if (savedInstanceState == null) {
+            return
+        }
+
+        setProvidedSubtitle = savedInstanceState.getBoolean(SetProvidedSubtitleKey)
+        resumeIsPlaying = savedInstanceState.getBoolean(IsPlayingKey, true)
+        resumeTime = savedInstanceState.getLong(TimeKey, 0)
+        resumeLength = savedInstanceState.getLong(LengthKey, 0)
+
+        // TODO: Reconfigure LocalPlayerFragment UI on resume.
+//        configure(
+//                resumeIsPlaying,
+//                resumeTime,
+//                resumeLength
+//        )
+    }
+
+    private fun updateResumeState() {
+        val activity = activity ?: return
+
+        val playbackState = MediaControllerCompat
+                .getMediaController(activity)
+                .playbackState
+
+        resumeIsPlaying = playbackState.state == PlaybackStateCompat.STATE_PLAYING
+        resumeTime = playbackState.position
+        resumeLength = playbackState.bufferedPosition
+    }
+
+    private fun stopPlayback() {
+        surfaceViewSubtitle.removeOnLayoutChangeListener(surfaceLayoutListener)
+
+        updateResumeState()
+        serviceBinder?.stop()
+        detachSurfaces()
     }
 
     private fun attachSurfaces() {
@@ -140,6 +203,8 @@ internal class LocalPlayerFragment : Fragment()
                 , this
         )
     }
+
+    private fun detachSurfaces() = serviceBinder?.detachSurfaces()
 
     private fun startPlayback() {
         surfaceViewMedia.addOnLayoutChangeListener(surfaceLayoutListener)
@@ -268,14 +333,16 @@ internal class LocalPlayerFragment : Fragment()
 
 
     private fun updateVideoSurfaces() {
-        if (serviceBinder == null) {
+        if (activity == null || serviceBinder == null) {
             return
         }
 
-        val activity = requireActivity()
+        val decorView = requireActivity()
+                .window
+                .decorView
 
-        val sw = activity.window.decorView.width
-        val sh = activity.window.decorView.height
+        val sw = decorView.width
+        val sh = decorView.height
 
         // sanity check
         if (sw * sh == 0) {
@@ -429,7 +496,7 @@ internal class LocalPlayerFragment : Fragment()
 //        , IVLCVout.OnNewVideoLayoutListener {
 //
 //    companion object {
-//        const val SetProvidedSubtitle = "bundle.setprovidedsubtitleonnextplayback"
+//        const val SetProvidedSubtitleKey = "bundle.setprovidedsubtitleonnextplayback"
 //        const val IsPlayingKey = "bundle.isplaying"
 //        const val LengthKey = "bundle.length"
 //        const val TimeKey = "bundle.time"
@@ -577,7 +644,7 @@ internal class LocalPlayerFragment : Fragment()
 //            return
 //        }
 //
-//        setProvidedSubtitle = savedInstanceState.getBoolean(SetProvidedSubtitle)
+//        setProvidedSubtitle = savedInstanceState.getBoolean(SetProvidedSubtitleKey)
 //        resumeIsPlaying = savedInstanceState.getBoolean(IsPlayingKey, true)
 //        resumeTime = savedInstanceState.getLong(TimeKey, 0)
 //        resumeLength = savedInstanceState.getLong(LengthKey, 0)
@@ -592,7 +659,7 @@ internal class LocalPlayerFragment : Fragment()
 //    override fun onSaveInstanceState(outState: Bundle) {
 //        val selectedSubtitleUri = serviceBinder?.selectedSubtitleUri
 //
-//        outState.putBoolean(SetProvidedSubtitle, selectedSubtitleUri === subtitleUri)
+//        outState.putBoolean(SetProvidedSubtitleKey, selectedSubtitleUri === subtitleUri)
 //        outState.putBoolean(IsPlayingKey, resumeIsPlaying)
 //        outState.putLong(TimeKey, resumeTime)
 //        outState.putLong(LengthKey, resumeLength)

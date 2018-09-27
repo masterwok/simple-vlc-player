@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.os.IBinder
 import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import com.masterwok.simplevlcplayer.R
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableAppCompatActivity
 import com.masterwok.simplevlcplayer.fragments.BasePlayerFragment
@@ -23,6 +25,7 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
         const val SubtitleLanguageCode = BasePlayerFragment.SubtitleLanguageCode
     }
 
+    private var mediaController: MediaControllerCompat? = null
     private var mediaPlayerServiceBinder: MediaPlayerServiceBinder? = null
     private var localPlayerFragment: LocalPlayerFragment? = null
     private var castPlayerFragment: CastPlayerFragment? = null
@@ -42,11 +45,41 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
         override fun onServiceConnected(componentName: ComponentName, iBinder: IBinder) {
             mediaPlayerServiceBinder = iBinder as MediaPlayerServiceBinder
 
+            registerMediaController(iBinder)
+
             showLocalPlayerFragment(iBinder)
         }
 
         override fun onServiceDisconnected(componentName: ComponentName) {
             mediaPlayerServiceBinder = null
+
+            mediaController?.unregisterCallback(controllerCallback)
+        }
+    }
+
+    private fun registerMediaController(serviceBinder: MediaPlayerServiceBinder?) {
+        if (serviceBinder == null) {
+            return
+        }
+
+        mediaController = MediaControllerCompat(
+                this,
+                serviceBinder.mediaSession!!
+        ).apply {
+            registerCallback(controllerCallback)
+        }
+
+        MediaControllerCompat.setMediaController(this, mediaController)
+    }
+
+    private val controllerCallback = object : MediaControllerCompat.Callback() {
+        override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
+            // TODO: Update player fragment state.
+//            configure(
+//                    state.state == PlaybackStateCompat.STATE_PLAYING,
+//                    state.position,
+//                    state.bufferedPosition
+//            )
         }
     }
 
@@ -124,6 +157,8 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
 
     override fun onStop() {
         unbindService(mediaPlayerServiceConnection)
+
+        mediaController?.unregisterCallback(controllerCallback)
 
         LocalBroadcastManager
                 .getInstance(this)

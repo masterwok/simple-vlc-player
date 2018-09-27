@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.masterwok.simplevlcplayer.R
+import com.masterwok.simplevlcplayer.common.extensions.getName
 import com.masterwok.simplevlcplayer.common.utils.ResourceUtil
 import com.masterwok.simplevlcplayer.components.PlayerControlComponent
 import com.masterwok.simplevlcplayer.constants.SizePolicy
@@ -126,6 +127,16 @@ internal class LocalPlayerFragment : Fragment()
             false
     )
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        subscribeToViewComponents()
+    }
+
+    private fun subscribeToViewComponents() {
+        componentPlayerControl.registerCallback(this)
+    }
+
     override fun onStart() {
         super.onStart()
 
@@ -233,7 +244,7 @@ internal class LocalPlayerFragment : Fragment()
         }
     }
 
-    fun configure(
+    private fun configure(
             isPlaying: Boolean,
             time: Long,
             length: Long
@@ -244,18 +255,33 @@ internal class LocalPlayerFragment : Fragment()
     )
 
     override fun onPlayPauseButtonClicked() {
+        serviceBinder?.togglePlayback()
     }
 
-    override fun onCastButtonClicked() {
-    }
+    override fun onCastButtonClicked() = RendererItemDialogFragment().show(
+            fragmentManager,
+            RendererItemDialogFragment.Tag
+    )
 
     override fun onProgressChanged(progress: Int) {
+        serviceBinder?.setProgress(progress)
+        serviceBinder?.play()
     }
 
     override fun onProgressChangeStarted() {
+        serviceBinder?.pause()
     }
 
     override fun onSubtitlesButtonClicked() {
+        val fragmentManager = fragmentManager ?: return
+
+        SubtitlesDialogFragment.createInstance(
+                mediaUri.getName(requireContext())
+                , subtitleUri
+                , openSubtitlesUserAgent
+                , subtitleLanguageCode
+                , subtitleDestinationUri
+        ).show(fragmentManager, SubtitlesDialogFragment.Tag)
     }
 
     override fun onPlayerOpening() {

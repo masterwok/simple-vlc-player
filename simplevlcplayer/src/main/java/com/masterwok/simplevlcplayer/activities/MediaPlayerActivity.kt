@@ -47,7 +47,11 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
 
             registerMediaController(iBinder)
 
-            showLocalPlayerFragment(iBinder)
+            if (mediaPlayerServiceBinder?.selectedRendererItem == null) {
+                showLocalPlayerFragment(iBinder)
+            } else {
+                showCastPlayerFragment(iBinder)
+            }
         }
 
         override fun onServiceDisconnected(componentName: ComponentName) {

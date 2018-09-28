@@ -20,6 +20,7 @@
         android:id="@+id/componentPlayerControl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:hasSelectedRenderer="true"/>
+        app:hasSelectedRenderer="true"
+        app:showSubtitleMenuItem="false"/>
 
 </FrameLayout>

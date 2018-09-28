@@ -31,6 +31,7 @@ public class PlayerControlComponent
     private boolean isTrackingTouch;
     private Callback callback;
     private boolean hasSelectedRenderer;
+    private boolean showSubtitleMenuItem;
 
     public PlayerControlComponent(Context context) {
         super(context);
@@ -84,6 +85,11 @@ public class PlayerControlComponent
         subscribeToViewComponents();
         startToolbarHideTimer();
 
+        if (!showSubtitleMenuItem) {
+            toolbarHeader.inflateMenu(R.menu.media_player_no_subtitle_item);
+            return;
+        }
+
         if (hasSelectedRenderer) {
             toolbarHeader.inflateMenu(R.menu.media_player_renderer);
         } else {
@@ -104,10 +110,14 @@ public class PlayerControlComponent
         );
 
         hasSelectedRenderer = styledAttributes.getBoolean(
-                R.styleable.PlayerControlComponent_hasSelectedRenderer,
+                R.styleable.PlayerControlComponent_showSubtitleMenuItem,
                 false
         );
 
+        showSubtitleMenuItem = styledAttributes.getBoolean(
+                R.styleable.PlayerControlComponent_showSubtitleMenuItem,
+                true
+        );
 
         styledAttributes.recycle();
     }
@@ -131,9 +141,9 @@ public class PlayerControlComponent
         toolbarHeader.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
 
-            if(itemId == R.id.menu_item_cast) {
+            if (itemId == R.id.menu_item_cast) {
                 callback.onCastButtonClicked();
-            } else if(itemId == R.id.menu_item_subtitles) {
+            } else if (itemId == R.id.menu_item_subtitles) {
                 callback.onSubtitlesButtonClicked();
             }
 

@@ -83,7 +83,7 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
         }
     }
 
-    private fun createLocalPlayerFragment(
+    private fun getLocalPlayerFragment(
             serviceBinder: MediaPlayerServiceBinder
     ): LocalPlayerFragment = supportFragmentManager
             .findFragmentByTag(LocalPlayerFragment.Tag) as? LocalPlayerFragment
@@ -96,7 +96,7 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
                     , subtitleLanguageCode = intent.getStringExtra(SubtitleLanguageCode)
             )
 
-    private fun createCastPlayerFragment(
+    private fun getCastPlayerFragment(
             serviceBinder: MediaPlayerServiceBinder
     ): CastPlayerFragment = supportFragmentManager
             .findFragmentByTag(CastPlayerFragment.Tag) as? CastPlayerFragment
@@ -119,13 +119,15 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
 
     private fun showLocalPlayerFragment(mediaPlayerServiceBinder: MediaPlayerServiceBinder) {
         castPlayerFragment = null
-        localPlayerFragment = createLocalPlayerFragment(mediaPlayerServiceBinder)
+        localPlayerFragment = getLocalPlayerFragment(mediaPlayerServiceBinder)
+
         showFragment(localPlayerFragment!!, LocalPlayerFragment.Tag)
     }
 
     private fun showCastPlayerFragment(mediaPlayerServiceBinder: MediaPlayerServiceBinder) {
         localPlayerFragment = null
-        castPlayerFragment = createCastPlayerFragment(mediaPlayerServiceBinder)
+        castPlayerFragment = getCastPlayerFragment(mediaPlayerServiceBinder)
+
         showFragment(castPlayerFragment!!, CastPlayerFragment.Tag)
     }
 

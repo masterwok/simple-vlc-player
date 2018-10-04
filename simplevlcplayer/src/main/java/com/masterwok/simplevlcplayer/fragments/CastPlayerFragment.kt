@@ -66,7 +66,11 @@ internal class CastPlayerFragment : Fragment()
                 putString(SubtitleLanguageCodeKey, subtitleLanguageCode)
                 putString(OpenSubtitlesUserAgentKey, openSubtitlesUserAgent)
 
-                BundleCompat.putBinder(this, MediaPlayerServiceBinder, mediaPlayerServiceBinder)
+                BundleCompat.putBinder(
+                        this
+                        , MediaPlayerServiceBinder
+                        , mediaPlayerServiceBinder
+                )
             }
         }
     }

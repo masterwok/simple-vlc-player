@@ -481,7 +481,7 @@ internal class LocalPlayerFragment : Fragment()
             return
         }
 
-        serviceBinder!!.vOut!!.setWindowSize(sw, sh)
+        serviceBinder?.vOut?.setWindowSize(sw, sh)
 
         var lp = surfaceViewMedia.layoutParams
 
@@ -500,8 +500,8 @@ internal class LocalPlayerFragment : Fragment()
 
         if (lp.width == lp.height && lp.width == ViewGroup.LayoutParams.MATCH_PARENT) {
             /* We handle the placement of the video using Android View LayoutParams */
-            serviceBinder!!.setAspectRatio(null)
-            serviceBinder!!.setScale(0f)
+            serviceBinder?.setAspectRatio(null)
+            serviceBinder?.setScale(0f)
         }
 
         var dw = sw.toDouble()

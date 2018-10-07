@@ -143,11 +143,10 @@ internal class CastPlayerFragment : Fragment()
 
     override fun onProgressChanged(progress: Int) {
         serviceBinder?.setProgress(progress)
-        serviceBinder?.play()
     }
 
     override fun onProgressChangeStarted() {
-        serviceBinder?.pause()
+        // Intentionally left blank..
     }
 
     override fun onSubtitlesButtonClicked() {

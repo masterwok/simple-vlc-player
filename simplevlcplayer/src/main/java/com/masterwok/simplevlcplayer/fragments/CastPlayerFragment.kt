@@ -23,15 +23,9 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 
 
-internal class CastPlayerFragment : Fragment()
+internal class CastPlayerFragment : MediaPlayerServiceFragment()
         , PlayerControlComponent.Callback
         , MediaPlayer.Callback {
-
-    private val serviceBinder: MediaPlayerServiceBinder?
-        get() = BundleCompat.getBinder(
-                arguments!!
-                , MediaPlayerServiceBinder
-        ) as? MediaPlayerServiceBinder
 
     private val mediaUri: Uri get() = arguments!!.getParcelable(MediaUriKey)
 
@@ -43,7 +37,6 @@ internal class CastPlayerFragment : Fragment()
 
         const val Tag = "tag.castplayerfragment"
 
-        private const val MediaPlayerServiceBinder = "bundle.mediaplayerservicebinder"
         private const val MediaUriKey = "bundle.mediauri"
         private const val SubtitleUriKey = "bundle.subtitleuri"
         private const val SubtitleDestinationUriKey = "bundle.subtitledestinationuri"
@@ -52,8 +45,7 @@ internal class CastPlayerFragment : Fragment()
 
         @JvmStatic
         fun createInstance(
-                mediaPlayerServiceBinder: MediaPlayerServiceBinder
-                , mediaUri: Uri
+                mediaUri: Uri
                 , subtitleUri: Uri?
                 , subtitleDestinationUri: Uri
                 , subtitleLanguageCode: String
@@ -65,12 +57,6 @@ internal class CastPlayerFragment : Fragment()
                 putParcelable(SubtitleDestinationUriKey, subtitleDestinationUri)
                 putString(SubtitleLanguageCodeKey, subtitleLanguageCode)
                 putString(OpenSubtitlesUserAgentKey, openSubtitlesUserAgent)
-
-                BundleCompat.putBinder(
-                        this
-                        , MediaPlayerServiceBinder
-                        , mediaPlayerServiceBinder
-                )
             }
         }
     }
@@ -92,15 +78,6 @@ internal class CastPlayerFragment : Fragment()
         subscribeToViewComponents()
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        // Only start playback when activity is initially created.
-        if (savedInstanceState == null) {
-            startPlayback()
-        }
-    }
-
     override fun onStart() {
         super.onStart()
 
@@ -115,6 +92,10 @@ internal class CastPlayerFragment : Fragment()
 
     private fun subscribeToViewComponents() {
         componentPlayerControl.registerCallback(this)
+    }
+
+    override fun onServiceConnected() {
+        startPlayback()
     }
 
     private fun startPlayback() {

@@ -36,7 +36,7 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
 
             when (action) {
                 MediaPlayerService.RendererClearedAction -> showLocalPlayerFragment()
-                MediaPlayerService.RendererSelectionAction -> showCastPlayerFragment(mediaPlayerServiceBinder!!)
+                MediaPlayerService.RendererSelectionAction -> showCastPlayerFragment()
             }
         }
     }
@@ -50,7 +50,7 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
             if (mediaPlayerServiceBinder?.selectedRendererItem == null) {
                 showLocalPlayerFragment()
             } else {
-                showCastPlayerFragment(iBinder)
+                showCastPlayerFragment()
             }
         }
 
@@ -93,13 +93,10 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
                     , subtitleLanguageCode = intent.getStringExtra(SubtitleLanguageCode)
             )
 
-    private fun getCastPlayerFragment(
-            serviceBinder: MediaPlayerServiceBinder
-    ): CastPlayerFragment = supportFragmentManager
+    private fun getCastPlayerFragment(): CastPlayerFragment = supportFragmentManager
             .findFragmentByTag(CastPlayerFragment.Tag) as? CastPlayerFragment
             ?: CastPlayerFragment.createInstance(
-                    mediaPlayerServiceBinder = serviceBinder
-                    , mediaUri = intent.getParcelableExtra(MediaUri)
+                    mediaUri = intent.getParcelableExtra(MediaUri)
                     , subtitleUri = intent.getParcelableExtra(SubtitleUri)
                     , subtitleDestinationUri = intent.getParcelableExtra(SubtitleDestinationUri)
                     , openSubtitlesUserAgent = intent.getStringExtra(OpenSubtitlesUserAgent)
@@ -121,9 +118,9 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
         showFragment(localPlayerFragment!!, LocalPlayerFragment.Tag)
     }
 
-    private fun showCastPlayerFragment(mediaPlayerServiceBinder: MediaPlayerServiceBinder) {
+    private fun showCastPlayerFragment() {
         localPlayerFragment = null
-        castPlayerFragment = getCastPlayerFragment(mediaPlayerServiceBinder)
+        castPlayerFragment = getCastPlayerFragment()
 
         showFragment(castPlayerFragment!!, CastPlayerFragment.Tag)
     }

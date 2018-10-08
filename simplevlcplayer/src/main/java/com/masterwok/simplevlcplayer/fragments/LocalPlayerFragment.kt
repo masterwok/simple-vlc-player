@@ -38,16 +38,10 @@ import org.videolan.libvlc.IVLCVout
 import org.videolan.libvlc.Media
 
 
-internal class LocalPlayerFragment : Fragment()
+internal class LocalPlayerFragment : MediaPlayerServiceFragment()
         , PlayerControlComponent.Callback
         , MediaPlayer.Callback
         , IVLCVout.OnNewVideoLayoutListener {
-
-    private val serviceBinder: MediaPlayerServiceBinder?
-        get() = BundleCompat.getBinder(
-                arguments!!
-                , MediaPlayerServiceBinder
-        ) as? MediaPlayerServiceBinder
 
     private val mediaUri: Uri get() = arguments!!.getParcelable(MediaUriKey)
     private val subtitleUri: Uri? get() = arguments!!.getParcelable(SubtitleUriKey)
@@ -76,7 +70,6 @@ internal class LocalPlayerFragment : Fragment()
 
         const val Tag = "tag.localplayerfragment"
 
-        private const val MediaPlayerServiceBinder = "bundle.mediaplayerservicebinder"
         private const val MediaUriKey = "bundle.mediauri"
         private const val SubtitleUriKey = "bundle.subtitleuri"
         private const val SubtitleDestinationUriKey = "bundle.subtitledestinationuri"
@@ -90,8 +83,7 @@ internal class LocalPlayerFragment : Fragment()
 
         @JvmStatic
         fun createInstance(
-                mediaPlayerServiceBinder: MediaPlayerServiceBinder
-                , mediaUri: Uri
+                mediaUri: Uri
                 , subtitleUri: Uri?
                 , subtitleDestinationUri: Uri
                 , subtitleLanguageCode: String
@@ -103,8 +95,6 @@ internal class LocalPlayerFragment : Fragment()
                 putParcelable(SubtitleDestinationUriKey, subtitleDestinationUri)
                 putString(SubtitleLanguageCodeKey, subtitleLanguageCode)
                 putString(OpenSubtitlesUserAgentKey, openSubtitlesUserAgent)
-
-                BundleCompat.putBinder(this, MediaPlayerServiceBinder, mediaPlayerServiceBinder)
             }
         }
     }
@@ -172,12 +162,14 @@ internal class LocalPlayerFragment : Fragment()
     override fun onStart() {
         super.onStart()
 
-        serviceBinder?.callback = this
-
         context?.registerReceiver(
                 becomingNoisyReceiver,
                 IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
         )
+    }
+
+    override fun onServiceConnected() {
+        serviceBinder?.callback = this
 
         startPlayback()
     }

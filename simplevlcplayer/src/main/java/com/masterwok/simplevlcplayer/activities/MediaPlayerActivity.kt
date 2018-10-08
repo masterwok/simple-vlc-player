@@ -35,7 +35,7 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
             val action = intent.action ?: return
 
             when (action) {
-                MediaPlayerService.RendererClearedAction -> showLocalPlayerFragment(mediaPlayerServiceBinder!!)
+                MediaPlayerService.RendererClearedAction -> showLocalPlayerFragment()
                 MediaPlayerService.RendererSelectionAction -> showCastPlayerFragment(mediaPlayerServiceBinder!!)
             }
         }
@@ -48,7 +48,7 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
             registerMediaController(iBinder)
 
             if (mediaPlayerServiceBinder?.selectedRendererItem == null) {
-                showLocalPlayerFragment(iBinder)
+                showLocalPlayerFragment()
             } else {
                 showCastPlayerFragment(iBinder)
             }
@@ -83,13 +83,10 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
         }
     }
 
-    private fun getLocalPlayerFragment(
-            serviceBinder: MediaPlayerServiceBinder
-    ): LocalPlayerFragment = supportFragmentManager
+    private fun getLocalPlayerFragment(): LocalPlayerFragment = supportFragmentManager
             .findFragmentByTag(LocalPlayerFragment.Tag) as? LocalPlayerFragment
             ?: LocalPlayerFragment.createInstance(
-                    mediaPlayerServiceBinder = serviceBinder
-                    , mediaUri = intent.getParcelableExtra(MediaUri)
+                    mediaUri = intent.getParcelableExtra(MediaUri)
                     , subtitleUri = intent.getParcelableExtra(SubtitleUri)
                     , subtitleDestinationUri = intent.getParcelableExtra(SubtitleDestinationUri)
                     , openSubtitlesUserAgent = intent.getStringExtra(OpenSubtitlesUserAgent)
@@ -117,9 +114,9 @@ class MediaPlayerActivity : InjectableAppCompatActivity() {
             .replace(R.id.framelayout_fragment_container, fragment, tag)
             .commit()
 
-    private fun showLocalPlayerFragment(mediaPlayerServiceBinder: MediaPlayerServiceBinder) {
+    private fun showLocalPlayerFragment() {
         castPlayerFragment = null
-        localPlayerFragment = getLocalPlayerFragment(mediaPlayerServiceBinder)
+        localPlayerFragment = getLocalPlayerFragment()
 
         showFragment(localPlayerFragment!!, LocalPlayerFragment.Tag)
     }

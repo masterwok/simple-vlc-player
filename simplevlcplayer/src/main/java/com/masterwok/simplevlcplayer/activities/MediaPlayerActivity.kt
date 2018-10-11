@@ -9,20 +9,25 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.masterwok.simplevlcplayer.R
 import com.masterwok.simplevlcplayer.dagger.injectors.InjectableAppCompatActivity
-import com.masterwok.simplevlcplayer.fragments.BasePlayerFragment
 import com.masterwok.simplevlcplayer.fragments.CastPlayerFragment
 import com.masterwok.simplevlcplayer.fragments.LocalPlayerFragment
 import com.masterwok.simplevlcplayer.services.MediaPlayerService
 import com.masterwok.simplevlcplayer.services.binders.MediaPlayerServiceBinder
 
+
 class MediaPlayerActivity : InjectableAppCompatActivity() {
 
     companion object {
-        const val MediaUri = BasePlayerFragment.MediaUri
-        const val SubtitleUri = BasePlayerFragment.SubtitleUri
-        const val SubtitleDestinationUri = BasePlayerFragment.SubtitleDestinationUri
-        const val OpenSubtitlesUserAgent = BasePlayerFragment.OpenSubtitlesUserAgent
-        const val SubtitleLanguageCode = BasePlayerFragment.SubtitleLanguageCode
+        @JvmStatic
+        val MediaUri = "extra.mediauri"
+        @JvmStatic
+        val SubtitleUri = "extra.subtitleuri"
+        @JvmStatic
+        val SubtitleDestinationUri = "extra.subtitledestinationuri"
+        @JvmStatic
+        val SubtitleLanguageCode = "extra.subtitlelanguagecode"
+        @JvmStatic
+        val OpenSubtitlesUserAgent = "extra.useragent"
     }
 
     private var mediaController: MediaControllerCompat? = null

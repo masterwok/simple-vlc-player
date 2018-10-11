@@ -159,19 +159,19 @@ internal class LocalPlayerFragment : MediaPlayerServiceFragment()
         componentPlayerControl.registerCallback(this)
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onServiceConnected() {
+        serviceBinder?.callback = this
+
+        startPlayback()
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         context?.registerReceiver(
                 becomingNoisyReceiver,
                 IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
         )
-    }
-
-    override fun onServiceConnected() {
-        serviceBinder?.callback = this
-
-        startPlayback()
     }
 
     override fun onPause() {

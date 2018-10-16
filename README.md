@@ -13,7 +13,8 @@ VlcOptionsProvider
         .setOptions(
                 new VlcOptionsProvider.Builder(this)
                         .withSubtitleBackgroundOpacity(255)
-                        .withSubtitleEncoding(SubtitleEncoding.RussianKOI8R)
+                        // See R.array.subtitles_encoding_values
+                        .withSubtitleEncoding("KOI8-R")
                         .setVerbose(true)
                         .build()
         );
@@ -27,7 +28,8 @@ Intent intent = new Intent(this, MediaPlayerActivity.class);
 intent.putExtra(MediaPlayerActivity.MediaUri, videoUri);
 intent.putExtra(MediaPlayerActivity.SubtitleUri, subtitleUri);
 intent.putExtra(MediaPlayerActivity.OpenSubtitlesUserAgent, "TemporaryUserAgent")
-intent.putExtra(MediaPlayerActivity.SubtitleLanguageCode, SubtitleLanguage.Russian)
+// See R.array.language_values
+intent.putExtra(MediaPlayerActivity.SubtitleLanguageCode, "rus")
 
 startActivity(intent);
 ```
@@ -46,7 +48,7 @@ and add the following in the dependent module:
 
 ```gradle
 dependencies {
-    implementation 'com.github.masterwok:simple-vlc-player:1.1.14'
+    implementation 'com.github.masterwok:simple-vlc-player:1.1.15'
 }
 ```
 

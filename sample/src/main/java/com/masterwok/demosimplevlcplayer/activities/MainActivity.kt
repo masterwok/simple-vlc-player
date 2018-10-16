@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         VlcOptionsProvider.getInstance().options = VlcOptionsProvider
                 .Builder(this)
                 .setVerbose(true)
-                // See R.array.subtitles_encoding_list
+                // See R.array.subtitles_encoding_values
                 .withSubtitleEncoding("KOI8-R")
                 .build()
     }

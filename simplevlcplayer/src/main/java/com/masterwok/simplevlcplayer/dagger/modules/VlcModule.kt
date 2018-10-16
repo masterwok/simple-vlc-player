@@ -13,6 +13,7 @@ import org.videolan.libvlc.LibVLC
  * This module is responsible for providing VLC dependencies.
  */
 @Module
+@Suppress("unused")
 class VlcModule {
 
     @Provides

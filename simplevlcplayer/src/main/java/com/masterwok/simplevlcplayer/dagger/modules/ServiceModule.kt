@@ -6,6 +6,7 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
+@Suppress("unused")
 class ServiceModule {
 
     @Singleton

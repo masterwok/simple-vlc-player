@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModel
 import android.content.Context
 import android.net.Uri
 import com.masterwok.opensubtitlesandroid.OpenSubtitlesUrlBuilder
-import com.masterwok.opensubtitlesandroid.SubtitleLanguage
 import com.masterwok.opensubtitlesandroid.models.OpenSubtitleItem
 import com.masterwok.opensubtitlesandroid.services.contracts.OpenSubtitlesService
 import kotlinx.coroutines.experimental.CommonPool
@@ -23,7 +22,7 @@ class SubtitlesDialogFragmentViewModel @Inject constructor(
     ): List<OpenSubtitleItem> = withContext(CommonPool) {
         val url = OpenSubtitlesUrlBuilder()
                 .query(mediaName)
-                .subLanguageId(subtitleLanguageCode ?: SubtitleLanguage.English)
+                .subLanguageId(subtitleLanguageCode ?: "eng")
                 .build()
 
         val tmpUserAgent = openSubtitlesUserAgent

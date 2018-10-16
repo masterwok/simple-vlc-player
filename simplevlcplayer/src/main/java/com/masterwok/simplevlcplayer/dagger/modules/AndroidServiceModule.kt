@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
 @Module
+@Suppress("unused")
 abstract class AndroidServiceModule {
 
     @ContributesAndroidInjector

@@ -14,8 +14,6 @@ import com.masterwok.demosimplevlcplayer.extensions.appCompatRequestPermissions
 import com.masterwok.demosimplevlcplayer.extensions.isPermissionGranted
 import com.masterwok.simplevlcplayer.VlcOptionsProvider
 import com.masterwok.simplevlcplayer.activities.MediaPlayerActivity
-import com.masterwok.simplevlcplayer.constants.SubtitleEncoding
-import com.masterwok.simplevlcplayer.constants.SubtitleLanguage
 import com.nononsenseapps.filepicker.FilePickerActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -36,7 +34,8 @@ class MainActivity : AppCompatActivity() {
         VlcOptionsProvider.getInstance().options = VlcOptionsProvider
                 .Builder(this)
                 .setVerbose(true)
-                .withSubtitleEncoding(SubtitleEncoding.RussianKOI8R)
+                // See R.array.subtitles_encoding_list
+                .withSubtitleEncoding("KOI8-R")
                 .build()
     }
 
@@ -135,6 +134,8 @@ class MainActivity : AppCompatActivity() {
                 // This should be the User-Agent you registered with opensubtitles.org
                 // See: http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst
                 putExtra(MediaPlayerActivity.OpenSubtitlesUserAgent, "TemporaryUserAgent")
-                putExtra(MediaPlayerActivity.SubtitleLanguageCode, SubtitleLanguage.Russian)
+
+                // See R.array.language_values
+                putExtra(MediaPlayerActivity.SubtitleLanguageCode, "rus")
             })
 }

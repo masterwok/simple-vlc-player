@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Subtitle language display values (share index with language_values) -->
     <string-array name="language_entries">
         <item>Albanian</item>
         <item>Arabic</item>
@@ -68,6 +69,7 @@
         <item>Vietnamese</item>
     </string-array>
 
+    <!-- Subtitle language values (share index with language_entries) -->
     <string-array name="language_values">
         <item>alb</item>
         <item>ara</item>
@@ -136,6 +138,7 @@
         <item>vie</item>
     </string-array>
 
+    <!-- Subtitle encoding display names (share index with subtitles_encoding_values) -->
     <string-array name="subtitles_encoding_list" tools:ignore="TypographyDashes">
         <item>Default (Windows-1252)</item>
         <item>Universal (UTF-8)</item>
@@ -181,6 +184,7 @@
         <item>Vietnamese (Windows-1258)</item>
     </string-array>
 
+    <!-- Subtitle encoding values (share index with subtitles_encoding_list) -->
     <string-array name="subtitles_encoding_values" translatable="false" tools:ignore="TypographyDashes">
         <item></item>
         <item>UTF-8</item>

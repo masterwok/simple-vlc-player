@@ -95,6 +95,8 @@ internal class CastPlayerFragment : MediaPlayerServiceFragment()
     }
 
     override fun onServiceConnected() {
+        serviceBinder?.callback = this
+
         startPlayback()
     }
 
@@ -151,10 +153,12 @@ internal class CastPlayerFragment : MediaPlayerServiceFragment()
     }
 
     override fun onPlayerStopped() {
-        // Intentionally left blank..
+        serviceBinder?.callback = null
+        activity?.finish()
     }
 
     override fun onPlayerEndReached() {
+        serviceBinder?.callback = null
         activity?.finish()
     }
 

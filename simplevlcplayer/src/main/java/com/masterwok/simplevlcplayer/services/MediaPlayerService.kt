@@ -459,6 +459,10 @@ class MediaPlayerService : InjectableService(), MediaPlayer.Callback, Dialog.Cal
             player?.pause()
         }
 
+        override fun onStop() {
+            super.onStop()
+        }
+
         override fun onMediaButtonEvent(mediaButtonEvent: Intent): Boolean {
             val action = mediaButtonEvent.action
 

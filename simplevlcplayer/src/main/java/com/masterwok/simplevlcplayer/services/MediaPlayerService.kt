@@ -78,7 +78,7 @@ class MediaPlayerService : InjectableService(), MediaPlayer.Callback, Dialog.Cal
         private const val MediaPlayerServiceChannelName = "Media Player Service"
         private const val MediaPlayerServiceChannelId = "channel.mediaplayerservice"
         private const val SimpleVlcSessionTag = "tag.simplevlcsession"
-        private const val MediaPlayerServiceNotificationId = 32106
+        private const val MediaPlayerServiceNotificationId = 1
 
         private fun getPauseAction(context: Context): NotificationCompat.Action {
             return NotificationCompat.Action(

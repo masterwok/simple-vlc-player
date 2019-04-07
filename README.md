@@ -3,6 +3,10 @@
 # simple-vlc-player
 An Android media player library powered by [LibVLC](https://wiki.videolan.org/LibVLC/) and [Open Subtitles](http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst).
 
+## Notice
+
+I'm currently unable to maintain this project. There are a few open issues that need to be resolved. Pull requests are welcome.
+
 ## Usage
 
 Options can be provided for the initialization of LibVLC by using the ```VlcOptionsProvider``` singleton. This optional configuration should only be provided once during app initialization, or at some point before starting the ```MediaPlayerActivity```. If no options are provided, then a default configuration is provided when initializing LibVLC. To make life easier, the ```VlcOptionsProvider.Builder``` class is available to help build a list of common options. If an option is not provided to the builder, then the default value for that option is used. For example, the following enables LibVLC verbose logging, sets the subtitle background opactiy, and sets the subtitle encoding:

@@ -1,6 +1,9 @@
 [![Release](https://jitpack.io/v/masterwok/simple-vlc-player.svg)](https://jitpack.io/#masterwok/simple-vlc-player)
 
-# simple-vlc-player
+# [deprecatged] simple-vlc-player
+
+I'm not longer maintaining this project due to time constraints.
+
 An Android media player library powered by [LibVLC](https://wiki.videolan.org/LibVLC/) and [Open Subtitles](http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst).
 
 ## Notice

@@ -1,6 +1,6 @@
 [![Release](https://jitpack.io/v/masterwok/simple-vlc-player.svg)](https://jitpack.io/#masterwok/simple-vlc-player)
 
-# [deprecatged] simple-vlc-player
+# [deprecated] simple-vlc-player
 
 I'm not longer maintaining this project due to time constraints.
 

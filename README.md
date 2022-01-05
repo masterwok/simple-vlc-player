@@ -2,7 +2,7 @@
 
 # [deprecated] simple-vlc-player
 
-I'm not longer maintaining this project due to time constraints.
+**I'm no longer maintaining this project due to time constraints.**
 
 An Android media player library powered by [LibVLC](https://wiki.videolan.org/LibVLC/) and [Open Subtitles](http://trac.opensubtitles.org/projects/opensubtitles/wiki/DevReadFirst).
 
